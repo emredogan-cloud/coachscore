@@ -17,8 +17,8 @@ definitions come from the master execution prompt; gating conditions come from
 |------|-------|-------|------|
 | 0 | Foundation (repo, CI/CD, ADRs, Game-Data Reference Table) | ✅ done | — |
 | 1 | Deterministic Scoring Engine | ✅ done | — |
-| 2 | AI Pipeline (Claude) + schema validation + anti-hallucination | ⛔ gated | `ANTHROPIC_API_KEY` |
-| 3 | Data Intake (tag / screenshot / manual + confidence) | ⛔ gated | Supabase + R2 + (Haiku for OCR) |
+| 2 | AI Pipeline (Claude) + schema validation + anti-hallucination | ✅ done | — (real `ANTHROPIC_API_KEY` available) |
+| 3 | Data Intake (tag / screenshot / manual + confidence) | ⛔ gated | Supabase + R2 |
 | 4 | Web Product (onboarding, teaser, score reveal, report, payments) | ⛔ gated | Stripe + Supabase + Resend |
 | 5 | Coach Marketplace Infrastructure | ⛔ gated | Stripe Connect (+ Wise/Payoneer) |
 | 6 | Additional SKUs (ReplayDoctor, BaseDoctor, WarPlan) | ⛔ gated | depends on P5 |
@@ -46,11 +46,27 @@ definitions come from the master execution prompt; gating conditions come from
   TH14 war-goal composite ≈ 85 / Grade A). **Property tests** assert range,
   weight-sum, and determinism.
 
-## Credential gate (why phases 2+ stop here)
+## Phase 2 — AI Pipeline ✅
 
-The autonomous-execution rule stops on an unavailable credential. Phases 2+
-require live third-party services with no keys present in this environment
-(`ANTHROPIC_API_KEY`, Supabase, Stripe, Cloudflare R2, PostHog). Their
-secret-free logic (schemas, validators, prompt-injection guards, pure
-calculations) can still be implemented and unit-tested behind interfaces; live
-wiring resumes the moment the corresponding credential is provided.
+- Real Anthropic provider behind a swappable interface (Opus reasoning + Haiku
+  extraction); forced tool use → JSON-Schema-validated structured output.
+- Anti-hallucination (ADR 0005): the roadmap is verified against the engine's
+  gap list (exact element ids + from/to levels); the model cannot invent stats.
+- Confidence scoring + low-confidence → human-review flag; prompt-injection
+  defense (untrusted user text wrapped as data, never instructions).
+- Curated, versioned knowledge base injected at inference.
+- OCR/extraction (vision) with per-field confidence routing.
+- Durable queue runner: idempotency + bounded retries + backoff + dead-letter
+  (transport-agnostic; in-memory store now, Redis/Postgres later).
+- Reference-data readiness gate isolates `needsVerification` data from PAID
+  generation (`assertPaidReportAllowed`).
+- 92 unit tests (no API) + a **live integration test** that hits the real
+  Anthropic API (run via `pnpm test:integration`; self-skips without a key, so
+  public CI stays green without putting a paid key in a public repo).
+
+## Credential gate (why phases 3+ stop here)
+
+Phases 3+ require live third-party services with no keys present
+(Supabase, Cloudflare R2, Stripe, PostHog, Resend). Their secret-free logic can
+still be implemented and unit-tested behind interfaces; live wiring resumes the
+moment the corresponding credential is provided.
