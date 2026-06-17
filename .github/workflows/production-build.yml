@@ -43,7 +43,7 @@ jobs:
           echo "Build artifact verified — BUILD_ID=$(cat .next/BUILD_ID)"
 
       - name: Upload production build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: next-build
           path: |
