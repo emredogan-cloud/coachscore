@@ -1,0 +1,58 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches: ['**']
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    name: Coverage thresholds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Enable Corepack (pins pnpm via packageManager)
+        run: corepack enable
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Tests with coverage (thresholds enforced in vitest.config.ts)
+        run: pnpm test:coverage
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 14
+
+  hygiene:
+    name: Formatting + no focused tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Enable Corepack (pins pnpm via packageManager)
+        run: corepack enable
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Prettier (format check)
+        run: pnpm format:check
+      - name: Guard against focused/skipped tests landing on a branch
+        run: |
+          if grep -rnE "\.(only|skip)\(" tests lib --include="*.test.ts"; then
+            echo "::error::Focused or skipped tests detected (.only/.skip). Remove before merge."
+            exit 1
+          fi
+          echo "No focused or skipped tests."

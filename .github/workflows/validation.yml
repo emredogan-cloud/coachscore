@@ -1,0 +1,48 @@
+name: Validation
+
+on:
+  pull_request:
+  push:
+    branches: ['**']
+
+concurrency:
+  group: validation-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Format · Lint · Typecheck · Test · Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack (pins pnpm via packageManager)
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prettier (format check)
+        run: pnpm format:check
+
+      - name: ESLint (no warnings allowed)
+        run: pnpm lint --max-warnings=0
+
+      - name: TypeScript (strict, no emit)
+        run: pnpm typecheck
+
+      - name: Unit + integration tests
+        run: pnpm test
+
+      - name: Validate Game-Data Reference Table
+        run: pnpm validate:reference
+
+      - name: Production build
+        run: pnpm build
