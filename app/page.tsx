@@ -40,18 +40,24 @@ export default function HomePage() {
         </ul>
       </section>
 
-      <div className="mt-10">
+      <div className="mt-10 flex flex-wrap gap-3">
         <Link
-          href="/intake"
+          href="/onboarding"
           className="inline-block rounded-md bg-black px-5 py-2.5 text-sm font-medium text-white dark:bg-white dark:text-black"
         >
           Score your account
         </Link>
-        <p className="mt-3 text-sm text-gray-500">
-          Enter your levels, upload screenshots, or paste your player tag for a
-          free instant score.
-        </p>
+        <Link
+          href="/pricing"
+          className="inline-block rounded-md border border-gray-300 px-5 py-2.5 text-sm dark:border-gray-700"
+        >
+          See pricing
+        </Link>
       </div>
+      <p className="mt-3 text-sm text-gray-500">
+        Free instant score. Full report with a prioritized upgrade roadmap,
+        AI-drafted and human-verified.
+      </p>
     </div>
   );
 }

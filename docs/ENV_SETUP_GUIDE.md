@@ -32,8 +32,10 @@
 
 # Quick Start (minimum to continue from the current state)
 
-The repo is at **Phase 2 complete**. Phases 0–2 need exactly **one real
-credential** to run end-to-end locally; everything else is gated to later phases.
+The repo is at **Phase 4 complete (implemented; activation pending credentials)**.
+Phases 0–2 run end-to-end with exactly **one real credential** (`ANTHROPIC_API_KEY`).
+Phases 3–4 are **IMPLEMENTED_BUT_NOT_ACTIVATED** — fully built behind interfaces;
+they light up when their credentials (Supabase, R2, Stripe, Resend) are provided.
 
 | Variable | Why | Status |
 |----------|-----|--------|
@@ -273,9 +275,9 @@ Verification, Common Mistakes, and Security Notes.
 
 ---
 
-## Provider: Stripe (payments)  ·  `PLANNED_NOT_IMPLEMENTED` (Phase 4; Connect in Phase 5)
+## Provider: Stripe (payments)  ·  `IMPLEMENTED_BUT_NOT_ACTIVATED` (Phase 4; Connect in Phase 5)
 
-> Declared `.env.example:32–34`. Payments per `COACHSCORE_ROADMAP.md` §3/§7 + `reports/TECH_DECISIONS.md` “Payments — Stripe”. No code reads them yet (Phase 4 adds Checkout + webhooks).
+> Declared `.env.example:32–34`. **Read by code (Phase 4):** `lib/payments/stripe-adapter.ts` (Checkout session via the Stripe REST API), `lib/payments/signature.ts` (webhook signature verification), `lib/api/checkout-handler.ts` + `lib/api/webhook-handler.ts`, and the routes `app/api/checkout`, `app/api/stripe/webhook`. The hosted-checkout redirect flow needs the **secret** + **webhook** keys; the publishable key is only required if you later add Stripe.js Elements. Until the keys are set, checkout returns HTTP 503 `not_activated`.
 
 **Pricing Tier:** **No monthly fee**; per-transaction **~2.9% + $0.30** (US cards). Connect (Phase 5) adds payout/account fees. Test mode is free.
 **Dashboard Navigation:** `dashboard.stripe.com` → **Developers → API keys** (secret + publishable); **Developers → Webhooks → Add endpoint** (signing secret); **Connect → Settings** (Phase 5).
@@ -287,7 +289,7 @@ Verification, Common Mistakes, and Security Notes.
 5. Paste into `.env.local`.
 
 ### `STRIPE_SECRET_KEY`
-- **Phase:** 4 · **Status:** `DECLARED` (`.env.example:32`); `PLANNED_NOT_IMPLEMENTED`
+- **Phase:** 4 · **Status:** `IMPLEMENTED_BUT_NOT_ACTIVATED` — `lib/payments/stripe-adapter.ts` (`StripePaymentProvider`/`createStripeProvider`); declared `.env.example:32`
 - **Required?** Required (Phase 4) · **Purpose:** Server-side key to create Checkout sessions, charges, and (P5) Connect transfers. **Provider:** Stripe
 - **Example Value:** `sk_test_51Xxxxxxxxxxxxxxxxxxxxxxxx`
 - **Verification:** `curl https://api.stripe.com/v1/balance -u "$STRIPE_SECRET_KEY:"` returns 200; a test Checkout session can be created.
@@ -295,7 +297,7 @@ Verification, Common Mistakes, and Security Notes.
 - **Security Notes:** **Server-only secret.** Vercel server env; never client; never in a public repo. Use **restricted keys** where possible; rotate on exposure.
 
 ### `STRIPE_WEBHOOK_SECRET`
-- **Phase:** 4 · **Status:** `DECLARED` (`.env.example:33`); `PLANNED_NOT_IMPLEMENTED`
+- **Phase:** 4 · **Status:** `IMPLEMENTED_BUT_NOT_ACTIVATED` — `lib/payments/signature.ts` (`verifyWebhookSignature`) via `lib/api/payment-wire.ts`; declared `.env.example:33`
 - **Required?** Required (Phase 4) · **Purpose:** Verifies inbound webhook signatures so order state can only be advanced by genuine Stripe events. **Provider:** Stripe
 - **Example Value:** `whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 - **Verification:** `stripe trigger checkout.session.completed` → the webhook route validates the signature (200), rejects a tampered body (400).
@@ -303,7 +305,7 @@ Verification, Common Mistakes, and Security Notes.
 - **Security Notes:** Server-only secret; per-endpoint + per-environment. Vercel server env.
 
 ### `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
-- **Phase:** 4 · **Status:** `DECLARED` (`.env.example:34`); `PLANNED_NOT_IMPLEMENTED`
+- **Phase:** 4 · **Status:** `DECLARED` (`.env.example:34`) — not required by the current hosted-checkout redirect flow; needed only if Stripe.js Elements is added later
 - **Required?** Required (Phase 4, client) · **Purpose:** Client-side key for Stripe.js / Checkout redirect. **Provider:** Stripe
 - **Example Value:** `pk_test_51Xxxxxxxxxxxxxxxxxxxxxxxx`
 - **Verification:** Stripe.js initializes; Checkout opens in the browser.
@@ -312,9 +314,9 @@ Verification, Common Mistakes, and Security Notes.
 
 ---
 
-## Provider: Resend (transactional + lifecycle email)  ·  `PLANNED_NOT_IMPLEMENTED` (Phase 4)
+## Provider: Resend (transactional + lifecycle email)  ·  `IMPLEMENTED_BUT_NOT_ACTIVATED` (Phase 4)
 
-> Declared `.env.example:45`; `COACHSCORE_ROADMAP.md` §3 “Email / Notifications — Resend”. No code yet (Phase 4 delivery + Phase 7 lifecycle).
+> Declared `.env.example:45–46`. **Read by code (Phase 4):** `lib/email` (templates + `ResendEmailProvider`/`createResendProvider` + the delivery pipeline that records `email_deliveries`). Lifecycle/re-engagement email is Phase 7.
 
 **Pricing Tier:** **Free tier** (~3,000 emails/mo, 100/day, 1 domain). Paid from ~$20/mo for higher volume + multiple domains.
 **Dashboard Navigation:** `resend.com` → **API Keys → Create API Key**; **Domains → Add Domain** (DNS records for deliverability).
@@ -325,12 +327,20 @@ Verification, Common Mistakes, and Security Notes.
 4. Paste into `.env.local` as `RESEND_API_KEY`.
 
 ### `RESEND_API_KEY`
-- **Phase:** 4 · **Status:** `DECLARED` (`.env.example:45`); `PLANNED_NOT_IMPLEMENTED`
+- **Phase:** 4 · **Status:** `IMPLEMENTED_BUT_NOT_ACTIVATED` — `lib/email/resend-adapter.ts` (`createResendProvider`); declared `.env.example:45`
 - **Required?** Required (Phase 4 — report delivery) · **Purpose:** Auth for sending transactional (report ready) + lifecycle (re-engagement) email. **Provider:** Resend
 - **Example Value:** `re_xxxxxxxxxxxxxxxxxxxxxxxx`
 - **Verification:** `curl -X POST https://api.resend.com/emails -H "Authorization: Bearer $RESEND_API_KEY" -H "Content-Type: application/json" -d '{"from":"noreply@coachscore.app","to":"you@example.com","subject":"test","text":"hi"}'` returns an id; dashboard **Logs** shows the send.
 - **Common Mistakes:** Sending from an unverified domain (blocked / spam); missing DKIM (poor deliverability); using a sending key with the wrong scope.
 - **Security Notes:** Server-only secret. Vercel server env; never client.
+
+### `RESEND_FROM_EMAIL`
+- **Phase:** 4 · **Status:** `IMPLEMENTED_BUT_NOT_ACTIVATED` — `lib/email/resend-adapter.ts` (`optionalEnv('RESEND_FROM_EMAIL', …)`); declared `.env.example:46`
+- **Required?** Optional (has a default) · **Purpose:** Verified "From" name + address for transactional email. **Provider:** Resend
+- **Example Value:** `CoachScore <noreply@coachscore.app>`
+- **Verification:** A delivered email shows this sender; the domain must be verified in Resend.
+- **Common Mistakes:** Using an unverified domain (blocked/spam); malformed display-name format.
+- **Security Notes:** Not a secret. Safe in Vercel + GitHub.
 
 ---
 
@@ -496,14 +506,15 @@ Each phase lists the variables that **must** be obtained before starting it.
 ### Phase 2 — AI Pipeline  ✅ (current)
 - `ANTHROPIC_API_KEY` ✅ (provided) · `ANTHROPIC_MODEL_REASONING` / `ANTHROPIC_MODEL_EXTRACTION` optional ✅
 
-### Phase 3 — Data Intake / Persistence  ⛔ NEXT
+### Phase 3 — Data Intake / Persistence  🟡 IMPLEMENTED_BUT_NOT_ACTIVATED
 - `NEXT_PUBLIC_SUPABASE_URL` ⛔ · `NEXT_PUBLIC_SUPABASE_ANON_KEY` ⛔ · `SUPABASE_SERVICE_ROLE_KEY` ⛔ · `DATABASE_URL` ⛔
 - `R2_ACCOUNT_ID` ⛔ · `R2_ACCESS_KEY_ID` ⛔ · `R2_SECRET_ACCESS_KEY` ⛔ · `R2_BUCKET` (default ok)
 - `COC_API_TOKEN` / `COC_API_PROXY_URL` ⛔ optional (tag-lookup path)
 
-### Phase 4 — Web Product / Payments
-- `STRIPE_SECRET_KEY` ⛔ · `STRIPE_WEBHOOK_SECRET` ⛔ · `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` ⛔
-- `RESEND_API_KEY` ⛔
+### Phase 4 — Web Product / Payments  🟡 IMPLEMENTED_BUT_NOT_ACTIVATED
+- Report/teaser/PDF/share + pricing work **with no credentials**.
+- `STRIPE_SECRET_KEY` ⛔ · `STRIPE_WEBHOOK_SECRET` ⛔ (checkout + webhooks) · `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (optional, only for Stripe.js Elements)
+- `RESEND_API_KEY` ⛔ · `RESEND_FROM_EMAIL` (optional, default provided) — email delivery
 - (recommended) `SENTRY_DSN` ⛔ PLANNED · `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` ⛔ PLANNED
 
 ### Phase 5 — Coach Marketplace

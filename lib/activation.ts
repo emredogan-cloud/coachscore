@@ -38,19 +38,33 @@ export function isAiConfigured(): boolean {
   return present('ANTHROPIC_API_KEY');
 }
 
+/** Stripe payments (Phase 4 checkout + webhooks). */
+export function isPaymentsConfigured(): boolean {
+  return present('STRIPE_SECRET_KEY');
+}
+
+/** Resend transactional email (Phase 4 delivery). */
+export function isEmailConfigured(): boolean {
+  return present('RESEND_API_KEY');
+}
+
 export interface ActivationStatus {
   readonly database: boolean;
   readonly storage: boolean;
   readonly cocApi: boolean;
   readonly ai: boolean;
+  readonly payments: boolean;
+  readonly email: boolean;
 }
 
-/** A snapshot of which Phase 3 dependencies are currently activated. */
+/** A snapshot of which credential-gated dependencies are currently activated. */
 export function activationStatus(): ActivationStatus {
   return {
     database: isDatabaseConfigured(),
     storage: isStorageConfigured(),
     cocApi: isCocApiConfigured(),
     ai: isAiConfigured(),
+    payments: isPaymentsConfigured(),
+    email: isEmailConfigured(),
   };
 }

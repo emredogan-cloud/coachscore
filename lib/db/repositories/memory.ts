@@ -24,11 +24,20 @@ import type {
   ReportDraftRow,
   Upload,
   User,
+  Order,
+  NewOrder,
+  Entitlement,
+  NewEntitlement,
+  EmailDelivery,
+  NewEmailDelivery,
 } from '../schema';
 import type {
   AccountRepository,
   AuditLogRepository,
+  EmailDeliveryRepository,
+  EntitlementRepository,
   JobRepository,
+  OrderRepository,
   Repositories,
   RepoDeps,
   ReportDraftRepository,
@@ -275,6 +284,106 @@ class MemAuditLogRepository implements AuditLogRepository {
   }
 }
 
+class MemOrderRepository implements OrderRepository {
+  private readonly t = new MemTable<Order>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewOrder): Promise<Order> {
+    const now = this.deps.now();
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      userId: input.userId ?? null,
+      reportId: input.reportId ?? null,
+      tier: input.tier,
+      quantity: input.quantity ?? 1,
+      amountCents: input.amountCents,
+      currency: input.currency ?? 'usd',
+      status: input.status ?? 'pending',
+      stripeSessionId: input.stripeSessionId ?? null,
+      stripePaymentIntentId: input.stripePaymentIntentId ?? null,
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
+    });
+  }
+  async findById(id: string): Promise<Order | null> {
+    return this.t.byId(id);
+  }
+  async findByStripeSessionId(sessionId: string): Promise<Order | null> {
+    return this.t.all().find((o) => o.stripeSessionId === sessionId) ?? null;
+  }
+  async listByUser(userId: string): Promise<Order[]> {
+    return this.t.all().filter((o) => o.userId === userId);
+  }
+  async update(
+    id: string,
+    patch: Partial<
+      Pick<Order, 'status' | 'stripeSessionId' | 'stripePaymentIntentId'>
+    >,
+  ): Promise<Order | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch, updatedAt: this.deps.now() });
+  }
+}
+
+class MemEntitlementRepository implements EntitlementRepository {
+  private readonly t = new MemTable<Entitlement>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewEntitlement): Promise<Entitlement> {
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      userId: input.userId ?? null,
+      sku: input.sku,
+      reportId: input.reportId ?? null,
+      orderId: input.orderId ?? null,
+      source: input.source,
+      createdAt: input.createdAt ?? this.deps.now(),
+    });
+  }
+  async listByUser(userId: string): Promise<Entitlement[]> {
+    return this.t.all().filter((e) => e.userId === userId);
+  }
+  async findForReport(
+    userId: string,
+    reportId: string,
+  ): Promise<Entitlement | null> {
+    return (
+      this.t
+        .all()
+        .find((e) => e.userId === userId && e.reportId === reportId) ?? null
+    );
+  }
+}
+
+class MemEmailDeliveryRepository implements EmailDeliveryRepository {
+  private readonly t = new MemTable<EmailDelivery>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewEmailDelivery): Promise<EmailDelivery> {
+    const now = this.deps.now();
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      toEmail: input.toEmail,
+      template: input.template,
+      status: input.status ?? 'queued',
+      relatedReportId: input.relatedReportId ?? null,
+      providerId: input.providerId ?? null,
+      error: input.error ?? null,
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
+    });
+  }
+  async findById(id: string): Promise<EmailDelivery | null> {
+    return this.t.byId(id);
+  }
+  async update(
+    id: string,
+    patch: Partial<Pick<EmailDelivery, 'status' | 'providerId' | 'error'>>,
+  ): Promise<EmailDelivery | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch, updatedAt: this.deps.now() });
+  }
+}
+
 /** Default deps for dev: random UUIDs + wall-clock timestamps. */
 export const defaultRepoDeps: RepoDeps = {
   idGen: () => randomUUID(),
@@ -293,5 +402,8 @@ export function createInMemoryRepositories(
     uploads: new MemUploadRepository(deps),
     jobs: new MemJobRepository(deps),
     auditLogs: new MemAuditLogRepository(deps),
+    orders: new MemOrderRepository(deps),
+    entitlements: new MemEntitlementRepository(deps),
+    emailDeliveries: new MemEmailDeliveryRepository(deps),
   };
 }

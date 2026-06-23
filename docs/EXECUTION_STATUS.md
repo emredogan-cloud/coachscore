@@ -19,7 +19,7 @@ definitions come from the master execution prompt; gating conditions come from
 | 1 | Deterministic Scoring Engine | ✅ done | — |
 | 2 | AI Pipeline (Claude) + schema validation + anti-hallucination | ✅ done | — (real `ANTHROPIC_API_KEY` available) |
 | 3 | Data Intake (tag / screenshot / manual) + DB / snapshots / storage / auth+RLS | 🟡 implemented, not activated | Supabase + R2 (activation only) |
-| 4 | Web Product (onboarding, teaser, score reveal, report, payments) | ⛔ gated | Stripe + Supabase + Resend |
+| 4 | Web Product (onboarding, teaser, full report, PDF, share, pricing, payments, email) | 🟡 implemented, not activated | Stripe + Resend (activation only) |
 | 5 | Coach Marketplace Infrastructure | ⛔ gated | Stripe Connect (+ Wise/Payoneer) |
 | 6 | Additional SKUs (ReplayDoctor, BaseDoctor, WarPlan) | ⛔ gated | depends on P5 |
 | 7 | Growth Infrastructure (analytics, experiments, referrals, SEO) | ⛔ gated | PostHog |
@@ -90,10 +90,37 @@ definitions come from the master execution prompt; gating conditions come from
 - **Activation only**: provide Supabase (`DATABASE_URL` + keys) and R2 creds,
   run `drizzle-kit migrate` (schema + RLS), and wire Supabase Auth identity.
 
-## Credential gate (why phases 4+ stop here)
+## Phase 4 — Web Product 🟡 (implemented, not activated)
 
-Phases 4+ require live third-party services with no keys present
-(Stripe, Resend, PostHog) plus the Phase-3 activation creds (Supabase, R2).
-Their secret-free logic can still be implemented and unit-tested behind
-interfaces; live wiring resumes the moment the corresponding credential is
-provided.
+- **Report experience** (`lib/report`): deterministic `RenderableReport` assembly
+  from snapshot + score (+ optional AI draft), strengths/weaknesses, teaser, and
+  report version-locking.
+- **PDF** (`lib/pdf`): deterministic, byte-stable report PDF via pdf-lib + a
+  print-ready HTML renderer. Works with no credential.
+- **Pricing** (`lib/pricing`): SKU catalog (free/basic/standard/pro/account_rescue/
+  clan) + comparison matrix from the monetization model.
+- **Payments** (`lib/payments`): `PaymentProvider` interface, HMAC webhook
+  signature verification, order state machine, Stripe event→transition mapping,
+  entitlement grant, checkout orchestration, Stripe adapter (fetch, gated), and a
+  webhook handler that fulfills orders + grants entitlements.
+- **Email** (`lib/email`): provider interface, transactional templates
+  (report-ready, receipt), Resend adapter (fetch, gated), delivery pipeline with
+  `email_deliveries` records.
+- **Share** (`lib/share` + `app/api/share/og`): share-card data + an OG image route.
+- **DB** (migration 0002 + RLS 0003): `orders`, `entitlements`, `email_deliveries`
+  + repos + deny-by-default RLS.
+- **API/UI**: `/api/{report,report/pdf,checkout,stripe/webhook,share/og}` + server
+  actions; `/onboarding`, `/report` (teaser → full-report funnel), `/pricing`.
+  Scoring/report/PDF/teaser are credential-free; checkout/webhook/email return
+  `not_activated` until Stripe/Resend are provisioned.
+- ~150 new tests; coverage thresholds held; CI green.
+- **Activation only**: Stripe (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`) and
+  Resend (`RESEND_API_KEY`), plus the Phase-3 Supabase creds for persistence.
+
+## Credential gate (why phases 5+ stop here)
+
+Phases 5+ require live third-party services with no keys present
+(Stripe Connect, Wise/Payoneer, PostHog) plus the Phase-3/4 activation creds
+(Supabase, R2, Stripe, Resend). Their secret-free logic can still be implemented
+and unit-tested behind interfaces; live wiring resumes the moment the
+corresponding credential is provided.

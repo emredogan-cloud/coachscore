@@ -13,7 +13,10 @@ import {
   accounts,
   accountSnapshots,
   auditLogs,
+  emailDeliveries,
+  entitlements,
   jobs,
+  orders,
   reportDrafts,
   reports,
   uploads,
@@ -36,11 +39,20 @@ import type {
   ReportDraftRow,
   Upload,
   User,
+  Order,
+  NewOrder,
+  Entitlement,
+  NewEntitlement,
+  EmailDelivery,
+  NewEmailDelivery,
 } from '../schema';
 import type {
   AccountRepository,
   AuditLogRepository,
+  EmailDeliveryRepository,
+  EntitlementRepository,
   JobRepository,
+  OrderRepository,
   Repositories,
   ReportDraftRepository,
   ReportRepository,
@@ -232,6 +244,93 @@ class DrizzleAuditLogRepository implements AuditLogRepository {
   }
 }
 
+class DrizzleOrderRepository implements OrderRepository {
+  async create(input: NewOrder): Promise<Order> {
+    return first(await getDb().insert(orders).values(input).returning());
+  }
+  async findById(id: string): Promise<Order | null> {
+    const rows = await getDb()
+      .select()
+      .from(orders)
+      .where(eq(orders.id, id))
+      .limit(1);
+    return rows[0] ?? null;
+  }
+  async findByStripeSessionId(sessionId: string): Promise<Order | null> {
+    const rows = await getDb()
+      .select()
+      .from(orders)
+      .where(eq(orders.stripeSessionId, sessionId))
+      .limit(1);
+    return rows[0] ?? null;
+  }
+  async listByUser(userId: string): Promise<Order[]> {
+    return getDb().select().from(orders).where(eq(orders.userId, userId));
+  }
+  async update(
+    id: string,
+    patch: Partial<
+      Pick<Order, 'status' | 'stripeSessionId' | 'stripePaymentIntentId'>
+    >,
+  ): Promise<Order | null> {
+    const rows = await getDb()
+      .update(orders)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(orders.id, id))
+      .returning();
+    return rows[0] ?? null;
+  }
+}
+
+class DrizzleEntitlementRepository implements EntitlementRepository {
+  async create(input: NewEntitlement): Promise<Entitlement> {
+    return first(await getDb().insert(entitlements).values(input).returning());
+  }
+  async listByUser(userId: string): Promise<Entitlement[]> {
+    return getDb()
+      .select()
+      .from(entitlements)
+      .where(eq(entitlements.userId, userId));
+  }
+  async findForReport(
+    userId: string,
+    reportId: string,
+  ): Promise<Entitlement | null> {
+    const rows = await getDb()
+      .select()
+      .from(entitlements)
+      .where(eq(entitlements.reportId, reportId));
+    return rows.find((e) => e.userId === userId) ?? null;
+  }
+}
+
+class DrizzleEmailDeliveryRepository implements EmailDeliveryRepository {
+  async create(input: NewEmailDelivery): Promise<EmailDelivery> {
+    return first(
+      await getDb().insert(emailDeliveries).values(input).returning(),
+    );
+  }
+  async findById(id: string): Promise<EmailDelivery | null> {
+    const rows = await getDb()
+      .select()
+      .from(emailDeliveries)
+      .where(eq(emailDeliveries.id, id))
+      .limit(1);
+    return rows[0] ?? null;
+  }
+  async update(
+    id: string,
+    patch: Partial<Pick<EmailDelivery, 'status' | 'providerId' | 'error'>>,
+  ): Promise<EmailDelivery | null> {
+    const rows = await getDb()
+      .update(emailDeliveries)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(emailDeliveries.id, id))
+      .returning();
+    return rows[0] ?? null;
+  }
+}
+
 export function createDrizzleRepositories(): Repositories {
   return {
     users: new DrizzleUserRepository(),
@@ -242,5 +341,8 @@ export function createDrizzleRepositories(): Repositories {
     uploads: new DrizzleUploadRepository(),
     jobs: new DrizzleJobRepository(),
     auditLogs: new DrizzleAuditLogRepository(),
+    orders: new DrizzleOrderRepository(),
+    entitlements: new DrizzleEntitlementRepository(),
+    emailDeliveries: new DrizzleEmailDeliveryRepository(),
   };
 }

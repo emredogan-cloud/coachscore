@@ -29,6 +29,7 @@
     "@anthropic-ai/sdk": "^0.104.2",
     "drizzle-orm": "^0.45.2",
     "next": "^15.5.19",
+    "pdf-lib": "^1.17.1",
     "postgres": "^3.4.9",
     "react": "19.0.0",
     "react-dom": "19.0.0",

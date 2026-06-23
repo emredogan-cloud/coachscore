@@ -39,7 +39,7 @@ Built phase-by-phase. See `docs/EXECUTION_STATUS.md` for the live phase ledger.
 | 1 | Deterministic Scoring Engine (7 sub-scores, goal-aware, gap list) | ✅ implemented + green |
 | 2 | AI pipeline (Claude) + schema validation + anti-hallucination + queue | ✅ implemented + green (live API verified) |
 | 3 | Data intake (tag / screenshot / manual) + DB / snapshots / storage / auth+RLS | 🟡 implemented, not activated (awaits Supabase + R2) |
-| 4 | Web product (teaser, score reveal, report, payments) | ⛔ gated on Stripe + Supabase |
+| 4 | Web product (onboarding, teaser, full report, PDF, share, pricing, Stripe, email) | 🟡 implemented, not activated (awaits Stripe + Resend; report/PDF/teaser work now) |
 | 5 | Coach marketplace | ⛔ gated on Stripe Connect |
 | 6 | ReplayDoctor / BaseDoctor / WarPlan SKUs | ⛔ depends on P5 |
 | 7 | Growth infra (analytics, experiments, referrals, SEO) | ⛔ gated on PostHog |

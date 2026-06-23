@@ -11,15 +11,21 @@ import type {
   Account,
   AccountSnapshotRow,
   AuditLog,
+  EmailDelivery,
+  Entitlement,
   Job,
   NewAccount,
   NewAccountSnapshotRow,
   NewAuditLog,
+  NewEmailDelivery,
+  NewEntitlement,
   NewJob,
+  NewOrder,
   NewReport,
   NewReportDraftRow,
   NewUpload,
   NewUser,
+  Order,
   Report,
   ReportDraftRow,
   Upload,
@@ -87,6 +93,34 @@ export interface AuditLogRepository {
   listByEntity(entityType: string, entityId: string): Promise<AuditLog[]>;
 }
 
+export interface OrderRepository {
+  create(input: NewOrder): Promise<Order>;
+  findById(id: string): Promise<Order | null>;
+  findByStripeSessionId(sessionId: string): Promise<Order | null>;
+  listByUser(userId: string): Promise<Order[]>;
+  update(
+    id: string,
+    patch: Partial<
+      Pick<Order, 'status' | 'stripeSessionId' | 'stripePaymentIntentId'>
+    >,
+  ): Promise<Order | null>;
+}
+
+export interface EntitlementRepository {
+  create(input: NewEntitlement): Promise<Entitlement>;
+  listByUser(userId: string): Promise<Entitlement[]>;
+  findForReport(userId: string, reportId: string): Promise<Entitlement | null>;
+}
+
+export interface EmailDeliveryRepository {
+  create(input: NewEmailDelivery): Promise<EmailDelivery>;
+  findById(id: string): Promise<EmailDelivery | null>;
+  update(
+    id: string,
+    patch: Partial<Pick<EmailDelivery, 'status' | 'providerId' | 'error'>>,
+  ): Promise<EmailDelivery | null>;
+}
+
 export interface Repositories {
   readonly users: UserRepository;
   readonly accounts: AccountRepository;
@@ -96,4 +130,7 @@ export interface Repositories {
   readonly uploads: UploadRepository;
   readonly jobs: JobRepository;
   readonly auditLogs: AuditLogRepository;
+  readonly orders: OrderRepository;
+  readonly entitlements: EntitlementRepository;
+  readonly emailDeliveries: EmailDeliveryRepository;
 }
