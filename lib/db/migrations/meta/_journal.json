@@ -15,6 +15,20 @@
       "when": 1782241021496,
       "tag": "0001_rls_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782254789038,
+      "tag": "0002_phase4_payments",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782254789739,
+      "tag": "0003_phase4_rls",
+      "breakpoints": true
     }
   ]
 }

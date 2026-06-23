@@ -15,7 +15,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    include: ['tests/**/*.test.ts', 'lib/**/*.test.ts'],
+    include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx', 'lib/**/*.test.ts'],
     // Live, API-hitting integration tests run via `pnpm test:integration`.
     exclude: [...configDefaults.exclude, 'tests/integration/**'],
     coverage: {
@@ -39,6 +39,12 @@ export default defineConfig({
         // Persistence wiring that resolves the live DB repositories; the handler
         // tests inject a fake `persist`, so the logic is covered without a DB.
         'lib/api/persist.ts',
+        // Phase 4 third-party HTTP boundaries — Stripe + Resend over fetch,
+        // exercised at activation. Signature/state/template logic is tested
+        // purely; handlers/pipelines inject fakes.
+        'lib/payments/stripe-adapter.ts',
+        'lib/email/resend-adapter.ts',
+        'lib/api/payment-wire.ts',
       ],
       thresholds: {
         statements: 90,

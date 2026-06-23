@@ -70,6 +70,24 @@ export const jobStatus = pgEnum('job_status', [
   'failed',
   'dead_letter',
 ]);
+export const orderStatus = pgEnum('order_status', [
+  'pending',
+  'paid',
+  'fulfilled',
+  'refunded',
+  'failed',
+  'expired',
+]);
+export const entitlementSource = pgEnum('entitlement_source', [
+  'purchase',
+  'grant',
+  'promo',
+]);
+export const emailStatus = pgEnum('email_status', ['queued', 'sent', 'failed']);
+export const emailTemplate = pgEnum('email_template', [
+  'report_ready',
+  'receipt',
+]);
 
 // --- Tables -----------------------------------------------------------------
 
@@ -248,6 +266,78 @@ export const auditLogs = pgTable(
   (t) => [index('audit_logs_entity_idx').on(t.entityType, t.entityId)],
 );
 
+export const orders = pgTable(
+  'orders',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id, {
+      onDelete: 'set null',
+    }),
+    reportId: uuid('report_id').references(() => reports.id, {
+      onDelete: 'set null',
+    }),
+    tier: reportTier('tier').notNull(),
+    quantity: integer('quantity').notNull().default(1),
+    amountCents: integer('amount_cents').notNull(),
+    currency: text('currency').notNull().default('usd'),
+    status: orderStatus('status').notNull().default('pending'),
+    stripeSessionId: text('stripe_session_id'),
+    stripePaymentIntentId: text('stripe_payment_intent_id'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('orders_user_id_idx').on(t.userId),
+    uniqueIndex('orders_stripe_session_uq').on(t.stripeSessionId),
+  ],
+);
+
+export const entitlements = pgTable(
+  'entitlements',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
+    sku: reportTier('sku').notNull(),
+    reportId: uuid('report_id').references(() => reports.id, {
+      onDelete: 'set null',
+    }),
+    orderId: uuid('order_id').references(() => orders.id, {
+      onDelete: 'set null',
+    }),
+    source: entitlementSource('source').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index('entitlements_user_id_idx').on(t.userId)],
+);
+
+export const emailDeliveries = pgTable(
+  'email_deliveries',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    toEmail: text('to_email').notNull(),
+    template: emailTemplate('template').notNull(),
+    status: emailStatus('status').notNull().default('queued'),
+    relatedReportId: uuid('related_report_id').references(() => reports.id, {
+      onDelete: 'set null',
+    }),
+    providerId: text('provider_id'),
+    error: text('error'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index('email_deliveries_to_idx').on(t.toEmail)],
+);
+
 // --- Inferred row types ------------------------------------------------------
 
 export type User = typeof users.$inferSelect;
@@ -266,3 +356,9 @@ export type Job = typeof jobs.$inferSelect;
 export type NewJob = typeof jobs.$inferInsert;
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type NewAuditLog = typeof auditLogs.$inferInsert;
+export type Order = typeof orders.$inferSelect;
+export type NewOrder = typeof orders.$inferInsert;
+export type Entitlement = typeof entitlements.$inferSelect;
+export type NewEntitlement = typeof entitlements.$inferInsert;
+export type EmailDelivery = typeof emailDeliveries.$inferSelect;
+export type NewEmailDelivery = typeof emailDeliveries.$inferInsert;
