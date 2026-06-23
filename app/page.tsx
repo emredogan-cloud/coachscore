@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { GRADE_BANDS } from '@/lib/core/grade';
 
 /**
@@ -39,9 +40,18 @@ export default function HomePage() {
         </ul>
       </section>
 
-      <p className="mt-10 text-sm text-gray-500">
-        Coming soon: paste your player tag for a free instant score.
-      </p>
+      <div className="mt-10">
+        <Link
+          href="/intake"
+          className="inline-block rounded-md bg-black px-5 py-2.5 text-sm font-medium text-white dark:bg-white dark:text-black"
+        >
+          Score your account
+        </Link>
+        <p className="mt-3 text-sm text-gray-500">
+          Enter your levels, upload screenshots, or paste your player tag for a
+          free instant score.
+        </p>
+      </div>
     </div>
   );
 }

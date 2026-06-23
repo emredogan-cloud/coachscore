@@ -9,6 +9,9 @@ export default defineConfig({
       '@': rootDir,
     },
   },
+  // Use the automatic JSX runtime so component render tests (.tsx) transform
+  // without a React import; matches React 19 / Next's automatic runtime.
+  esbuild: { jsx: 'automatic' },
   test: {
     globals: true,
     environment: 'node',
@@ -27,6 +30,15 @@ export default defineConfig({
         // test (pnpm test:integration), not by unit tests.
         'lib/ai/provider.ts',
         'lib/queue/jobs.ts',
+        // Phase 3 database I/O boundary — declarative schema + the live
+        // Postgres client/repositories, exercised once Supabase is provisioned.
+        // The in-memory repositories cover the persistence logic in unit tests.
+        'lib/db/schema.ts',
+        'lib/db/client.ts',
+        'lib/db/repositories/drizzle.ts',
+        // Persistence wiring that resolves the live DB repositories; the handler
+        // tests inject a fake `persist`, so the logic is covered without a DB.
+        'lib/api/persist.ts',
       ],
       thresholds: {
         statements: 90,

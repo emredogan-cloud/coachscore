@@ -18,7 +18,7 @@ definitions come from the master execution prompt; gating conditions come from
 | 0 | Foundation (repo, CI/CD, ADRs, Game-Data Reference Table) | ✅ done | — |
 | 1 | Deterministic Scoring Engine | ✅ done | — |
 | 2 | AI Pipeline (Claude) + schema validation + anti-hallucination | ✅ done | — (real `ANTHROPIC_API_KEY` available) |
-| 3 | Data Intake (tag / screenshot / manual + confidence) | ⛔ gated | Supabase + R2 |
+| 3 | Data Intake (tag / screenshot / manual) + DB / snapshots / storage / auth+RLS | 🟡 implemented, not activated | Supabase + R2 (activation only) |
 | 4 | Web Product (onboarding, teaser, score reveal, report, payments) | ⛔ gated | Stripe + Supabase + Resend |
 | 5 | Coach Marketplace Infrastructure | ⛔ gated | Stripe Connect (+ Wise/Payoneer) |
 | 6 | Additional SKUs (ReplayDoctor, BaseDoctor, WarPlan) | ⛔ gated | depends on P5 |
@@ -64,9 +64,36 @@ definitions come from the master execution prompt; gating conditions come from
   Anthropic API (run via `pnpm test:integration`; self-skips without a key, so
   public CI stays green without putting a paid key in a public repo).
 
-## Credential gate (why phases 3+ stop here)
+## Phase 3 — Data Intake 🟡 (implemented, not activated)
 
-Phases 3+ require live third-party services with no keys present
-(Supabase, Cloudflare R2, Stripe, PostHog, Resend). Their secret-free logic can
-still be implemented and unit-tested behind interfaces; live wiring resumes the
-moment the corresponding credential is provided.
+- Three intake paths converging on the engine's `NormalizedAccount`:
+  **manual** (works today, no credential), **screenshot** (wraps Phase-2 OCR →
+  correction → confidence routing; needs `ANTHROPIC_API_KEY`), **tag**
+  (CoC API adapter interface + `NotConfigured` default; needs the proxy).
+- **Immutable, version-locked snapshots** (`lib/snapshot`): canonical sha256
+  hash over (account, goal, engine/reference/KB versions); the engine consumes
+  snapshots via `scoreSnapshot`.
+- **Database layer** (`lib/db`): Drizzle schema for users, accounts,
+  account_snapshots, reports, report_drafts, uploads, jobs, audit_logs; SQL
+  migrations generated offline; repositories (in-memory + Drizzle) behind
+  interfaces; a `PersistenceService` with auth + audit logging.
+- **Deny-by-default RLS** SQL (`lib/db/migrations/0001_rls_policies.sql`,
+  docs/db/RLS.md) mirroring `lib/auth` roles/permissions.
+- **Storage** (`lib/storage`): adapter interface + in-memory local adapter +
+  env-gated R2 adapter (injected S3-like client, not activated).
+- **API surface**: `/api/intake/{manual,tag,screenshot}` routes + server
+  actions; scoring runs with no credentials, persistence is attempted only when
+  the database is activated (otherwise reported as `database_not_configured`).
+- **UI**: `/intake` three-path wizard (manual form, screenshot upload,
+  confidence-correction, review screen), feature-gated by activation status.
+- 105 new unit/route/component tests; coverage thresholds held; CI green.
+- **Activation only**: provide Supabase (`DATABASE_URL` + keys) and R2 creds,
+  run `drizzle-kit migrate` (schema + RLS), and wire Supabase Auth identity.
+
+## Credential gate (why phases 4+ stop here)
+
+Phases 4+ require live third-party services with no keys present
+(Stripe, Resend, PostHog) plus the Phase-3 activation creds (Supabase, R2).
+Their secret-free logic can still be implemented and unit-tested behind
+interfaces; live wiring resumes the moment the corresponding credential is
+provided.

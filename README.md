@@ -38,7 +38,7 @@ Built phase-by-phase. See `docs/EXECUTION_STATUS.md` for the live phase ledger.
 | 0 | Foundation, CI/CD, ADRs, Game-Data Reference Table | ✅ implemented + green |
 | 1 | Deterministic Scoring Engine (7 sub-scores, goal-aware, gap list) | ✅ implemented + green |
 | 2 | AI pipeline (Claude) + schema validation + anti-hallucination + queue | ✅ implemented + green (live API verified) |
-| 3 | Data intake (tag / screenshot / manual) + confidence routing | ⛔ gated on Supabase + R2 |
+| 3 | Data intake (tag / screenshot / manual) + DB / snapshots / storage / auth+RLS | 🟡 implemented, not activated (awaits Supabase + R2) |
 | 4 | Web product (teaser, score reveal, report, payments) | ⛔ gated on Stripe + Supabase |
 | 5 | Coach marketplace | ⛔ gated on Stripe Connect |
 | 6 | ReplayDoctor / BaseDoctor / WarPlan SKUs | ⛔ depends on P5 |
