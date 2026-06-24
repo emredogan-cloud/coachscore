@@ -29,6 +29,54 @@ export interface QueueStore {
   set<O>(key: string, record: JobRecord<O>): void;
 }
 
+/**
+ * Async persistence boundary (Phase 8) — the production-grade store. A
+ * Postgres-backed (`jobs` table) or Redis store implements this; the in-memory
+ * async store backs tests. `listByStatus` enables dead-letter inspection.
+ */
+export interface AsyncQueueStore {
+  get<O>(key: string): Promise<JobRecord<O> | undefined>;
+  set<O>(key: string, record: JobRecord<O>): Promise<void>;
+  listByStatus(status: JobStatus): Promise<JobRecord<unknown>[]>;
+}
+
+export interface RetryPolicy {
+  readonly maxAttempts: number;
+  readonly baseDelayMs: number;
+  readonly factor: number;
+  readonly maxDelayMs: number;
+}
+
+export const DEFAULT_RETRY_POLICY: RetryPolicy = {
+  maxAttempts: 3,
+  baseDelayMs: 200,
+  factor: 2,
+  maxDelayMs: 30_000,
+};
+
+export interface DurableRunOptions {
+  readonly idempotencyKey: string;
+  readonly policy?: RetryPolicy;
+  /** Injectable backoff (ms → Promise); tests pass a no-op for determinism. */
+  readonly sleep?: (ms: number) => Promise<void>;
+  readonly onDeadLetter?: (key: string, error: string) => void | Promise<void>;
+}
+
+/**
+ * Transport abstraction (Phase 8) for off-process queues — the interface a
+ * Redis or QStash adapter implements to hand a job to background workers. The
+ * inline transport runs the consumer immediately (single-process default).
+ */
+export interface QueueJobEnvelope {
+  readonly key: string;
+  readonly kind: string;
+  readonly payload: unknown;
+}
+
+export interface QueueTransport {
+  publish(job: QueueJobEnvelope): Promise<void>;
+}
+
 export interface RunOptions {
   readonly idempotencyKey: string;
   readonly maxAttempts?: number;

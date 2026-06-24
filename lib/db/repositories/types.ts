@@ -114,6 +114,7 @@ export interface UploadRepository {
 export interface JobRepository {
   create(input: NewJob): Promise<Job>;
   findByIdempotencyKey(key: string): Promise<Job | null>;
+  listByStatus(status: Job['status']): Promise<Job[]>;
   update(
     id: string,
     patch: Partial<Pick<Job, 'status' | 'attempts' | 'result' | 'error'>>,

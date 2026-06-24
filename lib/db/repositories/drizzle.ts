@@ -279,6 +279,9 @@ class DrizzleJobRepository implements JobRepository {
       .limit(1);
     return rows[0] ?? null;
   }
+  async listByStatus(status: Job['status']): Promise<Job[]> {
+    return getDb().select().from(jobs).where(eq(jobs.status, status));
+  }
   async update(
     id: string,
     patch: Partial<Pick<Job, 'status' | 'attempts' | 'result' | 'error'>>,

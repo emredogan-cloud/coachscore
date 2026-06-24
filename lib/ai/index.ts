@@ -26,6 +26,38 @@ export {
   type DraftConfidence,
 } from './confidence';
 export { referenceDataReadiness, assertPaidReportAllowed } from './readiness';
-export { AnthropicProvider, defaultProvider, MODELS } from './provider';
+export {
+  AnthropicProvider,
+  defaultProvider,
+  buildResilientProvider,
+  MODELS,
+} from './provider';
 export { generateReportDraft, type DraftDeps } from './draft';
 export { extractAccountFromScreenshots, type OcrDeps } from './ocr';
+export {
+  MODEL_PRICING,
+  priceForModel,
+  estimateCostCents,
+  CostAccountant,
+  BudgetGuard,
+  BudgetExceededError,
+  type ModelPrice,
+  type CostEntry,
+} from './cost';
+export {
+  RESPONSE_CACHE_VERSION,
+  responseCacheKey,
+  MemoryResponseCache,
+  CachingProvider,
+  type ResponseCache,
+} from './response-cache';
+export {
+  withTimeout,
+  withRetry,
+  backoffDelay,
+  ResilientProvider,
+  TimeoutError,
+  DEFAULT_RETRY,
+  type RetryConfig,
+  type ResilienceConfig,
+} from './resilience';

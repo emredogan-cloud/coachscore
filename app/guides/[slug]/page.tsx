@@ -13,6 +13,9 @@ import {
 } from '@/lib/seo';
 
 export const dynamicParams = false;
+// ISR (Phase 8): regenerate guides daily so evergreen content stays fresh
+// without a rebuild, while serving cached static HTML for fast SEO TTFB.
+export const revalidate = 86400;
 
 export function generateStaticParams(): { slug: string }[] {
   return SEO_GUIDE_SLUGS.map((slug) => ({ slug }));
