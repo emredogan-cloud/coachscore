@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { buildMetadata, SEO_GUIDES } from '@/lib/seo';
 
+// ISR (Phase 8): the guide index regenerates daily.
+export const revalidate = 86400;
+
 export const metadata: Metadata = buildMetadata({
   title: 'Clash of Clans upgrade guides | CoachScore',
   description:

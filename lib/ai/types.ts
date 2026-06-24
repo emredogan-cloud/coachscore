@@ -31,6 +31,12 @@ export interface GenerateOptions {
   readonly tool?: ProviderTool;
   /** Optional image blocks (base64) for vision extraction. */
   readonly images?: readonly ProviderImage[];
+  /**
+   * Mark the (large, static) system prompt for prompt caching (Phase 8). The
+   * provider sets an ephemeral cache breakpoint so repeated KB/reference context
+   * is billed at the cache-read rate. No effect on providers that don't cache.
+   */
+  readonly cacheSystem?: boolean;
 }
 
 export interface ProviderImage {
@@ -41,6 +47,10 @@ export interface ProviderImage {
 export interface ProviderUsage {
   readonly inputTokens: number;
   readonly outputTokens: number;
+  /** Prompt-cache read tokens (billed at the reduced cache-read rate). */
+  readonly cacheReadInputTokens?: number;
+  /** Prompt-cache creation tokens (the write that seeds the cache). */
+  readonly cacheCreationInputTokens?: number;
 }
 
 export interface ProviderResponse {
@@ -49,6 +59,8 @@ export interface ProviderResponse {
   readonly toolInput: unknown;
   readonly stopReason: string;
   readonly usage: ProviderUsage;
+  /** True when served from the response cache (no API call, zero marginal cost). */
+  readonly cached?: boolean;
 }
 
 /** The provider abstraction (ADR 0005): swap models/vendors without callers. */

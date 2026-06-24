@@ -9,6 +9,8 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import { optionalEnv, requireEnv } from '@/lib/env';
+import { MemoryResponseCache, CachingProvider } from './response-cache';
+import { ResilientProvider, type ResilienceConfig } from './resilience';
 import type { AiProvider, GenerateOptions, ProviderResponse } from './types';
 
 let cachedClient: Anthropic | null = null;
@@ -62,10 +64,23 @@ export class AnthropicProvider implements AiProvider {
   async generate(options: GenerateOptions): Promise<ProviderResponse> {
     const client = getClient();
 
+    // Prompt caching (Phase 8): mark the static system prompt with an ephemeral
+    // cache breakpoint so repeated KB/reference context bills at the cache rate.
+    const system: Anthropic.MessageParam['content'] | string =
+      options.cacheSystem
+        ? [
+            {
+              type: 'text',
+              text: options.system,
+              cache_control: { type: 'ephemeral' },
+            },
+          ]
+        : options.system;
+
     const response = await client.messages.create({
       model: options.model,
       max_tokens: options.maxTokens,
-      system: options.system,
+      system: system as string,
       messages: buildMessages(options),
       ...(options.tool
         ? {
@@ -99,12 +114,32 @@ export class AnthropicProvider implements AiProvider {
       usage: {
         inputTokens: response.usage.input_tokens,
         outputTokens: response.usage.output_tokens,
+        cacheReadInputTokens: response.usage.cache_read_input_tokens ?? 0,
+        cacheCreationInputTokens:
+          response.usage.cache_creation_input_tokens ?? 0,
       },
     };
   }
 }
 
-/** The default production provider. */
+/** The default production provider (raw). */
 export function defaultProvider(): AiProvider {
   return new AnthropicProvider();
+}
+
+/** Process-wide response cache for the production provider (Phase 8). */
+const sharedResponseCache = new MemoryResponseCache();
+
+/**
+ * Production provider with Phase-8 resilience + response caching: retry +
+ * timeout around the call, and identical requests served from cache. Used by the
+ * durable queue jobs; callers needing the raw provider use `defaultProvider`.
+ */
+export function buildResilientProvider(
+  config: ResilienceConfig = { timeoutMs: 60_000 },
+): AiProvider {
+  return new CachingProvider(
+    new ResilientProvider(new AnthropicProvider(), config),
+    sharedResponseCache,
+  );
 }

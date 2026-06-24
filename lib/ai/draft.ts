@@ -72,6 +72,8 @@ export async function generateReportDraft(
       messages,
       maxTokens: 2048,
       tool: DRAFT_TOOL,
+      // Prompt-cache the large static system/KB prompt (Phase 8 cost lever).
+      cacheSystem: true,
     });
     lastUsage = response.usage;
 

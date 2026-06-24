@@ -1,28 +1,32 @@
 /**
  * Job definitions binding the durable runner to the real AI orchestrators.
- * These use the production Anthropic provider; the runner's retry/idempotency/
- * dead-letter semantics are unit-tested independently with injected handlers.
+ * These use the resilient + cached Anthropic provider (Phase 8) over the
+ * durable async store (Postgres when activated, in-memory otherwise). The
+ * runner's retry/idempotency/dead-letter semantics are unit-tested independently
+ * with injected handlers + the memory async store.
  */
 
 import { generateReportDraft } from '@/lib/ai/draft';
 import { extractAccountFromScreenshots } from '@/lib/ai/ocr';
-import { defaultProvider } from '@/lib/ai/provider';
+import { buildResilientProvider } from '@/lib/ai/provider';
 import type {
   DraftInput,
   DraftResult,
   ExtractionResult,
   ProviderImage,
 } from '@/lib/ai/types';
-import { runJob } from './runner';
-import type { JobOutcome, QueueStore } from './types';
+import { runDurableJob } from './durable-runner';
+import type { AsyncQueueStore, JobOutcome } from './types';
+import { resolveQueueStore } from './wire';
 
 export function enqueueReportDraft(
   input: DraftInput,
   idempotencyKey: string,
-  store?: QueueStore,
+  store: AsyncQueueStore = resolveQueueStore('report_draft'),
 ): Promise<JobOutcome<DraftResult>> {
-  return runJob(
-    (i: DraftInput) => generateReportDraft(i, { provider: defaultProvider() }),
+  return runDurableJob(
+    (i: DraftInput) =>
+      generateReportDraft(i, { provider: buildResilientProvider() }),
     input,
     { idempotencyKey },
     store,
@@ -37,12 +41,12 @@ interface ExtractionPayload {
 export function enqueueExtraction(
   payload: ExtractionPayload,
   idempotencyKey: string,
-  store?: QueueStore,
+  store: AsyncQueueStore = resolveQueueStore('extraction'),
 ): Promise<JobOutcome<ExtractionResult>> {
-  return runJob(
+  return runDurableJob(
     (p: ExtractionPayload) =>
       extractAccountFromScreenshots(p.images, p.context, {
-        provider: defaultProvider(),
+        provider: buildResilientProvider(),
       }),
     payload,
     { idempotencyKey },

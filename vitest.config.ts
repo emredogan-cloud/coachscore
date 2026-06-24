@@ -30,6 +30,11 @@ export default defineConfig({
         // test (pnpm test:integration), not by unit tests.
         'lib/ai/provider.ts',
         'lib/queue/jobs.ts',
+        // Phase 8 durable-queue persistence + resolution boundaries — exercised
+        // against Postgres at activation; the durable runner + memory async
+        // store cover the logic in unit tests.
+        'lib/queue/drizzle-store.ts',
+        'lib/queue/wire.ts',
         // Phase 3 database I/O boundary — declarative schema + the live
         // Postgres client/repositories, exercised once Supabase is provisioned.
         // The in-memory repositories cover the persistence logic in unit tests.

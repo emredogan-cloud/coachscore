@@ -298,6 +298,9 @@ class MemJobRepository implements JobRepository {
   async findByIdempotencyKey(key: string): Promise<Job | null> {
     return this.t.all().find((j) => j.idempotencyKey === key) ?? null;
   }
+  async listByStatus(status: Job['status']): Promise<Job[]> {
+    return this.t.all().filter((j) => j.status === status);
+  }
   async update(
     id: string,
     patch: Partial<Pick<Job, 'status' | 'attempts' | 'result' | 'error'>>,
