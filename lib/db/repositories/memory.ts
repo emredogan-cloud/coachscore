@@ -48,6 +48,10 @@ import type {
   NewDispute,
   Notification,
   NewNotification,
+  ProductSubmission,
+  NewProductSubmission,
+  ProductReportRow,
+  NewProductReportRow,
 } from '../schema';
 import type {
   AccountRepository,
@@ -64,6 +68,8 @@ import type {
   OrderRepository,
   PayoutAccountRepository,
   PayoutRepository,
+  ProductReportRepository,
+  ProductSubmissionRepository,
   Repositories,
   RepoDeps,
   ReportDraftRepository,
@@ -320,7 +326,8 @@ class MemOrderRepository implements OrderRepository {
       id: input.id ?? this.deps.idGen(),
       userId: input.userId ?? null,
       reportId: input.reportId ?? null,
-      tier: input.tier,
+      tier: input.tier ?? null,
+      productSku: input.productSku ?? null,
       quantity: input.quantity ?? 1,
       amountCents: input.amountCents,
       currency: input.currency ?? 'usd',
@@ -359,7 +366,8 @@ class MemEntitlementRepository implements EntitlementRepository {
     return this.t.insert({
       id: input.id ?? this.deps.idGen(),
       userId: input.userId ?? null,
-      sku: input.sku,
+      sku: input.sku ?? null,
+      productSku: input.productSku ?? null,
       reportId: input.reportId ?? null,
       orderId: input.orderId ?? null,
       source: input.source,
@@ -497,7 +505,8 @@ class MemReviewAssignmentRepository implements ReviewAssignmentRepository {
     const now = this.deps.now();
     return this.t.insert({
       id: input.id ?? this.deps.idGen(),
-      reportId: input.reportId,
+      reportId: input.reportId ?? null,
+      productReportId: input.productReportId ?? null,
       reportDraftId: input.reportDraftId ?? null,
       coachId: input.coachId ?? null,
       status: input.status ?? 'unassigned',
@@ -712,6 +721,78 @@ class MemNotificationRepository implements NotificationRepository {
   }
 }
 
+class MemProductSubmissionRepository implements ProductSubmissionRepository {
+  private readonly t = new MemTable<ProductSubmission>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewProductSubmission): Promise<ProductSubmission> {
+    const now = this.deps.now();
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      userId: input.userId ?? null,
+      sku: input.sku,
+      context: input.context ?? null,
+      input: input.input,
+      uploadKeys: input.uploadKeys ?? null,
+      status: input.status ?? 'received',
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
+    });
+  }
+  async findById(id: string): Promise<ProductSubmission | null> {
+    return this.t.byId(id);
+  }
+  async update(
+    id: string,
+    patch: Partial<ProductSubmission>,
+  ): Promise<ProductSubmission | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch, updatedAt: this.deps.now() });
+  }
+}
+
+class MemProductReportRepository implements ProductReportRepository {
+  private readonly t = new MemTable<ProductReportRow>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewProductReportRow): Promise<ProductReportRow> {
+    const now = this.deps.now();
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      submissionId: input.submissionId,
+      sku: input.sku,
+      analysis: input.analysis,
+      scoreLabel: input.scoreLabel ?? null,
+      scoreValue: input.scoreValue ?? null,
+      confidence: input.confidence ?? 1,
+      status: input.status ?? 'pending',
+      paid: input.paid ?? false,
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
+    });
+  }
+  async findById(id: string): Promise<ProductReportRow | null> {
+    return this.t.byId(id);
+  }
+  async findBySubmission(
+    submissionId: string,
+  ): Promise<ProductReportRow | null> {
+    return this.t.all().find((r) => r.submissionId === submissionId) ?? null;
+  }
+  async listByStatus(
+    status: ProductReportRow['status'],
+  ): Promise<ProductReportRow[]> {
+    return this.t.all().filter((r) => r.status === status);
+  }
+  async update(
+    id: string,
+    patch: Partial<ProductReportRow>,
+  ): Promise<ProductReportRow | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch, updatedAt: this.deps.now() });
+  }
+}
+
 /** Default deps for dev: random UUIDs + wall-clock timestamps. */
 export const defaultRepoDeps: RepoDeps = {
   idGen: () => randomUUID(),
@@ -742,5 +823,7 @@ export function createInMemoryRepositories(
     payouts: new MemPayoutRepository(deps),
     disputes: new MemDisputeRepository(deps),
     notifications: new MemNotificationRepository(deps),
+    productSubmissions: new MemProductSubmissionRepository(deps),
+    productReports: new MemProductReportRepository(deps),
   };
 }

@@ -2,6 +2,7 @@ export {
   ApiError,
   ValidationError,
   NotActivatedError,
+  NotFoundError,
   errorToResult,
   type ApiErrorCode,
   type ApiErrorBody,
@@ -33,3 +34,13 @@ export {
   handleRaiseDispute,
   type MarketplaceHandlerDeps,
 } from './marketplace-handler';
+export {
+  handleProductSubmit,
+  handleProductReport,
+  handleProductCheckout,
+  type ProductSubmitHandlerDeps,
+  type ProductSubmitResponseBody,
+  type ProductReportHandlerDeps,
+  type ProductCheckoutHandlerDeps,
+} from './product-handler';
+export { type ProductPersistenceInfo } from './product-wire';

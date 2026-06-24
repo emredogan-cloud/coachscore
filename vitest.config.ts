@@ -47,6 +47,10 @@ export default defineConfig({
         'lib/api/payment-wire.ts',
         'lib/payouts/connect-adapter.ts',
         'lib/api/marketplace-wire.ts',
+        // Phase 6 product persistence wiring — resolves the live DB repositories;
+        // the handler tests inject fake `persist`/`fetch`, so the logic is covered
+        // without a database.
+        'lib/api/product-wire.ts',
       ],
       thresholds: {
         statements: 90,

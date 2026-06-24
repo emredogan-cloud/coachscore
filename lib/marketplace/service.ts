@@ -440,7 +440,16 @@ export class MarketplaceService {
       'Moderation not found.',
     );
     await this.updateAssignment(ra.id, { status: 'approved' });
-    await this.repos.reports.updateStatus(ra.reportId, { status: 'approved' });
+    if (ra.reportId !== null) {
+      await this.repos.reports.updateStatus(ra.reportId, {
+        status: 'approved',
+      });
+    }
+    if (ra.productReportId !== null) {
+      await this.repos.productReports.update(ra.productReportId, {
+        status: 'approved',
+      });
+    }
 
     let payout: Payout | null = null;
     if (ra.coachId !== null) {
@@ -526,7 +535,14 @@ export class MarketplaceService {
       'Moderation not found.',
     );
     await this.updateAssignment(ra.id, { status: 'rejected' });
-    await this.repos.reports.updateStatus(ra.reportId, { status: 'failed' });
+    if (ra.reportId !== null) {
+      await this.repos.reports.updateStatus(ra.reportId, { status: 'failed' });
+    }
+    if (ra.productReportId !== null) {
+      await this.repos.productReports.update(ra.productReportId, {
+        status: 'failed',
+      });
+    }
     await this.audit(
       identity.userId,
       'moderation.rejected',

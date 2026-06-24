@@ -12,6 +12,7 @@ import {
   priceForQuantity,
   type SkuId,
 } from '@/lib/pricing';
+import { getProduct, type ProductSku } from '@/lib/products';
 import type { PaymentProvider } from './types';
 
 export interface CreateCheckoutInput {
@@ -86,5 +87,58 @@ export async function createCheckout(
     sessionId: session.sessionId,
     url: session.url,
     amountCents,
+  };
+}
+
+export interface CreateProductCheckoutInput {
+  readonly sku: ProductSku;
+  readonly userId?: string | null;
+  readonly successUrl: string;
+  readonly cancelUrl: string;
+  readonly customerEmail?: string;
+}
+
+/**
+ * Checkout for a Phase-6 product SKU (ReplayDoctor / BaseDoctor / WarPlan).
+ * Reuses the same provider + order machinery as report checkout, but prices
+ * from the product catalog and records the purchase on `orders.productSku`
+ * (the report-tier column stays null for product orders).
+ */
+export async function createProductCheckout(
+  input: CreateProductCheckoutInput,
+  deps: CheckoutDeps,
+): Promise<CreateCheckoutResult> {
+  const product = getProduct(input.sku);
+
+  const order = await deps.repos.orders.create({
+    userId: input.userId ?? null,
+    reportId: null,
+    productSku: input.sku,
+    quantity: 1,
+    amountCents: product.priceUsdCents,
+    currency: 'usd',
+    status: 'pending',
+  });
+
+  const session = await deps.provider.createCheckoutSession({
+    productName: `CoachScore ${product.name}`,
+    unitAmountCents: product.priceUsdCents,
+    currency: 'usd',
+    quantity: 1,
+    successUrl: input.successUrl,
+    cancelUrl: input.cancelUrl,
+    clientReferenceId: order.id,
+    customerEmail: input.customerEmail,
+  });
+
+  await deps.repos.orders.update(order.id, {
+    stripeSessionId: session.sessionId,
+  });
+
+  return {
+    orderId: order.id,
+    sessionId: session.sessionId,
+    url: session.url,
+    amountCents: product.priceUsdCents,
   };
 }

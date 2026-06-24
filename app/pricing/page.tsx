@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { activationStatus } from '@/lib/activation';
 import { PricingTable } from '@/components/pricing/pricing-table';
+import { ProductCards } from '@/components/products/product-cards';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +29,20 @@ export default function PricingPage() {
       <div className="mt-8">
         <PricingTable />
       </div>
+
+      <section className="mt-16" aria-labelledby="addons-heading">
+        <h2 id="addons-heading" className="text-2xl font-bold tracking-tight">
+          Specialized coaching tools
+        </h2>
+        <p className="mt-2 text-gray-600 dark:text-gray-300">
+          Targeted, one-off analysis — submit an attack replay, a base layout,
+          or your next war and get an instant report you can have a coach
+          verify.
+        </p>
+        <div className="mt-6">
+          <ProductCards />
+        </div>
+      </section>
     </div>
   );
 }

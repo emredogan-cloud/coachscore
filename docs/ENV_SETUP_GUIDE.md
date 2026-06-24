@@ -523,8 +523,9 @@ Each phase lists the variables that **must** be obtained before starting it.
 - Coach onboarding, the review/moderation workflow, ratings, disputes, economics, and the coach/admin dashboards are **built**; they activate with the database (Phase 3 Supabase) + Stripe.
 - `STRIPE_SECRET_KEY` (reused — coach transfers) · `STRIPE_CONNECT_CLIENT_ID` (optional, Standard OAuth) · `WISE_API_TOKEN` / `PAYONEER_API_KEY` ⛔ PLANNED (fallback)
 
-### Phase 6 — Additional SKUs (ReplayDoctor/BaseDoctor/WarPlan)
-- Reuses existing rails (Supabase, R2, Stripe, Anthropic). R2 video usage grows. No new providers.
+### Phase 6 — Additional SKUs (ReplayDoctor/BaseDoctor/WarPlan)  🟡 IMPLEMENTED_BUT_NOT_ACTIVATED
+- The three product engines, submission/analysis pipeline, report renderer, persistence (`product_submissions` + `product_reports`, migrations `0006`/`0007` RLS), coach-review reuse, REST routes (`/api/products/{submit,report/[id],checkout}`), and UI (`/products`, `/products/[sku]`, pricing cards) are **built**.
+- **No new environment variables.** Reuses existing rails: `ANTHROPIC_API_KEY` (optional AI enrichment — the report is computed deterministically without it), `DATABASE_URL` (saving + coach review), `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` (checkout). The inline report works with zero credentials; each missing credential gates exactly one capability. R2 video usage grows but uses the existing bucket.
 
 ### Phase 7 — Growth Infrastructure
 - `NEXT_PUBLIC_POSTHOG_KEY` ⛔ · `NEXT_PUBLIC_POSTHOG_HOST` (default ok) · `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` ⛔ PLANNED

@@ -15,6 +15,8 @@ const USER_PERMISSIONS: readonly Permission[] = [
   'report:create',
   'report:read:own',
   'upload:create',
+  'product:create',
+  'product:read:own',
 ];
 
 const COACH_PERMISSIONS: readonly Permission[] = [

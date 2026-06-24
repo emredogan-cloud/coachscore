@@ -48,6 +48,10 @@ import type {
   ReviewAssignment,
   Upload,
   User,
+  ProductSubmission,
+  NewProductSubmission,
+  ProductReportRow,
+  NewProductReportRow,
 } from '../schema';
 
 export interface RepoDeps {
@@ -214,6 +218,26 @@ export interface NotificationRepository {
   ): Promise<Notification | null>;
 }
 
+export interface ProductSubmissionRepository {
+  create(input: NewProductSubmission): Promise<ProductSubmission>;
+  findById(id: string): Promise<ProductSubmission | null>;
+  update(
+    id: string,
+    patch: Partial<ProductSubmission>,
+  ): Promise<ProductSubmission | null>;
+}
+
+export interface ProductReportRepository {
+  create(input: NewProductReportRow): Promise<ProductReportRow>;
+  findById(id: string): Promise<ProductReportRow | null>;
+  findBySubmission(submissionId: string): Promise<ProductReportRow | null>;
+  listByStatus(status: ProductReportRow['status']): Promise<ProductReportRow[]>;
+  update(
+    id: string,
+    patch: Partial<ProductReportRow>,
+  ): Promise<ProductReportRow | null>;
+}
+
 export interface Repositories {
   readonly users: UserRepository;
   readonly accounts: AccountRepository;
@@ -235,4 +259,6 @@ export interface Repositories {
   readonly payouts: PayoutRepository;
   readonly disputes: DisputeRepository;
   readonly notifications: NotificationRepository;
+  readonly productSubmissions: ProductSubmissionRepository;
+  readonly productReports: ProductReportRepository;
 }
