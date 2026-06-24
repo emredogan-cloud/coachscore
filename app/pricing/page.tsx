@@ -2,22 +2,36 @@ import type { Metadata } from 'next';
 import { activationStatus } from '@/lib/activation';
 import { PricingTable } from '@/components/pricing/pricing-table';
 import { ProductCards } from '@/components/products/product-cards';
+import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { HeroBanner } from '@/components/ui';
+import { buildMetadata } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: 'Pricing — CoachScore',
+export const metadata: Metadata = buildMetadata({
+  title: 'Pricing — one-time Clash of Clans account reports | CoachScore',
   description:
     'One-time CoachScore reports: a free teaser, instant AI reports, and ' +
-    'human-verified coaching tiers. AI-drafted, human-verified.',
-};
+    'human-verified coaching tiers. No subscription.',
+  path: '/pricing',
+});
 
 export default function PricingPage() {
   const { payments } = activationStatus();
   return (
     <div className="mx-auto max-w-md px-4 py-10">
-      <HeroBanner tagline="Expert ratings · strategic advantage" />
+      <Breadcrumbs
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Pricing', href: '/pricing' },
+        ]}
+      />
+      <div className="mt-3">
+        <HeroBanner
+          headline="Pricing — one-time Clash of Clans reports"
+          tagline="Expert ratings · strategic advantage"
+        />
+      </div>
       <p className="mt-5 text-center text-[15px] text-[var(--muted)]">
         One-time reports — no subscription. AI-drafted, human-verified coaching.
       </p>

@@ -1,12 +1,16 @@
 import type { Metadata } from 'next';
+import { Breadcrumbs } from '@/components/seo/breadcrumbs';
+import { JsonLdScript } from '@/components/seo/json-ld';
 import { HeroBanner, MagicButton, PremiumCard } from '@/components/ui';
+import { buildMetadata, siteUrl, webApplicationJsonLd } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Get started — CoachScore',
+export const metadata: Metadata = buildMetadata({
+  title: 'Score your Clash of Clans account free — get started | CoachScore',
   description:
-    'How CoachScore works: submit your Clash of Clans account, get a scored ' +
-    'grade, and receive a prioritized, goal-aware upgrade roadmap.',
-};
+    'How CoachScore works: submit your Clash of Clans account, get a free ' +
+    'scored grade, and receive a prioritized, goal-aware upgrade roadmap.',
+  path: '/onboarding',
+});
 
 const STEPS: readonly { n: string; title: string; detail: string }[] = [
   {
@@ -40,7 +44,19 @@ const GOALS: readonly string[] = [
 export default function OnboardingPage() {
   return (
     <div className="mx-auto max-w-md px-4 py-10">
-      <HeroBanner tagline="How it works" />
+      <JsonLdScript data={webApplicationJsonLd(siteUrl())} />
+      <Breadcrumbs
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Get started', href: '/onboarding' },
+        ]}
+      />
+      <div className="mt-3">
+        <HeroBanner
+          headline="Score your Clash of Clans account in 3 steps"
+          tagline="How it works"
+        />
+      </div>
       <p className="mt-5 text-center text-[15px] text-[var(--muted)]">
         Stop guessing what to upgrade next — three steps to your roadmap.
       </p>

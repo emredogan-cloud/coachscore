@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ProductSubmitForm } from '@/components/products/product-submit-form';
+import { Breadcrumbs } from '@/components/seo/breadcrumbs';
+import { JsonLdScript } from '@/components/seo/json-ld';
 import { StatusBadge } from '@/components/ui';
+import { buildMetadata, canonicalUrl, productJsonLd } from '@/lib/seo';
 import {
   formatProductPrice,
   getProduct,
@@ -28,7 +30,11 @@ export async function generateMetadata({
   const { sku } = await params;
   if (!isSku(sku)) return { title: 'Not found — CoachScore' };
   const product = getProduct(sku);
-  return { title: `${product.name} — CoachScore`, description: product.blurb };
+  return buildMetadata({
+    title: `${product.name} — Clash of Clans ${product.repeatable ? 'replay' : 'account'} review | CoachScore`,
+    description: product.blurb,
+    path: `/products/${sku}`,
+  });
 }
 
 export default async function ProductSkuPage({
@@ -39,15 +45,25 @@ export default async function ProductSkuPage({
   const { sku } = await params;
   if (!isSku(sku)) notFound();
   const product = getProduct(sku);
+  const url = canonicalUrl(`/products/${sku}`);
 
   return (
     <div className="mx-auto max-w-md px-4 py-8">
-      <Link
-        href="/products"
-        className="inline-flex items-center gap-1 text-sm text-[var(--muted)] hover:text-white"
-      >
-        ← All tools
-      </Link>
+      <JsonLdScript
+        data={productJsonLd({
+          name: product.name,
+          description: product.blurb,
+          url,
+          priceUsd: product.priceUsdCents / 100,
+        })}
+      />
+      <Breadcrumbs
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Tools', href: '/products' },
+          { name: product.name, href: `/products/${sku}` },
+        ]}
+      />
       <header className="mt-4">
         <div className="flex items-center gap-2">
           <h1 className="text-3xl font-extrabold tracking-tight text-violet-gradient">
