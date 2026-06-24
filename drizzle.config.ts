@@ -1,4 +1,8 @@
 import { defineConfig } from 'drizzle-kit';
+import * as dotenv from 'dotenv';
+
+// Next.js ortamında .env.local dosyasının Drizzle Kit tarafından okunmasını sağla
+dotenv.config({ path: '.env.local' });
 
 /**
  * Drizzle Kit config (Phase 3).

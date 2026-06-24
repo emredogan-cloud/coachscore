@@ -20,7 +20,7 @@ definitions come from the master execution prompt; gating conditions come from
 | 2 | AI Pipeline (Claude) + schema validation + anti-hallucination | ✅ done | — (real `ANTHROPIC_API_KEY` available) |
 | 3 | Data Intake (tag / screenshot / manual) + DB / snapshots / storage / auth+RLS | 🟡 implemented, not activated | Supabase + R2 (activation only) |
 | 4 | Web Product (onboarding, teaser, full report, PDF, share, pricing, payments, email) | 🟡 implemented, not activated | Stripe + Resend (activation only) |
-| 5 | Coach Marketplace Infrastructure | ⛔ gated | Stripe Connect (+ Wise/Payoneer) |
+| 5 | Coach Marketplace (onboarding, review/moderation, ratings, disputes, payouts, admin) | 🟡 implemented, not activated | Supabase + Stripe Connect (activation only) |
 | 6 | Additional SKUs (ReplayDoctor, BaseDoctor, WarPlan) | ⛔ gated | depends on P5 |
 | 7 | Growth Infrastructure (analytics, experiments, referrals, SEO) | ⛔ gated | PostHog |
 | 8 | Optimization (perf, cost, caching, observability) | ⛔ gated | depends on P2–P7 |
@@ -117,10 +117,34 @@ definitions come from the master execution prompt; gating conditions come from
 - **Activation only**: Stripe (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`) and
   Resend (`RESEND_API_KEY`), plus the Phase-3 Supabase creds for persistence.
 
-## Credential gate (why phases 5+ stop here)
+## Phase 5 — Coach Marketplace 🟡 (implemented, not activated)
 
-Phases 5+ require live third-party services with no keys present
-(Stripe Connect, Wise/Payoneer, PostHog) plus the Phase-3/4 activation creds
-(Supabase, R2, Stripe, Resend). Their secret-free logic can still be implemented
-and unit-tested behind interfaces; live wiring resumes the moment the
-corresponding credential is provided.
+- **Domain state machines** via a generic FSM helper (`lib/fsm`): coach status,
+  application, review workflow, moderation, dispute (all pure + tested).
+- **Coach domain** (`lib/coach`): specialties catalog, profile validation,
+  Bayesian reputation scoring.
+- **Economics** (`lib/economics`): 60/40 coach/platform split + earnings.
+- **MarketplaceService** (`lib/marketplace`): coach onboarding (apply → approve
+  → activate), the human-review workflow (assign/claim/release/start/submit/
+  escalate), moderation (approve/request-revision/reject), ratings + reputation
+  recompute, disputes — all with deny-by-default auth + audit + queued
+  notifications.
+- **Payouts** (`lib/payouts`): Stripe Connect provider interface + adapter
+  (fetch, gated) + a payout service (onboarding, account-active, execute).
+- **Notifications** (`lib/notifications`): templates + delivery (gated on Resend).
+- **DB** (migration 0004 + RLS 0005): coaches, coach_applications,
+  review_assignments, moderations, coach_ratings, payout_accounts, payouts,
+  disputes, notifications + deny-by-default RLS; repos (in-memory + Drizzle).
+- **API/UI**: `/api/{coach/apply,coach/rate,dispute}` + coach/admin server
+  actions; `/coach` (apply), `/coach/dashboard`, `/admin`. All marketplace
+  writes return `not_activated` until the database (+ Supabase Auth) exists.
+- ~70 new tests; coverage thresholds held; CI green.
+- **Activation only**: Supabase (Phase 3) for persistence + Stripe (Connect) for
+  payouts.
+
+## Credential gate (why phases 6+ stop here)
+
+Phases 6+ require live third-party services with no keys present plus the
+Phase-3/4/5 activation creds (Supabase, R2, Stripe, Resend). Their secret-free
+logic can still be implemented and unit-tested behind interfaces; live wiring
+resumes the moment the corresponding credential is provided.

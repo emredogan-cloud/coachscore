@@ -27,3 +27,9 @@ export {
   handleStripeWebhookRequest,
   type WebhookApiDeps,
 } from './webhook-handler';
+export {
+  handleCoachApply,
+  handleRateCoach,
+  handleRaiseDispute,
+  type MarketplaceHandlerDeps,
+} from './marketplace-handler';
