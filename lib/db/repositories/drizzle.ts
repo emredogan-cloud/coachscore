@@ -7,12 +7,17 @@
  * logic in unit tests, so this file is outside coverage thresholds.
  */
 
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { getDb } from '../client';
 import {
   accounts,
   accountSnapshots,
+  analyticsEvents,
   auditLogs,
+  experimentAssignments,
+  lifecycleMessages,
+  referralCodes,
+  referrals,
   coachApplications,
   coachRatings,
   coaches,
@@ -78,9 +83,20 @@ import type {
   NewProductSubmission,
   ProductReportRow,
   NewProductReportRow,
+  AnalyticsEventRow,
+  NewAnalyticsEventRow,
+  ExperimentAssignmentRow,
+  NewExperimentAssignmentRow,
+  ReferralCodeRow,
+  NewReferralCodeRow,
+  ReferralRow,
+  NewReferralRow,
+  LifecycleMessageRow,
+  NewLifecycleMessageRow,
 } from '../schema';
 import type {
   AccountRepository,
+  AnalyticsEventRepository,
   AuditLogRepository,
   CoachApplicationRepository,
   CoachRatingRepository,
@@ -88,7 +104,9 @@ import type {
   DisputeRepository,
   EmailDeliveryRepository,
   EntitlementRepository,
+  ExperimentAssignmentRepository,
   JobRepository,
+  LifecycleMessageRepository,
   ModerationRepository,
   NotificationRepository,
   OrderRepository,
@@ -96,6 +114,8 @@ import type {
   PayoutRepository,
   ProductReportRepository,
   ProductSubmissionRepository,
+  ReferralCodeRepository,
+  ReferralRepository,
   Repositories,
   ReportDraftRepository,
   ReportRepository,
@@ -717,6 +737,168 @@ class DrizzleProductReportRepository implements ProductReportRepository {
   }
 }
 
+class DrizzleAnalyticsEventRepository implements AnalyticsEventRepository {
+  async create(input: NewAnalyticsEventRow): Promise<AnalyticsEventRow> {
+    return first(
+      await getDb().insert(analyticsEvents).values(input).returning(),
+    );
+  }
+  async list(): Promise<AnalyticsEventRow[]> {
+    return getDb().select().from(analyticsEvents);
+  }
+  async listByName(name: string): Promise<AnalyticsEventRow[]> {
+    return getDb()
+      .select()
+      .from(analyticsEvents)
+      .where(eq(analyticsEvents.name, name));
+  }
+}
+
+class DrizzleExperimentAssignmentRepository implements ExperimentAssignmentRepository {
+  async create(
+    input: NewExperimentAssignmentRow,
+  ): Promise<ExperimentAssignmentRow> {
+    return first(
+      await getDb().insert(experimentAssignments).values(input).returning(),
+    );
+  }
+  async findBySubject(
+    subjectId: string,
+    experimentKey: string,
+  ): Promise<ExperimentAssignmentRow | null> {
+    const r = await getDb()
+      .select()
+      .from(experimentAssignments)
+      .where(
+        and(
+          eq(experimentAssignments.subjectId, subjectId),
+          eq(experimentAssignments.experimentKey, experimentKey),
+        ),
+      )
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async listByExperiment(
+    experimentKey: string,
+  ): Promise<ExperimentAssignmentRow[]> {
+    return getDb()
+      .select()
+      .from(experimentAssignments)
+      .where(eq(experimentAssignments.experimentKey, experimentKey));
+  }
+  async list(): Promise<ExperimentAssignmentRow[]> {
+    return getDb().select().from(experimentAssignments);
+  }
+}
+
+class DrizzleReferralCodeRepository implements ReferralCodeRepository {
+  async create(input: NewReferralCodeRow): Promise<ReferralCodeRow> {
+    return first(await getDb().insert(referralCodes).values(input).returning());
+  }
+  async findByCode(code: string): Promise<ReferralCodeRow | null> {
+    const r = await getDb()
+      .select()
+      .from(referralCodes)
+      .where(eq(referralCodes.code, code))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async findByUser(userId: string): Promise<ReferralCodeRow | null> {
+    const r = await getDb()
+      .select()
+      .from(referralCodes)
+      .where(eq(referralCodes.userId, userId))
+      .limit(1);
+    return r[0] ?? null;
+  }
+}
+
+class DrizzleReferralRepository implements ReferralRepository {
+  async create(input: NewReferralRow): Promise<ReferralRow> {
+    return first(await getDb().insert(referrals).values(input).returning());
+  }
+  async findById(id: string): Promise<ReferralRow | null> {
+    const r = await getDb()
+      .select()
+      .from(referrals)
+      .where(eq(referrals.id, id))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async findPendingByReferee(
+    refereeUserId: string,
+  ): Promise<ReferralRow | null> {
+    const r = await getDb()
+      .select()
+      .from(referrals)
+      .where(
+        and(
+          eq(referrals.refereeUserId, refereeUserId),
+          eq(referrals.status, 'pending'),
+        ),
+      )
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async listByReferrer(referrerUserId: string): Promise<ReferralRow[]> {
+    return getDb()
+      .select()
+      .from(referrals)
+      .where(eq(referrals.referrerUserId, referrerUserId));
+  }
+  async list(): Promise<ReferralRow[]> {
+    return getDb().select().from(referrals);
+  }
+  async update(
+    id: string,
+    patch: Partial<ReferralRow>,
+  ): Promise<ReferralRow | null> {
+    const r = await getDb()
+      .update(referrals)
+      .set(patch)
+      .where(eq(referrals.id, id))
+      .returning();
+    return r[0] ?? null;
+  }
+}
+
+class DrizzleLifecycleMessageRepository implements LifecycleMessageRepository {
+  async create(input: NewLifecycleMessageRow): Promise<LifecycleMessageRow> {
+    return first(
+      await getDb().insert(lifecycleMessages).values(input).returning(),
+    );
+  }
+  async findByDedupeKey(
+    dedupeKey: string,
+  ): Promise<LifecycleMessageRow | null> {
+    const r = await getDb()
+      .select()
+      .from(lifecycleMessages)
+      .where(eq(lifecycleMessages.dedupeKey, dedupeKey))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async listByStatus(
+    status: LifecycleMessageRow['status'],
+  ): Promise<LifecycleMessageRow[]> {
+    return getDb()
+      .select()
+      .from(lifecycleMessages)
+      .where(eq(lifecycleMessages.status, status));
+  }
+  async update(
+    id: string,
+    patch: Partial<LifecycleMessageRow>,
+  ): Promise<LifecycleMessageRow | null> {
+    const r = await getDb()
+      .update(lifecycleMessages)
+      .set(patch)
+      .where(eq(lifecycleMessages.id, id))
+      .returning();
+    return r[0] ?? null;
+  }
+}
+
 export function createDrizzleRepositories(): Repositories {
   return {
     users: new DrizzleUserRepository(),
@@ -741,5 +923,10 @@ export function createDrizzleRepositories(): Repositories {
     notifications: new DrizzleNotificationRepository(),
     productSubmissions: new DrizzleProductSubmissionRepository(),
     productReports: new DrizzleProductReportRepository(),
+    analyticsEvents: new DrizzleAnalyticsEventRepository(),
+    experimentAssignments: new DrizzleExperimentAssignmentRepository(),
+    referralCodes: new DrizzleReferralCodeRepository(),
+    referrals: new DrizzleReferralRepository(),
+    lifecycleMessages: new DrizzleLifecycleMessageRepository(),
   };
 }

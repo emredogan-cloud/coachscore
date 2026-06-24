@@ -21,6 +21,8 @@ export type Permission =
   | 'upload:create'
   | 'product:create'
   | 'product:read:own'
+  | 'referral:create'
+  | 'referral:read:own'
   | 'audit:read'
   | 'admin:manage';
 

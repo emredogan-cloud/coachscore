@@ -20,6 +20,8 @@ const KEYS = [
   'ANTHROPIC_API_KEY',
   'STRIPE_SECRET_KEY',
   'RESEND_API_KEY',
+  'NEXT_PUBLIC_POSTHOG_KEY',
+  'NEXT_PUBLIC_PLAUSIBLE_DOMAIN',
 ] as const;
 
 const saved: Record<string, string | undefined> = {};
@@ -47,6 +49,8 @@ describe('activation gates', () => {
       ai: false,
       payments: false,
       email: false,
+      analytics: false,
+      plausible: false,
     });
   });
 

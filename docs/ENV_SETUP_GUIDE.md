@@ -344,9 +344,9 @@ Verification, Common Mistakes, and Security Notes.
 
 ---
 
-## Provider: PostHog (product analytics + experiments)  ·  `PLANNED_NOT_IMPLEMENTED` (Phase 7)
+## Provider: PostHog (product analytics + experiments)  ·  `IMPLEMENTED_BUT_NOT_ACTIVATED` (Phase 7)
 
-> Declared `.env.example:41–42`; `COACHSCORE_ROADMAP.md` §3/§11 (the experimentation system). No code yet (Phase 4 can start basic events; the framework is Phase 7).
+> **Read by code (Phase 7):** `lib/analytics` (`AnalyticsService` + taxonomy + funnels; the `PostHogProvider` forwards events via the `/capture/` HTTP endpoint in `posthog-adapter.ts`, gated on `NEXT_PUBLIC_POSTHOG_KEY`). Without the key, capture forwards to a no-op sink and (when `DATABASE_URL` is set) persists locally to `analytics_events` so the growth dashboard still works. Experiment assignment (`lib/experiments`) is deterministic + key-independent. `COACHSCORE_ROADMAP.md` §3/§11.
 
 **Pricing Tier:** **Free tier** (generous — ~1M events/mo, session replay quota, feature flags). Usage-based beyond. EU cloud host for GDPR/KVKK.
 **Dashboard Navigation:** `posthog.com` (choose **EU** region) → **Project Settings → Project API Key**; host is the EU ingestion URL.
@@ -527,8 +527,13 @@ Each phase lists the variables that **must** be obtained before starting it.
 - The three product engines, submission/analysis pipeline, report renderer, persistence (`product_submissions` + `product_reports`, migrations `0006`/`0007` RLS), coach-review reuse, REST routes (`/api/products/{submit,report/[id],checkout}`), and UI (`/products`, `/products/[sku]`, pricing cards) are **built**.
 - **No new environment variables.** Reuses existing rails: `ANTHROPIC_API_KEY` (optional AI enrichment — the report is computed deterministically without it), `DATABASE_URL` (saving + coach review), `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` (checkout). The inline report works with zero credentials; each missing credential gates exactly one capability. R2 video usage grows but uses the existing bucket.
 
-### Phase 7 — Growth Infrastructure
-- `NEXT_PUBLIC_POSTHOG_KEY` ⛔ · `NEXT_PUBLIC_POSTHOG_HOST` (default ok) · `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` ⛔ PLANNED
+### Phase 7 — Growth Infrastructure  🟡 IMPLEMENTED_BUT_NOT_ACTIVATED
+- **Built:** `lib/analytics` (taxonomy + funnels + PostHog/no-op sinks + PII scrub), `lib/experiments` (deterministic sticky assignment + flags + the roadmap's pre-registered experiments), `lib/referrals` (creator-code referrals + rewards + attribution), `lib/share` viral extensions (social targets + UTM + referral cards), `lib/seo` (metadata + JSON-LD + sitemap/robots + programmatic per-TH guides), `lib/lifecycle` (D1/D7/D30 + abandoned-checkout + winback rules engine), `lib/growth` (funnel/experiment/referral/KPI aggregation). DB tables `analytics_events`/`experiment_assignments`/`referral_codes`/`referrals`/`lifecycle_messages` (migrations `0008`/`0009` RLS). Routes `/api/{analytics/track, experiments/{assign,flags}, referrals, referrals/claim, growth/dashboard}`; pages `/guides`, `/guides/[slug]`, `/referrals`, `/admin/growth`, plus `sitemap.xml` + `robots.txt`.
+- **Env (all optional — gate one capability each, none required to build/run):**
+  - `NEXT_PUBLIC_POSTHOG_KEY` — forwards events to PostHog; absent ⇒ no-op forward + local DB persistence (`isAnalyticsConfigured`).
+  - `NEXT_PUBLIC_POSTHOG_HOST` — EU ingestion endpoint (default `https://eu.posthog.com`).
+  - `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` — privacy-friendly traffic analytics (`isPlausibleConfigured`); script-tag only, no server code path.
+  - **Reused:** `DATABASE_URL` (persist analytics/assignments/referrals/lifecycle; power the growth dashboard), `RESEND_API_KEY` (lifecycle/winback delivery — feature-gated; un-delivered messages stay `scheduled`, never faked). Referral writes + the growth dashboard additionally need Supabase **Auth** (the anonymous identity stub returns `not_activated` until then).
 - (P7 localization) local payment provider keys (UPI/GoPay) ⛔ PLANNED — via Stripe or a local PSP
 
 ### Phase 8 — Optimization / Data Moat

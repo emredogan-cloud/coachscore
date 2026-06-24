@@ -59,6 +59,12 @@ export default function HomePage() {
         >
           Specialized tools
         </Link>
+        <Link
+          href="/guides"
+          className="inline-block rounded-md border border-gray-300 px-5 py-2.5 text-sm dark:border-gray-700"
+        >
+          Upgrade guides
+        </Link>
       </div>
       <p className="mt-3 text-sm text-gray-500">
         Free instant score. Full report with a prioritized upgrade roadmap,

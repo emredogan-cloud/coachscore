@@ -175,6 +175,28 @@ export const productReportStatus = pgEnum('product_report_status', [
   'failed',
 ]);
 
+// Phase 7 — Growth infrastructure.
+export const analyticsSource = pgEnum('analytics_source', ['web', 'server']);
+export const referralStatus = pgEnum('referral_status', [
+  'pending',
+  'qualified',
+  'rewarded',
+  'expired',
+  'revoked',
+]);
+export const lifecycleKind = pgEnum('lifecycle_kind', [
+  'onboarding_reminder',
+  'abandoned_checkout',
+  'retention',
+  'winback',
+]);
+export const lifecycleStatus = pgEnum('lifecycle_status', [
+  'scheduled',
+  'sent',
+  'skipped',
+  'failed',
+]);
+
 // --- Tables -----------------------------------------------------------------
 
 export const users = pgTable('users', {
@@ -697,6 +719,120 @@ export const productReports = pgTable(
   (t) => [index('product_reports_submission_idx').on(t.submissionId)],
 );
 
+// Phase 7 — Growth infrastructure tables.
+
+export const analyticsEvents = pgTable(
+  'analytics_events',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id, {
+      onDelete: 'set null',
+    }),
+    anonId: text('anon_id'),
+    name: text('name').notNull(),
+    source: analyticsSource('source').notNull().default('server'),
+    properties: jsonb('properties').$type<Record<string, unknown>>(),
+    occurredAt: timestamp('occurred_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('analytics_events_name_idx').on(t.name),
+    index('analytics_events_occurred_idx').on(t.occurredAt),
+    index('analytics_events_user_idx').on(t.userId),
+  ],
+);
+
+export const experimentAssignments = pgTable(
+  'experiment_assignments',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    subjectId: text('subject_id').notNull(),
+    experimentKey: text('experiment_key').notNull(),
+    variant: text('variant').notNull(),
+    assignedAt: timestamp('assigned_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    uniqueIndex('experiment_assignments_subject_key_idx').on(
+      t.subjectId,
+      t.experimentKey,
+    ),
+  ],
+);
+
+export const referralCodes = pgTable(
+  'referral_codes',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    code: text('code').notNull().unique(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index('referral_codes_user_idx').on(t.userId)],
+);
+
+export const referrals = pgTable(
+  'referrals',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    codeId: uuid('code_id')
+      .notNull()
+      .references(() => referralCodes.id, { onDelete: 'cascade' }),
+    referrerUserId: uuid('referrer_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    refereeUserId: uuid('referee_user_id').references(() => users.id, {
+      onDelete: 'set null',
+    }),
+    status: referralStatus('status').notNull().default('pending'),
+    rewardCents: integer('reward_cents').notNull().default(0),
+    attributedOrderId: uuid('attributed_order_id').references(() => orders.id, {
+      onDelete: 'set null',
+    }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    qualifiedAt: timestamp('qualified_at', { withTimezone: true }),
+  },
+  (t) => [
+    index('referrals_referrer_idx').on(t.referrerUserId),
+    index('referrals_code_idx').on(t.codeId),
+    index('referrals_referee_idx').on(t.refereeUserId),
+  ],
+);
+
+export const lifecycleMessages = pgTable(
+  'lifecycle_messages',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
+    anonId: text('anon_id'),
+    kind: lifecycleKind('kind').notNull(),
+    status: lifecycleStatus('status').notNull().default('scheduled'),
+    dedupeKey: text('dedupe_key').notNull().unique(),
+    scheduledFor: timestamp('scheduled_for', { withTimezone: true }).notNull(),
+    sentAt: timestamp('sent_at', { withTimezone: true }),
+    payload: jsonb('payload').$type<Record<string, unknown>>(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('lifecycle_messages_status_idx').on(t.status),
+    index('lifecycle_messages_scheduled_idx').on(t.scheduledFor),
+    index('lifecycle_messages_user_idx').on(t.userId),
+  ],
+);
+
 // --- Inferred row types ------------------------------------------------------
 
 export type User = typeof users.$inferSelect;
@@ -743,3 +879,14 @@ export type ProductSubmission = typeof productSubmissions.$inferSelect;
 export type NewProductSubmission = typeof productSubmissions.$inferInsert;
 export type ProductReportRow = typeof productReports.$inferSelect;
 export type NewProductReportRow = typeof productReports.$inferInsert;
+export type AnalyticsEventRow = typeof analyticsEvents.$inferSelect;
+export type NewAnalyticsEventRow = typeof analyticsEvents.$inferInsert;
+export type ExperimentAssignmentRow = typeof experimentAssignments.$inferSelect;
+export type NewExperimentAssignmentRow =
+  typeof experimentAssignments.$inferInsert;
+export type ReferralCodeRow = typeof referralCodes.$inferSelect;
+export type NewReferralCodeRow = typeof referralCodes.$inferInsert;
+export type ReferralRow = typeof referrals.$inferSelect;
+export type NewReferralRow = typeof referrals.$inferInsert;
+export type LifecycleMessageRow = typeof lifecycleMessages.$inferSelect;
+export type NewLifecycleMessageRow = typeof lifecycleMessages.$inferInsert;
