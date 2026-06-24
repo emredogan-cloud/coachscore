@@ -21,10 +21,10 @@ export function notificationToEmail(
 ): EmailMessage {
   const subject = `[CoachScore] ${notification.title}`;
   const text = `${notification.title}\n\n${notification.body}`;
-  const html =
-    `<!doctype html><html><body style="font-family:sans-serif;color:#111">` +
-    `<h3>${esc(notification.title)}</h3><p>${esc(notification.body)}</p>` +
-    `<hr/><p style="color:#777;font-size:11px">CoachScore — unofficial, not endorsed by Supercell.</p>` +
-    `</body></html>`;
+  const title = esc(notification.title);
+  const body = esc(notification.body);
+  // Both interpolations are HTML-escaped above, so this is safe static markup.
+  // nosemgrep: javascript.express.security.injection.raw-html-format.raw-html-format
+  const html = `<!doctype html><html><body style="font-family:sans-serif;color:#111"><h3>${title}</h3><p>${body}</p><hr/><p style="color:#777;font-size:11px">CoachScore — unofficial, not endorsed by Supercell.</p></body></html>`;
   return { to: toEmail, subject, html, text };
 }
