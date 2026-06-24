@@ -35,6 +35,9 @@ export default defineConfig({
         // store cover the logic in unit tests.
         'lib/queue/drizzle-store.ts',
         'lib/queue/wire.ts',
+        // Phase 9 observability wiring — resolves console/Sentry/BetterStack
+        // adapters at activation; the logger/monitoring/health logic is tested.
+        'lib/observability/wire.ts',
         // Phase 3 database I/O boundary — declarative schema + the live
         // Postgres client/repositories, exercised once Supabase is provisioned.
         // The in-memory repositories cover the persistence logic in unit tests.

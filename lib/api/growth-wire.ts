@@ -7,15 +7,16 @@
  * coverage.
  */
 
+import { resolveIdentity } from '@/lib/auth';
 import type { Identity } from '@/lib/auth';
 import { AnalyticsService, defaultAnalyticsProvider } from '@/lib/analytics';
 import { createDrizzleRepositories } from '@/lib/db';
 import { GrowthService } from '@/lib/growth';
 import { ReferralService } from '@/lib/referrals';
 
-/** Replaced by Supabase Auth session resolution at activation. */
+/** Delegates to the central identity resolver (Phase 9). */
 export function resolveGrowthIdentity(): Identity {
-  return { userId: null, role: 'anon' };
+  return resolveIdentity();
 }
 
 export function resolveReferralService(): ReferralService {

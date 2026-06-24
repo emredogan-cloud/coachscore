@@ -9,7 +9,7 @@
  */
 
 import { createDrizzleRepositories, PersistenceService } from '@/lib/db';
-import type { Identity } from '@/lib/auth';
+import { resolveIdentity } from '@/lib/auth';
 import type { IntakeResult } from '@/lib/intake';
 
 export interface PersistenceInfo {
@@ -20,15 +20,10 @@ export interface PersistenceInfo {
   readonly snapshotId?: string;
 }
 
-/** Replaced by Supabase Auth session resolution at activation. */
-function currentIdentity(): Identity {
-  return { userId: null, role: 'anon' };
-}
-
 export async function persistIntake(
   result: IntakeResult,
 ): Promise<PersistenceInfo> {
-  const identity = currentIdentity();
+  const identity = resolveIdentity();
   if (identity.userId === null) {
     return {
       attempted: true,

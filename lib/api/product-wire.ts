@@ -9,7 +9,7 @@
  * fakes), so this file is outside coverage.
  */
 
-import type { Identity } from '@/lib/auth';
+import { resolveIdentity } from '@/lib/auth';
 import { createDrizzleRepositories } from '@/lib/db';
 import {
   ProductService,
@@ -24,18 +24,13 @@ export interface ProductPersistenceInfo {
   readonly reportId?: string;
 }
 
-/** Replaced by Supabase Auth session resolution at activation. */
-function currentIdentity(): Identity {
-  return { userId: null, role: 'anon' };
-}
-
 export async function persistProductReport(args: {
   readonly request: ProductInput;
   readonly report: ProductReportView;
   readonly context?: string;
   readonly uploadKeys?: readonly string[];
 }): Promise<ProductPersistenceInfo> {
-  const identity = currentIdentity();
+  const identity = resolveIdentity();
   if (identity.userId === null) {
     return {
       attempted: true,
@@ -58,7 +53,7 @@ export async function persistProductReport(args: {
 export async function resolveProductReport(
   reportId: string,
 ): Promise<ProductReportView | null> {
-  const identity = currentIdentity();
+  const identity = resolveIdentity();
   const service = new ProductService(createDrizzleRepositories());
   const row = await service.getReport(identity, reportId);
   return row?.analysis ?? null;

@@ -5,15 +5,13 @@
  * activation; the handlers inject fakes in tests, so this file is outside coverage.
  */
 
-import type { Identity } from '@/lib/auth';
 import { createDrizzleRepositories } from '@/lib/db';
 import { MarketplaceService } from '@/lib/marketplace';
 import { createStripeConnectProvider, PayoutService } from '@/lib/payouts';
 
-/** Replaced by Supabase Auth session resolution at activation. */
-export function resolveIdentity(): Identity {
-  return { userId: null, role: 'anon' };
-}
+// Identity resolution is centralized in lib/auth (Phase 9); re-exported here so
+// existing call sites keep importing it from the wire module.
+export { resolveIdentity } from '@/lib/auth';
 
 export function resolveMarketplaceService(): MarketplaceService {
   return new MarketplaceService(createDrizzleRepositories());
