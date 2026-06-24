@@ -44,15 +44,27 @@ export class AnalyticsService {
       anonId,
     };
 
-    await this.deps.provider.capture(captured);
+    // Telemetry is best-effort: a sink failure (PostHog down, DB unmigrated/
+    // unreachable) must never fail the caller. The taxonomy check above still
+    // throws for a genuine programming error (unknown event).
+    try {
+      await this.deps.provider.capture(captured);
+    } catch {
+      // forward sink unavailable — drop the event silently.
+    }
     if (this.deps.repo) {
-      await this.deps.repo.create({
-        userId,
-        anonId,
-        name: captured.name,
-        source: captured.source,
-        properties: clean,
-      });
+      try {
+        await this.deps.repo.create({
+          userId,
+          anonId,
+          name: captured.name,
+          source: captured.source,
+          properties: clean,
+        });
+      } catch {
+        // local persistence unavailable (e.g. DATABASE_URL set but not migrated)
+        // — never propagate; the forward sink already received the event.
+      }
     }
     return captured;
   }

@@ -11,6 +11,9 @@ export default tseslint.config(
       'next-env.d.ts',
       '*.config.mjs',
       '*.config.ts',
+      // Device-validation capture tooling — runs in a Playwright browser
+      // context (browser + node globals), not part of the app lint scope.
+      'scripts/*capture*.mjs',
     ],
   },
   js.configs.recommended,
