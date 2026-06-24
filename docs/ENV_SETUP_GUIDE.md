@@ -536,11 +536,18 @@ Each phase lists the variables that **must** be obtained before starting it.
   - **Reused:** `DATABASE_URL` (persist analytics/assignments/referrals/lifecycle; power the growth dashboard), `RESEND_API_KEY` (lifecycle/winback delivery — feature-gated; un-delivered messages stay `scheduled`, never faked). Referral writes + the growth dashboard additionally need Supabase **Auth** (the anonymous identity stub returns `not_activated` until then).
 - (P7 localization) local payment provider keys (UPI/GoPay) ⛔ PLANNED — via Stripe or a local PSP
 
-### Phase 8 — Optimization / Data Moat
-- No new credentials. `pgvector` runs inside Supabase (no new vendor — `reports/TECH_DECISIONS.md`). Optional fine-tuning uses the existing `ANTHROPIC_API_KEY`.
+### Phase 8 — Optimization / Data Moat  🟡 IMPLEMENTED_BUT_NOT_ACTIVATED
+- **No new required credentials.** Built: AI cost controls (prompt + response caching, cost/token accounting, `BudgetGuard`, timeout/retry — `lib/ai`), durable queue (`AsyncQueueStore` + `runDurableJob` + persistent `DrizzleQueueStore` on the `jobs` table, gated on `DATABASE_URL`; Redis/QStash adapter interface for later), performance caches (`lib/cache`), pgvector-ready retrieval/data-moat (`lib/retrieval` — `pgvector` inside the existing Supabase, **no new vendor**; a real embedding provider implements `EmbeddingProvider` at activation), perf indexes (migration `0010`) + `docs/db/PARTITIONING_RETENTION.md`, SEO ISR.
+- Optional: a real embedding provider (any vendor) for semantic retrieval; until then the offline hashing embedder runs.
 
-### Phase 9 — Production Readiness
-- No new credentials. Ensure **all** secrets are set in Vercel (Production), Sentry/uptime live, and the reference-data readiness gate passes for served Town Halls.
+### Phase 9 — Production Readiness  🟡 IMPLEMENTED_BUT_NOT_ACTIVATED
+- **No new *required* credentials.** Built: centralized identity (`lib/auth/identity.ts` — the single resolver Supabase Auth replaces), observability (`lib/observability` — structured logging + error/alert/heartbeat abstractions + `/api/health` activation matrix + `/admin/health`), security primitives (`lib/security` — rate limiter, fraud heuristics, abuse helpers), Playwright E2E + gated RLS/webhook integration suites, PWA (manifest + icon + service worker + offline shell), ops/deployment docs.
+- **Optional observability env (each lights one feature, none required to build/run):**
+  - `SENTRY_DSN` — error monitoring; absent ⇒ errors log via the structured logger (`LoggingErrorReporter`). The Sentry adapter (`@sentry/node`) is the one dependency to add at activation.
+  - `BETTERSTACK_HEARTBEAT_URL` — uptime heartbeat (`HttpHeartbeat`); absent ⇒ no-op.
+  - `LOG_LEVEL` (default `info`) — minimum structured-log level.
+  - E2E (test-only, not app env): `E2E_BASE_URL` (+ `E2E_STRIPE_TEST=1`) to run Playwright against staging; `SUPABASE_RLS_TEST=1` to run the live cross-tenant RLS suite.
+- Launch gate (`docs/deployment/LAUNCH_CHECKLIST.md`): reference data verified, Supabase Auth live + RLS proven, live Stripe webhook fulfillment, observability live, durable queue on Postgres.
 
 ---
 

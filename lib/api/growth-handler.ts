@@ -12,7 +12,7 @@
 import { z } from 'zod';
 import { isDatabaseConfigured } from '@/lib/activation';
 import type { Identity } from '@/lib/auth';
-import { AuthorizationError } from '@/lib/auth';
+import { AuthorizationError, isElevated } from '@/lib/auth';
 import {
   AnalyticsError,
   AnalyticsService,
@@ -256,7 +256,7 @@ export async function handleGrowthDashboard(
     );
   }
   const identity = deps.identity ?? resolveGrowthIdentity();
-  if (identity.role !== 'admin' && identity.role !== 'coach') {
+  if (!isElevated(identity)) {
     return errorToResult(new NotActivatedError(AUTH_NOT_ACTIVATED));
   }
   const service = deps.service ?? resolveGrowthService();

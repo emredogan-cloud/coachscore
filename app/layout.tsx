@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Disclaimer } from '@/components/disclaimer';
 import { ConsentBanner } from '@/components/growth/consent-banner';
+import { RegisterServiceWorker } from '@/components/pwa/register-sw';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({
           <Disclaimer />
         </footer>
         <ConsentBanner />
+        <RegisterServiceWorker />
       </body>
     </html>
   );

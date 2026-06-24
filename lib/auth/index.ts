@@ -8,3 +8,11 @@ export {
   canReadAccount,
   canReadReport,
 } from './policy';
+export {
+  ANONYMOUS_IDENTITY,
+  resolveIdentity,
+  isElevated,
+  assertRole,
+  hasAll,
+  RoleRequiredError,
+} from './identity';
