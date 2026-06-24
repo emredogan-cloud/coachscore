@@ -44,3 +44,16 @@ export {
   type ProductCheckoutHandlerDeps,
 } from './product-handler';
 export { type ProductPersistenceInfo } from './product-wire';
+export {
+  handleTrackEvent,
+  handleAssignExperiment,
+  handleGetFlags,
+  handleCreateReferralCode,
+  handleClaimReferral,
+  handleMyReferrals,
+  handleGrowthDashboard,
+  type TrackEventDeps,
+  type AssignExperimentDeps,
+  type ReferralHandlerDeps,
+  type GrowthDashboardDeps,
+} from './growth-handler';

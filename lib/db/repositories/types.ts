@@ -52,6 +52,16 @@ import type {
   NewProductSubmission,
   ProductReportRow,
   NewProductReportRow,
+  AnalyticsEventRow,
+  NewAnalyticsEventRow,
+  ExperimentAssignmentRow,
+  NewExperimentAssignmentRow,
+  ReferralCodeRow,
+  NewReferralCodeRow,
+  ReferralRow,
+  NewReferralRow,
+  LifecycleMessageRow,
+  NewLifecycleMessageRow,
 } from '../schema';
 
 export interface RepoDeps {
@@ -238,6 +248,49 @@ export interface ProductReportRepository {
   ): Promise<ProductReportRow | null>;
 }
 
+export interface AnalyticsEventRepository {
+  create(input: NewAnalyticsEventRow): Promise<AnalyticsEventRow>;
+  list(): Promise<AnalyticsEventRow[]>;
+  listByName(name: string): Promise<AnalyticsEventRow[]>;
+}
+
+export interface ExperimentAssignmentRepository {
+  create(input: NewExperimentAssignmentRow): Promise<ExperimentAssignmentRow>;
+  findBySubject(
+    subjectId: string,
+    experimentKey: string,
+  ): Promise<ExperimentAssignmentRow | null>;
+  listByExperiment(experimentKey: string): Promise<ExperimentAssignmentRow[]>;
+  list(): Promise<ExperimentAssignmentRow[]>;
+}
+
+export interface ReferralCodeRepository {
+  create(input: NewReferralCodeRow): Promise<ReferralCodeRow>;
+  findByCode(code: string): Promise<ReferralCodeRow | null>;
+  findByUser(userId: string): Promise<ReferralCodeRow | null>;
+}
+
+export interface ReferralRepository {
+  create(input: NewReferralRow): Promise<ReferralRow>;
+  findById(id: string): Promise<ReferralRow | null>;
+  findPendingByReferee(refereeUserId: string): Promise<ReferralRow | null>;
+  listByReferrer(referrerUserId: string): Promise<ReferralRow[]>;
+  list(): Promise<ReferralRow[]>;
+  update(id: string, patch: Partial<ReferralRow>): Promise<ReferralRow | null>;
+}
+
+export interface LifecycleMessageRepository {
+  create(input: NewLifecycleMessageRow): Promise<LifecycleMessageRow>;
+  findByDedupeKey(dedupeKey: string): Promise<LifecycleMessageRow | null>;
+  listByStatus(
+    status: LifecycleMessageRow['status'],
+  ): Promise<LifecycleMessageRow[]>;
+  update(
+    id: string,
+    patch: Partial<LifecycleMessageRow>,
+  ): Promise<LifecycleMessageRow | null>;
+}
+
 export interface Repositories {
   readonly users: UserRepository;
   readonly accounts: AccountRepository;
@@ -261,4 +314,9 @@ export interface Repositories {
   readonly notifications: NotificationRepository;
   readonly productSubmissions: ProductSubmissionRepository;
   readonly productReports: ProductReportRepository;
+  readonly analyticsEvents: AnalyticsEventRepository;
+  readonly experimentAssignments: ExperimentAssignmentRepository;
+  readonly referralCodes: ReferralCodeRepository;
+  readonly referrals: ReferralRepository;
+  readonly lifecycleMessages: LifecycleMessageRepository;
 }

@@ -48,6 +48,16 @@ export function isEmailConfigured(): boolean {
   return present('RESEND_API_KEY');
 }
 
+/** PostHog product analytics + experiments (Phase 7). */
+export function isAnalyticsConfigured(): boolean {
+  return present('NEXT_PUBLIC_POSTHOG_KEY');
+}
+
+/** Plausible privacy-friendly traffic analytics (Phase 7). */
+export function isPlausibleConfigured(): boolean {
+  return present('NEXT_PUBLIC_PLAUSIBLE_DOMAIN');
+}
+
 export interface ActivationStatus {
   readonly database: boolean;
   readonly storage: boolean;
@@ -55,6 +65,8 @@ export interface ActivationStatus {
   readonly ai: boolean;
   readonly payments: boolean;
   readonly email: boolean;
+  readonly analytics: boolean;
+  readonly plausible: boolean;
 }
 
 /** A snapshot of which credential-gated dependencies are currently activated. */
@@ -66,5 +78,7 @@ export function activationStatus(): ActivationStatus {
     ai: isAiConfigured(),
     payments: isPaymentsConfigured(),
     email: isEmailConfigured(),
+    analytics: isAnalyticsConfigured(),
+    plausible: isPlausibleConfigured(),
   };
 }

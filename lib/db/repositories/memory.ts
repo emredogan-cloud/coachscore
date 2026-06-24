@@ -52,9 +52,20 @@ import type {
   NewProductSubmission,
   ProductReportRow,
   NewProductReportRow,
+  AnalyticsEventRow,
+  NewAnalyticsEventRow,
+  ExperimentAssignmentRow,
+  NewExperimentAssignmentRow,
+  ReferralCodeRow,
+  NewReferralCodeRow,
+  ReferralRow,
+  NewReferralRow,
+  LifecycleMessageRow,
+  NewLifecycleMessageRow,
 } from '../schema';
 import type {
   AccountRepository,
+  AnalyticsEventRepository,
   AuditLogRepository,
   CoachApplicationRepository,
   CoachRatingRepository,
@@ -62,7 +73,9 @@ import type {
   DisputeRepository,
   EmailDeliveryRepository,
   EntitlementRepository,
+  ExperimentAssignmentRepository,
   JobRepository,
+  LifecycleMessageRepository,
   ModerationRepository,
   NotificationRepository,
   OrderRepository,
@@ -70,6 +83,8 @@ import type {
   PayoutRepository,
   ProductReportRepository,
   ProductSubmissionRepository,
+  ReferralCodeRepository,
+  ReferralRepository,
   Repositories,
   RepoDeps,
   ReportDraftRepository,
@@ -793,6 +808,168 @@ class MemProductReportRepository implements ProductReportRepository {
   }
 }
 
+class MemAnalyticsEventRepository implements AnalyticsEventRepository {
+  private readonly t = new MemTable<AnalyticsEventRow>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewAnalyticsEventRow): Promise<AnalyticsEventRow> {
+    const now = this.deps.now();
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      userId: input.userId ?? null,
+      anonId: input.anonId ?? null,
+      name: input.name,
+      source: input.source ?? 'server',
+      properties: input.properties ?? null,
+      occurredAt: input.occurredAt ?? now,
+      createdAt: input.createdAt ?? now,
+    });
+  }
+  async list(): Promise<AnalyticsEventRow[]> {
+    return this.t.all();
+  }
+  async listByName(name: string): Promise<AnalyticsEventRow[]> {
+    return this.t.all().filter((r) => r.name === name);
+  }
+}
+
+class MemExperimentAssignmentRepository implements ExperimentAssignmentRepository {
+  private readonly t = new MemTable<ExperimentAssignmentRow>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(
+    input: NewExperimentAssignmentRow,
+  ): Promise<ExperimentAssignmentRow> {
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      subjectId: input.subjectId,
+      experimentKey: input.experimentKey,
+      variant: input.variant,
+      assignedAt: input.assignedAt ?? this.deps.now(),
+    });
+  }
+  async findBySubject(
+    subjectId: string,
+    experimentKey: string,
+  ): Promise<ExperimentAssignmentRow | null> {
+    return (
+      this.t
+        .all()
+        .find(
+          (r) => r.subjectId === subjectId && r.experimentKey === experimentKey,
+        ) ?? null
+    );
+  }
+  async listByExperiment(
+    experimentKey: string,
+  ): Promise<ExperimentAssignmentRow[]> {
+    return this.t.all().filter((r) => r.experimentKey === experimentKey);
+  }
+  async list(): Promise<ExperimentAssignmentRow[]> {
+    return this.t.all();
+  }
+}
+
+class MemReferralCodeRepository implements ReferralCodeRepository {
+  private readonly t = new MemTable<ReferralCodeRow>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewReferralCodeRow): Promise<ReferralCodeRow> {
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      userId: input.userId,
+      code: input.code,
+      createdAt: input.createdAt ?? this.deps.now(),
+    });
+  }
+  async findByCode(code: string): Promise<ReferralCodeRow | null> {
+    return this.t.all().find((r) => r.code === code) ?? null;
+  }
+  async findByUser(userId: string): Promise<ReferralCodeRow | null> {
+    return this.t.all().find((r) => r.userId === userId) ?? null;
+  }
+}
+
+class MemReferralRepository implements ReferralRepository {
+  private readonly t = new MemTable<ReferralRow>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewReferralRow): Promise<ReferralRow> {
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      codeId: input.codeId,
+      referrerUserId: input.referrerUserId,
+      refereeUserId: input.refereeUserId ?? null,
+      status: input.status ?? 'pending',
+      rewardCents: input.rewardCents ?? 0,
+      attributedOrderId: input.attributedOrderId ?? null,
+      createdAt: input.createdAt ?? this.deps.now(),
+      qualifiedAt: input.qualifiedAt ?? null,
+    });
+  }
+  async findById(id: string): Promise<ReferralRow | null> {
+    return this.t.byId(id);
+  }
+  async findPendingByReferee(
+    refereeUserId: string,
+  ): Promise<ReferralRow | null> {
+    return (
+      this.t
+        .all()
+        .find(
+          (r) => r.refereeUserId === refereeUserId && r.status === 'pending',
+        ) ?? null
+    );
+  }
+  async listByReferrer(referrerUserId: string): Promise<ReferralRow[]> {
+    return this.t.all().filter((r) => r.referrerUserId === referrerUserId);
+  }
+  async list(): Promise<ReferralRow[]> {
+    return this.t.all();
+  }
+  async update(
+    id: string,
+    patch: Partial<ReferralRow>,
+  ): Promise<ReferralRow | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch });
+  }
+}
+
+class MemLifecycleMessageRepository implements LifecycleMessageRepository {
+  private readonly t = new MemTable<LifecycleMessageRow>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewLifecycleMessageRow): Promise<LifecycleMessageRow> {
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      userId: input.userId ?? null,
+      anonId: input.anonId ?? null,
+      kind: input.kind,
+      status: input.status ?? 'scheduled',
+      dedupeKey: input.dedupeKey,
+      scheduledFor: input.scheduledFor,
+      sentAt: input.sentAt ?? null,
+      payload: input.payload ?? null,
+      createdAt: input.createdAt ?? this.deps.now(),
+    });
+  }
+  async findByDedupeKey(
+    dedupeKey: string,
+  ): Promise<LifecycleMessageRow | null> {
+    return this.t.all().find((r) => r.dedupeKey === dedupeKey) ?? null;
+  }
+  async listByStatus(
+    status: LifecycleMessageRow['status'],
+  ): Promise<LifecycleMessageRow[]> {
+    return this.t.all().filter((r) => r.status === status);
+  }
+  async update(
+    id: string,
+    patch: Partial<LifecycleMessageRow>,
+  ): Promise<LifecycleMessageRow | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch });
+  }
+}
+
 /** Default deps for dev: random UUIDs + wall-clock timestamps. */
 export const defaultRepoDeps: RepoDeps = {
   idGen: () => randomUUID(),
@@ -825,5 +1002,10 @@ export function createInMemoryRepositories(
     notifications: new MemNotificationRepository(deps),
     productSubmissions: new MemProductSubmissionRepository(deps),
     productReports: new MemProductReportRepository(deps),
+    analyticsEvents: new MemAnalyticsEventRepository(deps),
+    experimentAssignments: new MemExperimentAssignmentRepository(deps),
+    referralCodes: new MemReferralCodeRepository(deps),
+    referrals: new MemReferralRepository(deps),
+    lifecycleMessages: new MemLifecycleMessageRepository(deps),
   };
 }

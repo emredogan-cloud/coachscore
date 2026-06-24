@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Disclaimer } from '@/components/disclaimer';
+import { ConsentBanner } from '@/components/growth/consent-banner';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default function RootLayout({
         <footer className="border-t border-gray-200 dark:border-gray-800">
           <Disclaimer />
         </footer>
+        <ConsentBanner />
       </body>
     </html>
   );

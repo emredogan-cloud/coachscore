@@ -51,6 +51,10 @@ export default defineConfig({
         // the handler tests inject fake `persist`/`fetch`, so the logic is covered
         // without a database.
         'lib/api/product-wire.ts',
+        // Phase 7 third-party + DB wiring boundaries — resolved at activation;
+        // the handlers/services inject fakes in tests.
+        'lib/analytics/posthog-adapter.ts',
+        'lib/api/growth-wire.ts',
       ],
       thresholds: {
         statements: 90,
