@@ -2,21 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Premium "battle" theme (Phase B). Dark, violet + gold, glassy panels with
+ * gradient borders + glows — matches the /interface artwork. Dark-only by design
+ * (the artwork has no light variant); we set color-scheme dark and a fixed
+ * aurora backdrop behind all content.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
+  color-scheme: dark;
+  --bg: #070510;
+  --surface: #100b1f;
+  --surface-2: #161029;
+  --border: rgba(255, 255, 255, 0.08);
+  --fg: #f5f3ff;
+  --muted: #a39db8;
+  --violet: #a855f7;
+  --gold: #e8b339;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #fafafa;
-  }
+html {
+  background: var(--bg);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  position: relative;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
   font-family:
     ui-sans-serif,
     system-ui,
@@ -24,4 +36,92 @@ body {
     'Segoe UI',
     Roboto,
     sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fixed aurora backdrop — radial violet/gold glows over the near-black base. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      60% 40% at 50% -5%,
+      rgba(124, 58, 237, 0.28),
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 35% at 100% 8%,
+      rgba(232, 179, 57, 0.1),
+      transparent 70%
+    ),
+    radial-gradient(
+      50% 40% at 0% 100%,
+      rgba(124, 58, 237, 0.16),
+      transparent 70%
+    ),
+    var(--bg);
+}
+
+@layer utilities {
+  /* Glassmorphism surface. */
+  .glass {
+    background: rgba(255, 255, 255, 0.035);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--border);
+  }
+
+  /* Gradient (violet→gold) border via double background-clip. */
+  .gradient-border {
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--surface), var(--surface)) padding-box,
+      linear-gradient(135deg, rgba(168, 85, 247, 0.55), rgba(232, 179, 57, 0.4))
+        border-box;
+  }
+  .gradient-border-gold {
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--surface), var(--surface)) padding-box,
+      linear-gradient(
+          135deg,
+          rgba(245, 210, 114, 0.85),
+          rgba(201, 150, 42, 0.5)
+        )
+        border-box;
+  }
+
+  /* Gradient text fills. */
+  .text-gold-gradient {
+    background: linear-gradient(135deg, #f5d272 0%, #e8b339 45%, #c9962a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-violet-gradient {
+    background: linear-gradient(135deg, #c4b5fd 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Brand wordmark treatment (no web-font dependency). */
+  .wordmark {
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    text-shadow: 0 0 24px rgba(168, 85, 247, 0.35);
+  }
+}
+
+/* Respect reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

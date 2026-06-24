@@ -51,7 +51,7 @@ export function ConfidenceCorrection({
         type="button"
         onClick={handleApply}
         disabled={submitting}
-        className="mt-3 rounded bg-black px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+        className="mt-3 rounded bg-black px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50 dark:bg-violet-gradient dark:text-white"
       >
         Apply corrections & re-score
       </button>

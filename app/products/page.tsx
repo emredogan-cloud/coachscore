@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { ProductCards } from '@/components/products/product-cards';
+import { HeroBanner } from '@/components/ui';
 
 export const metadata: Metadata = {
   title: 'Specialized tools — CoachScore',
@@ -11,14 +12,14 @@ export const metadata: Metadata = {
 
 export default function ProductsPage() {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12">
-      <h1 className="text-3xl font-bold tracking-tight">
-        Specialized coaching tools
-      </h1>
-      <p className="mt-2 text-gray-600 dark:text-gray-300">
+    <div className="mx-auto max-w-md px-4 py-10">
+      <HeroBanner tagline="Specialized coaching tools" />
+      <p className="mt-5 text-center text-[15px] text-[var(--muted)]">
         Beyond the full account score: targeted analysis for a single attack
-        replay, a base layout, or your next war. Each report is generated
-        instantly and can be verified by a real coach.
+        replay, a base layout, or your next war —{' '}
+        <span className="text-white">
+          generated instantly, coach-verifiable.
+        </span>
       </p>
       <div className="mt-8">
         <ProductCards />

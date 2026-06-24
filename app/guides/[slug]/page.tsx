@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { JsonLdScript } from '@/components/seo/json-ld';
+import { MagicButton, PremiumCard } from '@/components/ui';
 import {
   articleJsonLd,
   breadcrumbJsonLd,
@@ -61,44 +62,51 @@ export default async function GuidePage({
   ];
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-12">
+    <article className="mx-auto max-w-md px-4 py-10">
       <JsonLdScript data={jsonLd} />
-      <nav className="text-sm text-gray-500">
-        <Link href="/guides" className="hover:underline">
+      <nav className="text-sm text-[var(--muted)]">
+        <Link href="/guides" className="hover:text-white">
           Guides
         </Link>{' '}
-        / {guide.h1}
+        / <span className="text-[var(--fg)]/80">{guide.h1}</span>
       </nav>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight">{guide.h1}</h1>
-      <p className="mt-3 text-gray-600 dark:text-gray-300">{guide.intro}</p>
+      <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-white">
+        {guide.h1}
+      </h1>
+      <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">
+        {guide.intro}
+      </p>
 
       {guide.sections.map((section) => (
-        <section key={section.heading} className="mt-8">
-          <h2 className="text-xl font-semibold">{section.heading}</h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
+        <section key={section.heading} className="mt-7">
+          <h2 className="text-lg font-semibold text-white">
+            {section.heading}
+          </h2>
+          <p className="mt-2 text-[15px] leading-relaxed text-[var(--muted)]">
             {section.body}
           </p>
         </section>
       ))}
 
-      <div className="mt-10 rounded-lg border border-black p-5 dark:border-white">
-        <p className="font-medium">{guide.ctaText}</p>
-        <Link
-          href="/onboarding"
-          className="mt-3 inline-block rounded-md bg-black px-5 py-2.5 text-sm font-medium text-white dark:bg-white dark:text-black"
-        >
-          Score my account free
-        </Link>
-      </div>
+      <PremiumCard tone="gold" glowed className="mt-9 p-5 text-center">
+        <p className="font-medium text-white">{guide.ctaText}</p>
+        <div className="mt-3">
+          <MagicButton href="/onboarding" variant="gold">
+            Score my account free
+          </MagicButton>
+        </div>
+      </PremiumCard>
 
       {guide.faqs.length > 0 ? (
-        <section className="mt-10">
-          <h2 className="text-xl font-semibold">FAQ</h2>
-          <dl className="mt-2 space-y-4">
+        <section className="mt-9">
+          <h2 className="text-lg font-semibold text-white">FAQ</h2>
+          <dl className="mt-3 space-y-4">
             {guide.faqs.map((faq) => (
               <div key={faq.question}>
-                <dt className="font-medium">{faq.question}</dt>
-                <dd className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                <dt className="font-medium text-[var(--fg)]/90">
+                  {faq.question}
+                </dt>
+                <dd className="mt-1 text-sm text-[var(--muted)]">
                   {faq.answer}
                 </dd>
               </div>

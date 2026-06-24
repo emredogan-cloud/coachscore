@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { requestCheckout } from '@/app/report/actions';
 import type { SkuId } from '@/lib/pricing';
+import { MagicButton } from '@/components/ui';
 
 type Status = 'idle' | 'loading' | 'not_activated' | 'error';
 
@@ -28,21 +29,21 @@ export function BuyButton({ sku, label }: { sku: SkuId; label: string }) {
 
   return (
     <div>
-      <button
-        type="button"
+      <MagicButton
+        variant="violet"
+        size="lg"
         onClick={() => void buy()}
         disabled={status === 'loading'}
-        className="w-full rounded bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
       >
         {status === 'loading' ? 'Starting…' : label}
-      </button>
+      </MagicButton>
       {status === 'not_activated' ? (
-        <p className="mt-1 text-xs text-amber-600">
+        <p className="mt-2 text-xs text-amber-300/90">
           Checkout isn’t activated yet (Stripe not configured).
         </p>
       ) : null}
       {status === 'error' ? (
-        <p className="mt-1 text-xs text-red-600">
+        <p className="mt-2 text-xs text-red-300">
           Something went wrong — try again.
         </p>
       ) : null}
