@@ -25,6 +25,7 @@ export default function ProductsPage() {
       />
       <div className="mt-3">
         <HeroBanner
+          crest
           headline="Specialized Clash of Clans coaching tools"
           tagline="Targeted analysis"
         />

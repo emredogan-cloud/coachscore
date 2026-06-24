@@ -28,6 +28,7 @@ export default function PricingPage() {
       />
       <div className="mt-3">
         <HeroBanner
+          crest
           headline="Pricing — one-time Clash of Clans reports"
           tagline="Expert ratings · strategic advantage"
         />

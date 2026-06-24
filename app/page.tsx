@@ -81,10 +81,17 @@ const HOME_FAQS: readonly FaqEntry[] = [
 
 export default function HomePage() {
   return (
-    <div className="mx-auto max-w-md px-4 py-10">
+    <div className="relative mx-auto max-w-md px-4 py-10">
+      {/* Generated dark-aura backdrop behind the hero (2.7KB webp, masked to
+          fade out so body text keeps AA contrast). */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[460px] bg-[url('/assets/generated/hero-aura-bg.webp')] bg-cover bg-top opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent)]"
+      />
       <JsonLdScript data={faqJsonLd(HOME_FAQS)} />
 
       <HeroBanner
+        crest
         headline="Rate your Clash of Clans account & get an upgrade roadmap"
         tagline="Expert account rating"
       />
