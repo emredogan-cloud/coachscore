@@ -49,24 +49,31 @@ export class ExperimentService {
   async assign(subjectId: string, experimentKey: string): Promise<Assignment> {
     const experiment = this.experiment(experimentKey);
 
+    // Persistence is best-effort: assignment is deterministic, so a downed
+    // store (e.g. DATABASE_URL set but not migrated) degrades to stateless
+    // assignment rather than failing the request.
     if (this.deps.repo) {
-      const existing = await this.deps.repo.findBySubject(
-        subjectId,
-        experimentKey,
-      );
-      if (existing) {
-        return {
+      try {
+        const existing = await this.deps.repo.findBySubject(
           subjectId,
           experimentKey,
-          variant: existing.variant,
-        };
+        );
+        if (existing) {
+          return { subjectId, experimentKey, variant: existing.variant };
+        }
+      } catch {
+        // store unavailable — fall through to stateless (sticky-by-hash) assignment.
       }
     }
 
     const variant = assignVariant(experiment, subjectId);
 
     if (this.deps.repo) {
-      await this.deps.repo.create({ subjectId, experimentKey, variant });
+      try {
+        await this.deps.repo.create({ subjectId, experimentKey, variant });
+      } catch {
+        // persistence unavailable — the variant is still deterministic + stable.
+      }
     }
     await this.recordExposure(subjectId, experimentKey, variant);
 

@@ -111,4 +111,35 @@ describe('AnalyticsService', () => {
     await forwardOnly.track({ name: 'teaser_started' });
     expect(sink.events).toHaveLength(1);
   });
+
+  it('is best-effort: a failing persistence sink never throws (device-found bug)', async () => {
+    const brokenRepo = {
+      async create() {
+        throw new Error('Failed query: insert into "analytics_events" ...');
+      },
+      async list() {
+        return [];
+      },
+      async listByName() {
+        return [];
+      },
+    };
+    const svcWithBrokenDb = new AnalyticsService({
+      provider: sink,
+      repo: brokenRepo,
+    });
+    const captured = await svcWithBrokenDb.track({ name: 'teaser_completed' });
+    expect(captured.name).toBe('teaser_completed');
+    expect(sink.events).toHaveLength(1); // forward sink still received it
+  });
+
+  it('is best-effort: a failing forward sink never throws', async () => {
+    const brokenProvider = {
+      async capture() {
+        throw new Error('posthog down');
+      },
+    };
+    const svc2 = new AnalyticsService({ provider: brokenProvider });
+    await expect(svc2.track({ name: 'landing_viewed' })).resolves.toBeTruthy();
+  });
 });

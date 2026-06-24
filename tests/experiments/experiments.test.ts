@@ -133,4 +133,32 @@ describe('ExperimentService', () => {
     expect(real.flag('referrals_enabled', 'u1')).toBe(true);
     expect(real.flag('does_not_exist', 'u1')).toBe(false);
   });
+
+  it('degrades to stateless assignment when the store is down (device-found bug)', async () => {
+    const brokenRepo = {
+      async create() {
+        throw new Error(
+          'Failed query: insert into "experiment_assignments" ...',
+        );
+      },
+      async findBySubject() {
+        throw new Error('Failed query: select ... experiment_assignments ...');
+      },
+      async listByExperiment() {
+        return [];
+      },
+      async list() {
+        return [];
+      },
+    };
+    const resilient = new ExperimentService({
+      repo: brokenRepo,
+      experiments: [TWO_WAY],
+    });
+    const a = await resilient.assign('user-7', 'exp_ab');
+    expect(['a', 'b']).toContain(a.variant);
+    // Deterministic: same subject → same variant even without persistence.
+    const again = await resilient.assign('user-7', 'exp_ab');
+    expect(again.variant).toBe(a.variant);
+  });
 });
