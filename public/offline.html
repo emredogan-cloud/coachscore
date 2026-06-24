@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Offline — CoachScore</title>
     <style>
+      :root {
+        color-scheme: dark;
+      }
       body {
         font-family:
           system-ui,
@@ -12,8 +15,14 @@
           Segoe UI,
           Roboto,
           sans-serif;
-        background: #0a0a0a;
-        color: #fafafa;
+        background:
+          radial-gradient(
+            60% 40% at 50% 0%,
+            rgba(124, 58, 237, 0.28),
+            transparent 70%
+          ),
+          #070510;
+        color: #f5f3ff;
         display: flex;
         min-height: 100vh;
         margin: 0;
@@ -23,22 +32,33 @@
       }
       .card {
         max-width: 28rem;
-        padding: 2rem;
+        padding: 2.5rem 2rem;
+      }
+      .glyph {
+        font-size: 3rem;
+        filter: drop-shadow(0 0 22px rgba(168, 85, 247, 0.5));
       }
       h1 {
-        font-size: 1.5rem;
+        margin: 1rem 0 0.5rem;
+        font-size: 1.6rem;
+        background: linear-gradient(135deg, #f5d272, #a855f7);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
       }
       p {
-        color: #a3a3a3;
+        color: #a39db8;
+        line-height: 1.6;
       }
     </style>
   </head>
   <body>
     <div class="card">
+      <div class="glyph">⚔️</div>
       <h1>You're offline</h1>
       <p>
-        CoachScore needs a connection to score accounts. Saved reports you've
-        already opened remain available — reconnect to generate new ones.
+        CoachScore needs a connection to score accounts. Reports you've already
+        opened stay available — reconnect to generate new ones.
       </p>
     </div>
   </body>

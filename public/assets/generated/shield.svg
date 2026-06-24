@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 112" role="img" aria-label="CoachScore shield">
+  <defs>
+    <linearGradient id="sg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#e8b339" />
+    </linearGradient>
+  </defs>
+  <path d="M48 4l40 14v34c0 28-20 44-40 56C28 96 8 80 8 52V18L48 4z"
+        fill="none" stroke="url(#sg)" stroke-width="3" />
+  <path d="M48 16l28 10v26c0 20-14 31-28 40-14-9-28-20-28-40V26l28-10z"
+        fill="rgba(168,85,247,0.12)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" />
+</svg>

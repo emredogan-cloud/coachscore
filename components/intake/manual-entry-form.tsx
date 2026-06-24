@@ -202,7 +202,7 @@ export function ManualEntryForm({
       <button
         type="submit"
         disabled={submitting}
-        className="rounded bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+        className="rounded bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-violet-gradient dark:text-white"
       >
         {submitting ? 'Scoring…' : 'Get my CoachScore'}
       </button>

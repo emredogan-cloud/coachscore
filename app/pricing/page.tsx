@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { activationStatus } from '@/lib/activation';
 import { PricingTable } from '@/components/pricing/pricing-table';
 import { ProductCards } from '@/components/products/product-cards';
+import { HeroBanner } from '@/components/ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,29 +16,31 @@ export const metadata: Metadata = {
 export default function PricingPage() {
   const { payments } = activationStatus();
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12">
-      <h1 className="text-3xl font-bold tracking-tight">Pricing</h1>
-      <p className="mt-2 text-gray-600 dark:text-gray-300">
+    <div className="mx-auto max-w-md px-4 py-10">
+      <HeroBanner tagline="Expert ratings · strategic advantage" />
+      <p className="mt-5 text-center text-[15px] text-[var(--muted)]">
         One-time reports — no subscription. AI-drafted, human-verified coaching.
       </p>
       {!payments ? (
-        <p className="mt-4 rounded bg-amber-50 p-3 text-sm text-amber-700 dark:bg-amber-950/30">
+        <p className="mt-5 rounded-xl border border-amber-500/25 bg-amber-500/10 p-3 text-center text-sm text-amber-200/90">
           Checkout is not activated yet (Stripe not configured). Browse the
-          plans below; purchasing turns on once payments are live.
+          plans below — purchasing turns on once payments are live.
         </p>
       ) : null}
       <div className="mt-8">
         <PricingTable />
       </div>
 
-      <section className="mt-16" aria-labelledby="addons-heading">
-        <h2 id="addons-heading" className="text-2xl font-bold tracking-tight">
+      <section className="mt-14" aria-labelledby="addons-heading">
+        <h2
+          id="addons-heading"
+          className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold/80"
+        >
           Specialized coaching tools
         </h2>
-        <p className="mt-2 text-gray-600 dark:text-gray-300">
+        <p className="mx-auto mt-2 max-w-sm text-center text-sm text-[var(--muted)]">
           Targeted, one-off analysis — submit an attack replay, a base layout,
-          or your next war and get an instant report you can have a coach
-          verify.
+          or your next war and get an instant report a coach can verify.
         </p>
         <div className="mt-6">
           <ProductCards />

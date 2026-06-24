@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { HeroBanner, MagicButton, PremiumCard } from '@/components/ui';
 
 export const metadata: Metadata = {
   title: 'Get started — CoachScore',
@@ -8,18 +8,21 @@ export const metadata: Metadata = {
     'grade, and receive a prioritized, goal-aware upgrade roadmap.',
 };
 
-const STEPS: readonly { title: string; detail: string }[] = [
+const STEPS: readonly { n: string; title: string; detail: string }[] = [
   {
-    title: '1. Submit your account',
+    n: '1',
+    title: 'Submit your account',
     detail: 'Enter your levels, upload screenshots, or paste your player tag.',
   },
   {
-    title: '2. Get scored',
+    n: '2',
+    title: 'Get scored',
     detail:
       'A deterministic engine grades seven dimensions for the goal you pick.',
   },
   {
-    title: '3. Get your roadmap',
+    n: '3',
+    title: 'Get your roadmap',
     detail:
       'A prioritized, goal-aware upgrade plan — AI-drafted, human-verified.',
   },
@@ -36,38 +39,42 @@ const GOALS: readonly string[] = [
 
 export default function OnboardingPage() {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12">
-      <h1 className="text-3xl font-bold tracking-tight">
-        Welcome to CoachScore
-      </h1>
-      <p className="mt-2 text-gray-600 dark:text-gray-300">
-        Stop guessing what to upgrade next. Here is how it works.
+    <div className="mx-auto max-w-md px-4 py-10">
+      <HeroBanner tagline="How it works" />
+      <p className="mt-5 text-center text-[15px] text-[var(--muted)]">
+        Stop guessing what to upgrade next — three steps to your roadmap.
       </p>
 
-      <ol className="mt-8 space-y-4">
+      <ol className="mt-8 space-y-3">
         {STEPS.map((step) => (
-          <li
-            key={step.title}
-            className="rounded-lg border border-gray-200 p-4 dark:border-gray-800"
-          >
-            <h2 className="font-semibold">{step.title}</h2>
-            <p className="mt-1 text-sm text-gray-500">{step.detail}</p>
-          </li>
+          <PremiumCard key={step.n} tone="violet" className="p-4">
+            <div className="flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-gradient text-sm font-bold text-white shadow-glow-violet-sm">
+                {step.n}
+              </span>
+              <div>
+                <h2 className="font-semibold text-white">{step.title}</h2>
+                <p className="mt-0.5 text-sm text-[var(--muted)]">
+                  {step.detail}
+                </p>
+              </div>
+            </div>
+          </PremiumCard>
         ))}
       </ol>
 
       <section className="mt-8" aria-labelledby="goals-heading">
         <h2
           id="goals-heading"
-          className="text-sm font-semibold uppercase text-gray-500"
+          className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold/80"
         >
           Pick a goal when you start
         </h2>
-        <ul className="mt-3 flex flex-wrap gap-2">
+        <ul className="mt-3 flex flex-wrap justify-center gap-2">
           {GOALS.map((goal) => (
             <li
               key={goal}
-              className="rounded-full border border-gray-200 px-3 py-1 text-sm dark:border-gray-800"
+              className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-[var(--fg)]/90"
             >
               {goal}
             </li>
@@ -75,19 +82,13 @@ export default function OnboardingPage() {
         </ul>
       </section>
 
-      <div className="mt-10 flex flex-wrap gap-3">
-        <Link
-          href="/report"
-          className="rounded-md bg-black px-5 py-2.5 text-sm font-medium text-white dark:bg-white dark:text-black"
-        >
+      <div className="mt-9 space-y-3">
+        <MagicButton href="/report" variant="gold" size="lg">
           Start — score my account
-        </Link>
-        <Link
-          href="/pricing"
-          className="rounded-md border border-gray-300 px-5 py-2.5 text-sm dark:border-gray-700"
-        >
+        </MagicButton>
+        <MagicButton href="/pricing" variant="ghost" size="lg">
           See pricing
-        </Link>
+        </MagicButton>
       </div>
     </div>
   );

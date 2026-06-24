@@ -3,7 +3,11 @@
 import { useState } from 'react';
 import { requestProductSubmit } from '@/app/products/actions';
 import type { ProductReportView, ProductSku } from '@/lib/products';
+import { MagicButton, PremiumCard } from '@/components/ui';
 import { ProductReportViewCard } from './product-report-view';
+
+const INPUT_CLS =
+  'mt-1.5 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-brand-violet/60 focus:ring-2 focus:ring-brand-violet/25';
 
 type FieldKind = 'number' | 'select' | 'boolean' | 'text';
 
@@ -283,18 +287,14 @@ export function ProductSubmitForm({ sku }: { sku: ProductSku }) {
     return (
       <div className="space-y-4">
         {persistNote ? (
-          <p className="rounded bg-gray-50 p-3 text-sm text-gray-600 dark:bg-gray-900 dark:text-gray-300">
+          <p className="rounded-xl border border-brand-violet/20 bg-brand-violet/10 p-3 text-sm text-brand-violet-light">
             {persistNote}
           </p>
         ) : null}
         <ProductReportViewCard report={report} />
-        <button
-          type="button"
-          onClick={() => setReport(null)}
-          className="rounded border border-gray-300 px-4 py-2 text-sm dark:border-gray-700"
-        >
+        <MagicButton variant="ghost" onClick={() => setReport(null)}>
           Submit another
-        </button>
+        </MagicButton>
       </div>
     );
   }
@@ -307,15 +307,15 @@ export function ProductSubmitForm({ sku }: { sku: ProductSku }) {
       }}
       className="space-y-4"
     >
-      <div className="grid gap-4 sm:grid-cols-2">
+      <PremiumCard tone="plain" className="grid gap-4 p-5 sm:grid-cols-2">
         {FIELD_SETS[sku].map((f) => (
           <label key={f.key} className="block text-sm">
-            <span className="font-medium">{f.label}</span>
+            <span className="font-medium text-white/85">{f.label}</span>
             {f.kind === 'select' ? (
               <select
                 value={String(values[f.key])}
                 onChange={(e) => set(f.key, e.target.value)}
-                className="mt-1 w-full rounded border border-gray-300 bg-transparent px-2 py-1 dark:border-gray-700"
+                className={INPUT_CLS}
               >
                 {f.options?.map((o) => (
                   <option key={o.value} value={o.value}>
@@ -337,15 +337,17 @@ export function ProductSubmitForm({ sku }: { sku: ProductSku }) {
                 min={f.min}
                 max={f.max}
                 onChange={(e) => set(f.key, e.target.value)}
-                className="mt-1 w-full rounded border border-gray-300 bg-transparent px-2 py-1 dark:border-gray-700"
+                className={INPUT_CLS}
               />
             )}
           </label>
         ))}
-      </div>
+      </PremiumCard>
 
       <label className="block text-sm">
-        <span className="font-medium">Anything else? (optional)</span>
+        <span className="font-medium text-white/85">
+          Anything else? (optional)
+        </span>
         <textarea
           value={context}
           onChange={(e) => setContext(e.target.value)}
@@ -354,15 +356,23 @@ export function ProductSubmitForm({ sku }: { sku: ProductSku }) {
         />
       </label>
 
-      <button
+      <MagicButton
         type="submit"
+        variant="violet"
+        size="lg"
         disabled={status === 'loading'}
-        className="rounded bg-black px-5 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
       >
-        {status === 'loading' ? 'Analyzing…' : 'Get my analysis'}
-      </button>
+        {status === 'loading' ? (
+          <span className="inline-flex items-center gap-2">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            Analyzing…
+          </span>
+        ) : (
+          'Get my analysis'
+        )}
+      </MagicButton>
       {status === 'error' ? (
-        <p className="text-sm text-red-600">
+        <p className="text-sm text-red-300">
           Something went wrong — check your inputs and try again.
         </p>
       ) : null}
