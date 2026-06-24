@@ -53,6 +53,7 @@ export default function OnboardingPage() {
       />
       <div className="mt-3">
         <HeroBanner
+          crest
           headline="Score your Clash of Clans account in 3 steps"
           tagline="How it works"
         />

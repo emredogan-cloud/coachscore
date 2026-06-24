@@ -69,11 +69,16 @@ const config: Config = {
           from: { opacity: '0', transform: 'translateY(6px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
+        float: {
+          '0%,100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-6px)' },
+        },
       },
       animation: {
         'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
         shimmer: 'shimmer 1.6s infinite',
         'count-up': 'count-up 0.5s ease-out both',
+        float: 'float 6s ease-in-out infinite',
       },
     },
   },
