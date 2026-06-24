@@ -45,6 +45,8 @@ export default defineConfig({
         'lib/payments/stripe-adapter.ts',
         'lib/email/resend-adapter.ts',
         'lib/api/payment-wire.ts',
+        'lib/payouts/connect-adapter.ts',
+        'lib/api/marketplace-wire.ts',
       ],
       thresholds: {
         statements: 90,

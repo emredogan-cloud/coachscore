@@ -30,18 +30,45 @@ import type {
   NewEntitlement,
   EmailDelivery,
   NewEmailDelivery,
+  Coach,
+  NewCoach,
+  CoachApplication,
+  NewCoachApplication,
+  ReviewAssignment,
+  NewReviewAssignment,
+  Moderation,
+  NewModeration,
+  CoachRating,
+  NewCoachRating,
+  PayoutAccount,
+  NewPayoutAccount,
+  Payout,
+  NewPayout,
+  Dispute,
+  NewDispute,
+  Notification,
+  NewNotification,
 } from '../schema';
 import type {
   AccountRepository,
   AuditLogRepository,
+  CoachApplicationRepository,
+  CoachRatingRepository,
+  CoachRepository,
+  DisputeRepository,
   EmailDeliveryRepository,
   EntitlementRepository,
   JobRepository,
+  ModerationRepository,
+  NotificationRepository,
   OrderRepository,
+  PayoutAccountRepository,
+  PayoutRepository,
   Repositories,
   RepoDeps,
   ReportDraftRepository,
   ReportRepository,
+  ReviewAssignmentRepository,
   SnapshotRepository,
   UploadRepository,
   UserRepository,
@@ -384,6 +411,307 @@ class MemEmailDeliveryRepository implements EmailDeliveryRepository {
   }
 }
 
+class MemCoachRepository implements CoachRepository {
+  private readonly t = new MemTable<Coach>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewCoach): Promise<Coach> {
+    const now = this.deps.now();
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      userId: input.userId,
+      displayName: input.displayName,
+      bio: input.bio,
+      status: input.status ?? 'applied',
+      specialties: input.specialties,
+      hourlyRateCents: input.hourlyRateCents ?? null,
+      acceptingWork: input.acceptingWork ?? true,
+      weeklyCapacity: input.weeklyCapacity ?? 10,
+      ratingAverage: input.ratingAverage ?? 0,
+      ratingCount: input.ratingCount ?? 0,
+      reputationScore: input.reputationScore ?? 0,
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
+    });
+  }
+  async findById(id: string): Promise<Coach | null> {
+    return this.t.byId(id);
+  }
+  async findByUserId(userId: string): Promise<Coach | null> {
+    return this.t.all().find((c) => c.userId === userId) ?? null;
+  }
+  async listByStatus(status: Coach['status']): Promise<Coach[]> {
+    return this.t.all().filter((c) => c.status === status);
+  }
+  async listActive(): Promise<Coach[]> {
+    return this.t.all().filter((c) => c.status === 'active');
+  }
+  async update(id: string, patch: Partial<Coach>): Promise<Coach | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch, updatedAt: this.deps.now() });
+  }
+}
+
+class MemCoachApplicationRepository implements CoachApplicationRepository {
+  private readonly t = new MemTable<CoachApplication>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewCoachApplication): Promise<CoachApplication> {
+    const now = this.deps.now();
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      userId: input.userId,
+      status: input.status ?? 'pending',
+      displayName: input.displayName,
+      bio: input.bio,
+      specialties: input.specialties,
+      motivation: input.motivation,
+      experience: input.experience,
+      reviewedByUserId: input.reviewedByUserId ?? null,
+      reviewNotes: input.reviewNotes ?? null,
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
+    });
+  }
+  async findById(id: string): Promise<CoachApplication | null> {
+    return this.t.byId(id);
+  }
+  async listByStatus(
+    status: CoachApplication['status'],
+  ): Promise<CoachApplication[]> {
+    return this.t.all().filter((a) => a.status === status);
+  }
+  async update(
+    id: string,
+    patch: Partial<CoachApplication>,
+  ): Promise<CoachApplication | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch, updatedAt: this.deps.now() });
+  }
+}
+
+class MemReviewAssignmentRepository implements ReviewAssignmentRepository {
+  private readonly t = new MemTable<ReviewAssignment>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewReviewAssignment): Promise<ReviewAssignment> {
+    const now = this.deps.now();
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      reportId: input.reportId,
+      reportDraftId: input.reportDraftId ?? null,
+      coachId: input.coachId ?? null,
+      status: input.status ?? 'unassigned',
+      editedDraft: input.editedDraft ?? null,
+      notes: input.notes ?? null,
+      claimedAt: input.claimedAt ?? null,
+      submittedAt: input.submittedAt ?? null,
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
+    });
+  }
+  async findById(id: string): Promise<ReviewAssignment | null> {
+    return this.t.byId(id);
+  }
+  async listByStatus(
+    status: ReviewAssignment['status'],
+  ): Promise<ReviewAssignment[]> {
+    return this.t.all().filter((r) => r.status === status);
+  }
+  async listByCoach(coachId: string): Promise<ReviewAssignment[]> {
+    return this.t.all().filter((r) => r.coachId === coachId);
+  }
+  async update(
+    id: string,
+    patch: Partial<ReviewAssignment>,
+  ): Promise<ReviewAssignment | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch, updatedAt: this.deps.now() });
+  }
+}
+
+class MemModerationRepository implements ModerationRepository {
+  private readonly t = new MemTable<Moderation>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewModeration): Promise<Moderation> {
+    const now = this.deps.now();
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      reviewAssignmentId: input.reviewAssignmentId,
+      status: input.status ?? 'pending',
+      moderatorUserId: input.moderatorUserId ?? null,
+      notes: input.notes ?? null,
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
+    });
+  }
+  async findById(id: string): Promise<Moderation | null> {
+    return this.t.byId(id);
+  }
+  async findByAssignment(
+    reviewAssignmentId: string,
+  ): Promise<Moderation | null> {
+    return (
+      this.t.all().find((m) => m.reviewAssignmentId === reviewAssignmentId) ??
+      null
+    );
+  }
+  async update(
+    id: string,
+    patch: Partial<Moderation>,
+  ): Promise<Moderation | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch, updatedAt: this.deps.now() });
+  }
+}
+
+class MemCoachRatingRepository implements CoachRatingRepository {
+  private readonly t = new MemTable<CoachRating>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewCoachRating): Promise<CoachRating> {
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      coachId: input.coachId,
+      reportId: input.reportId ?? null,
+      raterUserId: input.raterUserId ?? null,
+      stars: input.stars,
+      comment: input.comment ?? null,
+      moderation: input.moderation ?? 'visible',
+      createdAt: input.createdAt ?? this.deps.now(),
+    });
+  }
+  async listByCoach(coachId: string): Promise<CoachRating[]> {
+    return this.t.all().filter((r) => r.coachId === coachId);
+  }
+  async update(
+    id: string,
+    patch: Partial<CoachRating>,
+  ): Promise<CoachRating | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch });
+  }
+}
+
+class MemPayoutAccountRepository implements PayoutAccountRepository {
+  private readonly t = new MemTable<PayoutAccount>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewPayoutAccount): Promise<PayoutAccount> {
+    const now = this.deps.now();
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      coachId: input.coachId,
+      provider: input.provider ?? 'stripe_connect',
+      externalAccountId: input.externalAccountId ?? null,
+      status: input.status ?? 'pending',
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
+    });
+  }
+  async findByCoach(coachId: string): Promise<PayoutAccount | null> {
+    return this.t.all().find((p) => p.coachId === coachId) ?? null;
+  }
+  async update(
+    id: string,
+    patch: Partial<PayoutAccount>,
+  ): Promise<PayoutAccount | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch, updatedAt: this.deps.now() });
+  }
+}
+
+class MemPayoutRepository implements PayoutRepository {
+  private readonly t = new MemTable<Payout>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewPayout): Promise<Payout> {
+    const now = this.deps.now();
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      coachId: input.coachId,
+      reviewAssignmentId: input.reviewAssignmentId ?? null,
+      amountCents: input.amountCents,
+      currency: input.currency ?? 'usd',
+      status: input.status ?? 'pending',
+      externalPayoutId: input.externalPayoutId ?? null,
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
+    });
+  }
+  async findById(id: string): Promise<Payout | null> {
+    return this.t.byId(id);
+  }
+  async listByCoach(coachId: string): Promise<Payout[]> {
+    return this.t.all().filter((p) => p.coachId === coachId);
+  }
+  async update(id: string, patch: Partial<Payout>): Promise<Payout | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch, updatedAt: this.deps.now() });
+  }
+}
+
+class MemDisputeRepository implements DisputeRepository {
+  private readonly t = new MemTable<Dispute>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewDispute): Promise<Dispute> {
+    const now = this.deps.now();
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      reportId: input.reportId ?? null,
+      orderId: input.orderId ?? null,
+      raisedByUserId: input.raisedByUserId ?? null,
+      status: input.status ?? 'open',
+      reason: input.reason,
+      resolutionNotes: input.resolutionNotes ?? null,
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
+    });
+  }
+  async findById(id: string): Promise<Dispute | null> {
+    return this.t.byId(id);
+  }
+  async listByStatus(status: Dispute['status']): Promise<Dispute[]> {
+    return this.t.all().filter((d) => d.status === status);
+  }
+  async update(id: string, patch: Partial<Dispute>): Promise<Dispute | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch, updatedAt: this.deps.now() });
+  }
+}
+
+class MemNotificationRepository implements NotificationRepository {
+  private readonly t = new MemTable<Notification>();
+  constructor(private readonly deps: RepoDeps) {}
+  async create(input: NewNotification): Promise<Notification> {
+    const now = this.deps.now();
+    return this.t.insert({
+      id: input.id ?? this.deps.idGen(),
+      userId: input.userId ?? null,
+      kind: input.kind,
+      title: input.title,
+      body: input.body,
+      payload: input.payload ?? null,
+      status: input.status ?? 'queued',
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
+    });
+  }
+  async listByUser(userId: string): Promise<Notification[]> {
+    return this.t.all().filter((n) => n.userId === userId);
+  }
+  async update(
+    id: string,
+    patch: Partial<Notification>,
+  ): Promise<Notification | null> {
+    const existing = this.t.byId(id);
+    if (existing === null) return null;
+    return this.t.insert({ ...existing, ...patch, updatedAt: this.deps.now() });
+  }
+}
+
 /** Default deps for dev: random UUIDs + wall-clock timestamps. */
 export const defaultRepoDeps: RepoDeps = {
   idGen: () => randomUUID(),
@@ -405,5 +733,14 @@ export function createInMemoryRepositories(
     orders: new MemOrderRepository(deps),
     entitlements: new MemEntitlementRepository(deps),
     emailDeliveries: new MemEmailDeliveryRepository(deps),
+    coaches: new MemCoachRepository(deps),
+    coachApplications: new MemCoachApplicationRepository(deps),
+    reviewAssignments: new MemReviewAssignmentRepository(deps),
+    moderations: new MemModerationRepository(deps),
+    coachRatings: new MemCoachRatingRepository(deps),
+    payoutAccounts: new MemPayoutAccountRepository(deps),
+    payouts: new MemPayoutRepository(deps),
+    disputes: new MemDisputeRepository(deps),
+    notifications: new MemNotificationRepository(deps),
   };
 }

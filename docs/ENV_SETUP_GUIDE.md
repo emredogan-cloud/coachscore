@@ -455,7 +455,9 @@ Verification, Common Mistakes, and Security Notes.
 
 ---
 
-## Provider: Stripe Connect + Wise/Payoneer (coach payouts)  ·  `PLANNED_NOT_IMPLEMENTED` (Phase 5)
+## Provider: Stripe Connect + Wise/Payoneer (coach payouts)  ·  `IMPLEMENTED_BUT_NOT_ACTIVATED` (Phase 5)
+
+> **Read by code (Phase 5):** Stripe Connect is wired in `lib/payouts/connect-adapter.ts` (Express connected accounts + account links + transfers over the Stripe REST API) and orchestrated by `lib/payouts/service.ts`. It activates on `STRIPE_SECRET_KEY`; `STRIPE_CONNECT_CLIENT_ID` is declared (`.env.example`) for the Standard-OAuth flow. Wise/Payoneer remain a future fallback. Until the keys are set, payout onboarding/execution surface as `not_activated`.
 
 > **Not in `.env.example`.** Referenced in `COACHSCORE_ROADMAP.md` §3 (“Connect (P2 coach payouts); Payoneer/Wise fallback”) + `reports/TECH_DECISIONS.md` “Payments — Stripe (Checkout → Connect) + Payoneer/Wise fallback” + §10 Phase 5.
 
@@ -463,8 +465,8 @@ Verification, Common Mistakes, and Security Notes.
 **Dashboard Navigation:** Stripe **Connect → Settings → Integration** (platform/client id); Wise: `wise.com` business → **Settings → API tokens**; Payoneer: partner/API program.
 **Step-by-Step Creation (high level):** enable **Connect** in the Stripe dashboard; obtain the Connect client id; for fallback rails, apply for Wise/Payoneer business API access and create tokens.
 
-### `STRIPE_CONNECT_CLIENT_ID` *(PLANNED_NOT_IMPLEMENTED)*
-- **Phase:** 5 · **Required?** Required (Phase 5 payouts) · **Purpose:** Onboard coaches as connected accounts + route payouts. **Provider:** Stripe Connect
+### `STRIPE_CONNECT_CLIENT_ID`
+- **Phase:** 5 · **Status:** `IMPLEMENTED_BUT_NOT_ACTIVATED` — `lib/payouts/connect-adapter.ts` (`connectClientId`); declared `.env.example`. **Required?** Optional for Express accounts (used by the current adapter); required only for the Standard-OAuth onboarding flow. **Purpose:** Onboard coaches as connected accounts + route payouts. **Provider:** Stripe Connect
 - **Example Value:** `ca_Xxxxxxxxxxxxxxxxxxxxxxxx` · **Security:** Server-only; Vercel server env.
 
 ### `WISE_API_TOKEN` / `PAYONEER_API_KEY` *(PLANNED_NOT_IMPLEMENTED)*
@@ -517,8 +519,9 @@ Each phase lists the variables that **must** be obtained before starting it.
 - `RESEND_API_KEY` ⛔ · `RESEND_FROM_EMAIL` (optional, default provided) — email delivery
 - (recommended) `SENTRY_DSN` ⛔ PLANNED · `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` ⛔ PLANNED
 
-### Phase 5 — Coach Marketplace
-- `STRIPE_CONNECT_CLIENT_ID` ⛔ PLANNED · `WISE_API_TOKEN` / `PAYONEER_API_KEY` ⛔ PLANNED (fallback)
+### Phase 5 — Coach Marketplace  🟡 IMPLEMENTED_BUT_NOT_ACTIVATED
+- Coach onboarding, the review/moderation workflow, ratings, disputes, economics, and the coach/admin dashboards are **built**; they activate with the database (Phase 3 Supabase) + Stripe.
+- `STRIPE_SECRET_KEY` (reused — coach transfers) · `STRIPE_CONNECT_CLIENT_ID` (optional, Standard OAuth) · `WISE_API_TOKEN` / `PAYONEER_API_KEY` ⛔ PLANNED (fallback)
 
 ### Phase 6 — Additional SKUs (ReplayDoctor/BaseDoctor/WarPlan)
 - Reuses existing rails (Supabase, R2, Stripe, Anthropic). R2 video usage grows. No new providers.

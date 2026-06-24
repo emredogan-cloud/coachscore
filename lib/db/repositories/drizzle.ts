@@ -13,12 +13,21 @@ import {
   accounts,
   accountSnapshots,
   auditLogs,
+  coachApplications,
+  coachRatings,
+  coaches,
+  disputes,
   emailDeliveries,
   entitlements,
   jobs,
+  moderations,
+  notifications,
   orders,
+  payoutAccounts,
+  payouts,
   reportDrafts,
   reports,
+  reviewAssignments,
   uploads,
   users,
 } from '../schema';
@@ -45,17 +54,44 @@ import type {
   NewEntitlement,
   EmailDelivery,
   NewEmailDelivery,
+  Coach,
+  NewCoach,
+  CoachApplication,
+  NewCoachApplication,
+  ReviewAssignment,
+  NewReviewAssignment,
+  Moderation,
+  NewModeration,
+  CoachRating,
+  NewCoachRating,
+  PayoutAccount,
+  NewPayoutAccount,
+  Payout,
+  NewPayout,
+  Dispute,
+  NewDispute,
+  Notification,
+  NewNotification,
 } from '../schema';
 import type {
   AccountRepository,
   AuditLogRepository,
+  CoachApplicationRepository,
+  CoachRatingRepository,
+  CoachRepository,
+  DisputeRepository,
   EmailDeliveryRepository,
   EntitlementRepository,
   JobRepository,
+  ModerationRepository,
+  NotificationRepository,
   OrderRepository,
+  PayoutAccountRepository,
+  PayoutRepository,
   Repositories,
   ReportDraftRepository,
   ReportRepository,
+  ReviewAssignmentRepository,
   SnapshotRepository,
   UploadRepository,
   UserRepository,
@@ -331,6 +367,276 @@ class DrizzleEmailDeliveryRepository implements EmailDeliveryRepository {
   }
 }
 
+class DrizzleCoachRepository implements CoachRepository {
+  async create(input: NewCoach): Promise<Coach> {
+    return first(await getDb().insert(coaches).values(input).returning());
+  }
+  async findById(id: string): Promise<Coach | null> {
+    const r = await getDb()
+      .select()
+      .from(coaches)
+      .where(eq(coaches.id, id))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async findByUserId(userId: string): Promise<Coach | null> {
+    const r = await getDb()
+      .select()
+      .from(coaches)
+      .where(eq(coaches.userId, userId))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async listByStatus(status: Coach['status']): Promise<Coach[]> {
+    return getDb().select().from(coaches).where(eq(coaches.status, status));
+  }
+  async listActive(): Promise<Coach[]> {
+    return getDb().select().from(coaches).where(eq(coaches.status, 'active'));
+  }
+  async update(id: string, patch: Partial<Coach>): Promise<Coach | null> {
+    const r = await getDb()
+      .update(coaches)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(coaches.id, id))
+      .returning();
+    return r[0] ?? null;
+  }
+}
+
+class DrizzleCoachApplicationRepository implements CoachApplicationRepository {
+  async create(input: NewCoachApplication): Promise<CoachApplication> {
+    return first(
+      await getDb().insert(coachApplications).values(input).returning(),
+    );
+  }
+  async findById(id: string): Promise<CoachApplication | null> {
+    const r = await getDb()
+      .select()
+      .from(coachApplications)
+      .where(eq(coachApplications.id, id))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async listByStatus(
+    status: CoachApplication['status'],
+  ): Promise<CoachApplication[]> {
+    return getDb()
+      .select()
+      .from(coachApplications)
+      .where(eq(coachApplications.status, status));
+  }
+  async update(
+    id: string,
+    patch: Partial<CoachApplication>,
+  ): Promise<CoachApplication | null> {
+    const r = await getDb()
+      .update(coachApplications)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(coachApplications.id, id))
+      .returning();
+    return r[0] ?? null;
+  }
+}
+
+class DrizzleReviewAssignmentRepository implements ReviewAssignmentRepository {
+  async create(input: NewReviewAssignment): Promise<ReviewAssignment> {
+    return first(
+      await getDb().insert(reviewAssignments).values(input).returning(),
+    );
+  }
+  async findById(id: string): Promise<ReviewAssignment | null> {
+    const r = await getDb()
+      .select()
+      .from(reviewAssignments)
+      .where(eq(reviewAssignments.id, id))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async listByStatus(
+    status: ReviewAssignment['status'],
+  ): Promise<ReviewAssignment[]> {
+    return getDb()
+      .select()
+      .from(reviewAssignments)
+      .where(eq(reviewAssignments.status, status));
+  }
+  async listByCoach(coachId: string): Promise<ReviewAssignment[]> {
+    return getDb()
+      .select()
+      .from(reviewAssignments)
+      .where(eq(reviewAssignments.coachId, coachId));
+  }
+  async update(
+    id: string,
+    patch: Partial<ReviewAssignment>,
+  ): Promise<ReviewAssignment | null> {
+    const r = await getDb()
+      .update(reviewAssignments)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(reviewAssignments.id, id))
+      .returning();
+    return r[0] ?? null;
+  }
+}
+
+class DrizzleModerationRepository implements ModerationRepository {
+  async create(input: NewModeration): Promise<Moderation> {
+    return first(await getDb().insert(moderations).values(input).returning());
+  }
+  async findById(id: string): Promise<Moderation | null> {
+    const r = await getDb()
+      .select()
+      .from(moderations)
+      .where(eq(moderations.id, id))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async findByAssignment(
+    reviewAssignmentId: string,
+  ): Promise<Moderation | null> {
+    const r = await getDb()
+      .select()
+      .from(moderations)
+      .where(eq(moderations.reviewAssignmentId, reviewAssignmentId))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async update(
+    id: string,
+    patch: Partial<Moderation>,
+  ): Promise<Moderation | null> {
+    const r = await getDb()
+      .update(moderations)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(moderations.id, id))
+      .returning();
+    return r[0] ?? null;
+  }
+}
+
+class DrizzleCoachRatingRepository implements CoachRatingRepository {
+  async create(input: NewCoachRating): Promise<CoachRating> {
+    return first(await getDb().insert(coachRatings).values(input).returning());
+  }
+  async listByCoach(coachId: string): Promise<CoachRating[]> {
+    return getDb()
+      .select()
+      .from(coachRatings)
+      .where(eq(coachRatings.coachId, coachId));
+  }
+  async update(
+    id: string,
+    patch: Partial<CoachRating>,
+  ): Promise<CoachRating | null> {
+    const r = await getDb()
+      .update(coachRatings)
+      .set(patch)
+      .where(eq(coachRatings.id, id))
+      .returning();
+    return r[0] ?? null;
+  }
+}
+
+class DrizzlePayoutAccountRepository implements PayoutAccountRepository {
+  async create(input: NewPayoutAccount): Promise<PayoutAccount> {
+    return first(
+      await getDb().insert(payoutAccounts).values(input).returning(),
+    );
+  }
+  async findByCoach(coachId: string): Promise<PayoutAccount | null> {
+    const r = await getDb()
+      .select()
+      .from(payoutAccounts)
+      .where(eq(payoutAccounts.coachId, coachId))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async update(
+    id: string,
+    patch: Partial<PayoutAccount>,
+  ): Promise<PayoutAccount | null> {
+    const r = await getDb()
+      .update(payoutAccounts)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(payoutAccounts.id, id))
+      .returning();
+    return r[0] ?? null;
+  }
+}
+
+class DrizzlePayoutRepository implements PayoutRepository {
+  async create(input: NewPayout): Promise<Payout> {
+    return first(await getDb().insert(payouts).values(input).returning());
+  }
+  async findById(id: string): Promise<Payout | null> {
+    const r = await getDb()
+      .select()
+      .from(payouts)
+      .where(eq(payouts.id, id))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async listByCoach(coachId: string): Promise<Payout[]> {
+    return getDb().select().from(payouts).where(eq(payouts.coachId, coachId));
+  }
+  async update(id: string, patch: Partial<Payout>): Promise<Payout | null> {
+    const r = await getDb()
+      .update(payouts)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(payouts.id, id))
+      .returning();
+    return r[0] ?? null;
+  }
+}
+
+class DrizzleDisputeRepository implements DisputeRepository {
+  async create(input: NewDispute): Promise<Dispute> {
+    return first(await getDb().insert(disputes).values(input).returning());
+  }
+  async findById(id: string): Promise<Dispute | null> {
+    const r = await getDb()
+      .select()
+      .from(disputes)
+      .where(eq(disputes.id, id))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async listByStatus(status: Dispute['status']): Promise<Dispute[]> {
+    return getDb().select().from(disputes).where(eq(disputes.status, status));
+  }
+  async update(id: string, patch: Partial<Dispute>): Promise<Dispute | null> {
+    const r = await getDb()
+      .update(disputes)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(disputes.id, id))
+      .returning();
+    return r[0] ?? null;
+  }
+}
+
+class DrizzleNotificationRepository implements NotificationRepository {
+  async create(input: NewNotification): Promise<Notification> {
+    return first(await getDb().insert(notifications).values(input).returning());
+  }
+  async listByUser(userId: string): Promise<Notification[]> {
+    return getDb()
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, userId));
+  }
+  async update(
+    id: string,
+    patch: Partial<Notification>,
+  ): Promise<Notification | null> {
+    const r = await getDb()
+      .update(notifications)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(notifications.id, id))
+      .returning();
+    return r[0] ?? null;
+  }
+}
+
 export function createDrizzleRepositories(): Repositories {
   return {
     users: new DrizzleUserRepository(),
@@ -344,5 +650,14 @@ export function createDrizzleRepositories(): Repositories {
     orders: new DrizzleOrderRepository(),
     entitlements: new DrizzleEntitlementRepository(),
     emailDeliveries: new DrizzleEmailDeliveryRepository(),
+    coaches: new DrizzleCoachRepository(),
+    coachApplications: new DrizzleCoachApplicationRepository(),
+    reviewAssignments: new DrizzleReviewAssignmentRepository(),
+    moderations: new DrizzleModerationRepository(),
+    coachRatings: new DrizzleCoachRatingRepository(),
+    payoutAccounts: new DrizzlePayoutAccountRepository(),
+    payouts: new DrizzlePayoutRepository(),
+    disputes: new DrizzleDisputeRepository(),
+    notifications: new DrizzleNotificationRepository(),
   };
 }
