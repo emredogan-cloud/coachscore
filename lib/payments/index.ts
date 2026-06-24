@@ -25,8 +25,10 @@ export {
 } from './stripe-adapter';
 export {
   createCheckout,
+  createProductCheckout,
   NotPurchasableError,
   type CreateCheckoutInput,
+  type CreateProductCheckoutInput,
   type CreateCheckoutResult,
   type CheckoutDeps,
 } from './checkout';

@@ -25,6 +25,8 @@ import {
   orders,
   payoutAccounts,
   payouts,
+  productReports,
+  productSubmissions,
   reportDrafts,
   reports,
   reviewAssignments,
@@ -72,6 +74,10 @@ import type {
   NewDispute,
   Notification,
   NewNotification,
+  ProductSubmission,
+  NewProductSubmission,
+  ProductReportRow,
+  NewProductReportRow,
 } from '../schema';
 import type {
   AccountRepository,
@@ -88,6 +94,8 @@ import type {
   OrderRepository,
   PayoutAccountRepository,
   PayoutRepository,
+  ProductReportRepository,
+  ProductSubmissionRepository,
   Repositories,
   ReportDraftRepository,
   ReportRepository,
@@ -637,6 +645,78 @@ class DrizzleNotificationRepository implements NotificationRepository {
   }
 }
 
+class DrizzleProductSubmissionRepository implements ProductSubmissionRepository {
+  async create(input: NewProductSubmission): Promise<ProductSubmission> {
+    return first(
+      await getDb().insert(productSubmissions).values(input).returning(),
+    );
+  }
+  async findById(id: string): Promise<ProductSubmission | null> {
+    const r = await getDb()
+      .select()
+      .from(productSubmissions)
+      .where(eq(productSubmissions.id, id))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async update(
+    id: string,
+    patch: Partial<ProductSubmission>,
+  ): Promise<ProductSubmission | null> {
+    const r = await getDb()
+      .update(productSubmissions)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(productSubmissions.id, id))
+      .returning();
+    return r[0] ?? null;
+  }
+}
+
+class DrizzleProductReportRepository implements ProductReportRepository {
+  async create(input: NewProductReportRow): Promise<ProductReportRow> {
+    return first(
+      await getDb().insert(productReports).values(input).returning(),
+    );
+  }
+  async findById(id: string): Promise<ProductReportRow | null> {
+    const r = await getDb()
+      .select()
+      .from(productReports)
+      .where(eq(productReports.id, id))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async findBySubmission(
+    submissionId: string,
+  ): Promise<ProductReportRow | null> {
+    const r = await getDb()
+      .select()
+      .from(productReports)
+      .where(eq(productReports.submissionId, submissionId))
+      .limit(1);
+    return r[0] ?? null;
+  }
+  async listByStatus(
+    status: ProductReportRow['status'],
+  ): Promise<ProductReportRow[]> {
+    return getDb()
+      .select()
+      .from(productReports)
+      .where(eq(productReports.status, status));
+  }
+  async update(
+    id: string,
+    patch: Partial<ProductReportRow>,
+  ): Promise<ProductReportRow | null> {
+    const r = await getDb()
+      .update(productReports)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(productReports.id, id))
+      .returning();
+    return r[0] ?? null;
+  }
+}
+
 export function createDrizzleRepositories(): Repositories {
   return {
     users: new DrizzleUserRepository(),
@@ -659,5 +739,7 @@ export function createDrizzleRepositories(): Repositories {
     payouts: new DrizzlePayoutRepository(),
     disputes: new DrizzleDisputeRepository(),
     notifications: new DrizzleNotificationRepository(),
+    productSubmissions: new DrizzleProductSubmissionRepository(),
+    productReports: new DrizzleProductReportRepository(),
   };
 }

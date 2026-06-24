@@ -27,6 +27,7 @@ import {
 import type { Goal, NormalizedAccount } from '@/lib/core';
 import type { ProviderUsage, ReportDraft } from '@/lib/ai';
 import type { SnapshotProvenance } from '@/lib/snapshot';
+import type { ProductReportView } from '@/lib/products';
 
 // --- Enums ------------------------------------------------------------------
 
@@ -153,6 +154,25 @@ export const notificationStatus = pgEnum('notification_status', [
   'sent',
   'failed',
   'read',
+]);
+export const productSku = pgEnum('product_sku', [
+  'replay_doctor',
+  'base_doctor',
+  'war_plan',
+]);
+export const productSubmissionStatus = pgEnum('product_submission_status', [
+  'received',
+  'analyzing',
+  'analyzed',
+  'failed',
+]);
+export const productReportStatus = pgEnum('product_report_status', [
+  'pending',
+  'awaiting_review',
+  'in_review',
+  'approved',
+  'delivered',
+  'failed',
 ]);
 
 // --- Tables -----------------------------------------------------------------
@@ -342,7 +362,8 @@ export const orders = pgTable(
     reportId: uuid('report_id').references(() => reports.id, {
       onDelete: 'set null',
     }),
-    tier: reportTier('tier').notNull(),
+    tier: reportTier('tier'),
+    productSku: productSku('product_sku'),
     quantity: integer('quantity').notNull().default(1),
     amountCents: integer('amount_cents').notNull(),
     currency: text('currency').notNull().default('usd'),
@@ -367,7 +388,8 @@ export const entitlements = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
-    sku: reportTier('sku').notNull(),
+    sku: reportTier('sku'),
+    productSku: productSku('product_sku'),
     reportId: uuid('report_id').references(() => reports.id, {
       onDelete: 'set null',
     }),
@@ -462,9 +484,13 @@ export const reviewAssignments = pgTable(
   'review_assignments',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    reportId: uuid('report_id')
-      .notNull()
-      .references(() => reports.id, { onDelete: 'cascade' }),
+    reportId: uuid('report_id').references(() => reports.id, {
+      onDelete: 'cascade',
+    }),
+    productReportId: uuid('product_report_id').references(
+      () => productReports.id,
+      { onDelete: 'cascade' },
+    ),
     reportDraftId: uuid('report_draft_id').references(() => reportDrafts.id, {
       onDelete: 'set null',
     }),
@@ -625,6 +651,52 @@ export const notifications = pgTable(
   (t) => [index('notifications_user_id_idx').on(t.userId)],
 );
 
+export const productSubmissions = pgTable(
+  'product_submissions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id, {
+      onDelete: 'set null',
+    }),
+    sku: productSku('sku').notNull(),
+    context: text('context'),
+    input: jsonb('input').notNull(),
+    uploadKeys: jsonb('upload_keys').$type<string[]>(),
+    status: productSubmissionStatus('status').notNull().default('received'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index('product_submissions_user_id_idx').on(t.userId)],
+);
+
+export const productReports = pgTable(
+  'product_reports',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    submissionId: uuid('submission_id')
+      .notNull()
+      .references(() => productSubmissions.id, { onDelete: 'cascade' }),
+    sku: productSku('sku').notNull(),
+    analysis: jsonb('analysis').$type<ProductReportView>().notNull(),
+    scoreLabel: text('score_label'),
+    scoreValue: integer('score_value'),
+    confidence: real('confidence').notNull().default(1),
+    status: productReportStatus('status').notNull().default('pending'),
+    paid: boolean('paid').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index('product_reports_submission_idx').on(t.submissionId)],
+);
+
 // --- Inferred row types ------------------------------------------------------
 
 export type User = typeof users.$inferSelect;
@@ -667,3 +739,7 @@ export type Dispute = typeof disputes.$inferSelect;
 export type NewDispute = typeof disputes.$inferInsert;
 export type Notification = typeof notifications.$inferSelect;
 export type NewNotification = typeof notifications.$inferInsert;
+export type ProductSubmission = typeof productSubmissions.$inferSelect;
+export type NewProductSubmission = typeof productSubmissions.$inferInsert;
+export type ProductReportRow = typeof productReports.$inferSelect;
+export type NewProductReportRow = typeof productReports.$inferInsert;

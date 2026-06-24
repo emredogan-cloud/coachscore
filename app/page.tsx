@@ -53,6 +53,12 @@ export default function HomePage() {
         >
           See pricing
         </Link>
+        <Link
+          href="/products"
+          className="inline-block rounded-md border border-gray-300 px-5 py-2.5 text-sm dark:border-gray-700"
+        >
+          Specialized tools
+        </Link>
       </div>
       <p className="mt-3 text-sm text-gray-500">
         Free instant score. Full report with a prioritized upgrade roadmap,

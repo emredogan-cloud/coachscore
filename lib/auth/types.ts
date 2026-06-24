@@ -19,6 +19,8 @@ export type Permission =
   | 'report:read:any'
   | 'report:review'
   | 'upload:create'
+  | 'product:create'
+  | 'product:read:own'
   | 'audit:read'
   | 'admin:manage';
 

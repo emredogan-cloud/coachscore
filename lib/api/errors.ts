@@ -7,6 +7,7 @@
 export type ApiErrorCode =
   | 'validation_error'
   | 'not_activated'
+  | 'not_found'
   | 'internal_error';
 
 export interface ApiErrorBody {
@@ -46,6 +47,13 @@ export class ValidationError extends ApiError {
 export class NotActivatedError extends ApiError {
   constructor(message: string) {
     super('not_activated', 503, message);
+  }
+}
+
+/** 404 — the resource does not exist or the caller may not see it. */
+export class NotFoundError extends ApiError {
+  constructor(message = 'Not found.') {
+    super('not_found', 404, message);
   }
 }
 
