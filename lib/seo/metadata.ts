@@ -6,7 +6,7 @@
  */
 
 import type { Metadata } from 'next';
-import { appConfig } from '@/lib/env';
+import { appConfig, optionalEnv } from '@/lib/env';
 
 export function siteUrl(): string {
   return appConfig.url.replace(/\/$/, '');
@@ -15,6 +15,23 @@ export function siteUrl(): string {
 export function canonicalUrl(path: string): string {
   const p = path.startsWith('/') ? path : `/${path}`;
   return `${siteUrl()}${p === '/' ? '' : p}`;
+}
+
+/** Absolute logo URL for Organization JSON-LD (the maskable PWA icon). */
+export function orgLogoUrl(): string {
+  return canonicalUrl('/icon.svg');
+}
+
+/**
+ * Real, verified social/profile URLs for Organization `sameAs`, supplied via
+ * `NEXT_PUBLIC_SOCIAL_PROFILES` (comma-separated). Empty by default — we never
+ * fabricate profiles that do not exist (roadmap §11/KURALLAR).
+ */
+export function socialProfiles(): string[] {
+  return optionalEnv('NEXT_PUBLIC_SOCIAL_PROFILES', '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.startsWith('http'));
 }
 
 export interface MetaInput {
@@ -32,7 +49,12 @@ export function buildMetadata(input: MetaInput): Metadata {
   return {
     title: input.title,
     description: input.description,
-    alternates: { canonical: url },
+    alternates: {
+      canonical: url,
+      // hreflang readiness (roadmap §9.10): English-first today, with an
+      // x-default so adding locales later is a config change, not a refactor.
+      languages: { en: url, 'x-default': url },
+    },
     openGraph: {
       title: input.title,
       description: input.description,

@@ -8,6 +8,7 @@ export const revalidate = 86400;
 export default function sitemap(): MetadataRoute.Sitemap {
   return buildSitemap(siteUrl()).map((entry) => ({
     url: entry.url,
+    lastModified: entry.lastModified,
     changeFrequency: entry.changeFrequency,
     priority: entry.priority,
   }));

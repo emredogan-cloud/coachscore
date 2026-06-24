@@ -1,11 +1,25 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
 import { GRADE_BANDS } from '@/lib/core/grade';
+import { JsonLdScript } from '@/components/seo/json-ld';
 import { HeroBanner, MagicButton, PremiumCard } from '@/components/ui';
+import { buildMetadata, faqJsonLd, type FaqEntry } from '@/lib/seo';
 
 /**
- * Landing page — premium "battle" theme (Phase B). Brand hero, the grade scale
- * as glowing shield cards, the value pillars, and the primary CTA into the
- * teaser funnel. Server-rendered, mobile-first.
+ * Landing page — premium "battle" theme + SEO-optimized (roadmap §9.5, §11,
+ * §12, §18). Keyword H1, crawlable value + EEAT copy, contextual internal links
+ * (the hub → spoke authority flow), a branded-intent FAQ, and the free-tool CTA.
+ * Server-rendered, mobile-first. Organization + WebSite JSON-LD come from the
+ * root layout; here we add WebApplication (the free tool) + FAQPage.
  */
+
+export const metadata: Metadata = buildMetadata({
+  title: 'CoachScore — Rate My Clash of Clans Account & Upgrade Roadmap',
+  description:
+    'Rate your Clash of Clans account and get a prioritized, goal-aware upgrade ' +
+    'roadmap in under a minute. Free instant score, AI-drafted and human-verified.',
+  path: '/',
+});
 
 const GRADE_COLOR: Record<string, string> = {
   S: '#f5d272',
@@ -32,10 +46,48 @@ const PILLARS = [
   },
 ];
 
+const POPULAR_GUIDES: readonly { href: string; label: string }[] = [
+  { href: '/guides/is-my-account-rushed', label: 'Is my account rushed?' },
+  { href: '/guides/th17-upgrade-order-2026', label: 'TH17 upgrade order' },
+  { href: '/guides/th16-upgrade-order-2026', label: 'TH16 upgrade order' },
+  {
+    href: '/guides/th16-hero-equipment-priority',
+    label: 'Best TH16 hero equipment',
+  },
+];
+
+const HOME_FAQS: readonly FaqEntry[] = [
+  {
+    question: 'Is CoachScore free?',
+    answer:
+      'Yes — you can score your Clash of Clans account and see your grade for free, with no account required. The full prioritized upgrade roadmap and specialized tools are paid.',
+  },
+  {
+    question: 'What does CoachScore do?',
+    answer:
+      'It rates your account across seven dimensions (heroes, offense, defense, equipment, progression/rush, walls, and clan value) and gives you a prioritized, goal-aware upgrade roadmap — AI-drafted and verified by a real coach.',
+  },
+  {
+    question: 'Which Town Halls are supported?',
+    answer:
+      'CoachScore covers Town Halls 11 through 18, the current late-game range, with per-Town-Hall upgrade guides and a free rush checker.',
+  },
+  {
+    question: 'Is CoachScore affiliated with Supercell?',
+    answer:
+      'No. CoachScore is unofficial and is not endorsed by Supercell. Clash of Clans is a trademark of Supercell.',
+  },
+];
+
 export default function HomePage() {
   return (
     <div className="mx-auto max-w-md px-4 py-10">
-      <HeroBanner tagline="Expert Clash of Clans account rating" />
+      <JsonLdScript data={faqJsonLd(HOME_FAQS)} />
+
+      <HeroBanner
+        headline="Rate your Clash of Clans account & get an upgrade roadmap"
+        tagline="Expert account rating"
+      />
 
       <p className="mt-6 text-center text-[15px] leading-relaxed text-[var(--muted)]">
         Stop guessing what to upgrade next. Get your account scored and receive
@@ -45,8 +97,26 @@ export default function HomePage() {
         </span>
       </p>
 
+      {/* CTA — primary conversion path into the free teaser */}
+      <div className="mt-8 space-y-3">
+        <MagicButton href="/onboarding" variant="gold" size="lg">
+          Score your account
+        </MagicButton>
+        <div className="flex gap-3">
+          <MagicButton href="/pricing" variant="ghost" className="flex-1">
+            See pricing
+          </MagicButton>
+          <MagicButton href="/products" variant="ghost" className="flex-1">
+            Specialized tools
+          </MagicButton>
+        </div>
+      </div>
+      <p className="mt-4 text-center text-xs text-[var(--muted)]">
+        Free instant score · no account required · AI-drafted, human-verified.
+      </p>
+
       {/* Grade scale — shield cards */}
-      <section className="mt-9" aria-labelledby="grades-heading">
+      <section className="mt-10" aria-labelledby="grades-heading">
         <h2
           id="grades-heading"
           className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold/80"
@@ -80,11 +150,22 @@ export default function HomePage() {
             );
           })}
         </div>
+        <p className="mt-3 text-center text-sm text-[var(--muted)]">
+          Every account gets a grade from F to S based on how close it is to a
+          maxed, war-ready base for its Town Hall.{' '}
+          <Link
+            href="/methodology"
+            className="text-brand-violet-light hover:text-white"
+          >
+            See how scoring works
+          </Link>
+          .
+        </p>
       </section>
 
       {/* Value pillars */}
       <section
-        className="mt-8 grid grid-cols-4 gap-2"
+        className="mt-9 grid grid-cols-4 gap-2"
         aria-label="What you get"
       >
         {PILLARS.map((p) => (
@@ -109,23 +190,94 @@ export default function HomePage() {
         ))}
       </section>
 
-      {/* CTA */}
-      <div className="mt-9 space-y-3">
-        <MagicButton href="/onboarding" variant="gold" size="lg">
-          Score your account
-        </MagicButton>
-        <div className="flex gap-3">
-          <MagicButton href="/pricing" variant="ghost" className="flex-1">
-            See pricing
-          </MagicButton>
-          <MagicButton href="/products" variant="ghost" className="flex-1">
-            Specialized tools
-          </MagicButton>
+      {/* Popular guides — internal links (hub → spoke) */}
+      <section className="mt-10" aria-labelledby="guides-heading">
+        <h2
+          id="guides-heading"
+          className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold/80"
+        >
+          Popular free guides
+        </h2>
+        <ul className="mt-3 grid grid-cols-2 gap-2">
+          {POPULAR_GUIDES.map((g) => (
+            <li key={g.href}>
+              <Link
+                href={g.href}
+                className="block rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-[var(--fg)]/90 transition hover:border-brand-violet/40 hover:text-white"
+              >
+                {g.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 text-sm">
+          <Link
+            href="/guides"
+            className="text-brand-violet-light hover:text-white"
+          >
+            Browse all Clash of Clans upgrade guides →
+          </Link>
+        </p>
+      </section>
+
+      {/* Why trust it — EEAT */}
+      <section className="mt-10" aria-labelledby="trust-heading">
+        <h2
+          id="trust-heading"
+          className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold/80"
+        >
+          Why you can trust the grade
+        </h2>
+        <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">
+          CoachScore grades with a transparent, deterministic engine — the same
+          inputs always produce the same score — then a real coach verifies the
+          AI-drafted roadmap before you act on it. Our scoring rubric, editorial
+          process, and a full example report are public.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-3 text-sm">
+          <Link
+            href="/methodology"
+            className="text-brand-violet-light hover:text-white"
+          >
+            Methodology
+          </Link>
+          <Link
+            href="/sample-report"
+            className="text-brand-violet-light hover:text-white"
+          >
+            Sample report
+          </Link>
+          <Link
+            href="/editorial-standards"
+            className="text-brand-violet-light hover:text-white"
+          >
+            Editorial standards
+          </Link>
+          <Link
+            href="/about"
+            className="text-brand-violet-light hover:text-white"
+          >
+            About
+          </Link>
         </div>
-      </div>
-      <p className="mt-4 text-center text-xs text-[var(--muted)]">
-        Free instant score · no account required · AI-drafted, human-verified.
-      </p>
+      </section>
+
+      {/* FAQ — branded / trust intent */}
+      <section className="mt-10" aria-labelledby="faq-heading">
+        <h2 id="faq-heading" className="text-lg font-semibold text-white">
+          Frequently asked questions
+        </h2>
+        <dl className="mt-3 space-y-4">
+          {HOME_FAQS.map((faq) => (
+            <div key={faq.question}>
+              <dt className="font-medium text-[var(--fg)]/90">
+                {faq.question}
+              </dt>
+              <dd className="mt-1 text-sm text-[var(--muted)]">{faq.answer}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
     </div>
   );
 }

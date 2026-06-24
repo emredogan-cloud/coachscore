@@ -28,7 +28,10 @@ export function optionalEnv(name: string, fallback: string): string {
 
 /** Phase-0 public app configuration (always available). */
 export const appConfig = {
-  url: optionalEnv('NEXT_PUBLIC_APP_URL', 'http://localhost:3000'),
+  // The production origin is the default so canonical/sitemap/OG URLs are always
+  // correct for SEO even in preview builds (roadmap §9.1). Local dev overrides
+  // via NEXT_PUBLIC_APP_URL=http://localhost:3000 in .env.local.
+  url: optionalEnv('NEXT_PUBLIC_APP_URL', 'https://coachscore.app'),
   env: optionalEnv('NEXT_PUBLIC_APP_ENV', 'development'),
 } as const;
 

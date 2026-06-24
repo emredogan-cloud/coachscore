@@ -25,6 +25,7 @@
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
     "validate:reference": "tsx scripts/validate-reference-table.ts",
+    "validate:seo": "tsx scripts/validate-seo.ts",
     "validate": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test"
   },
   "dependencies": {
