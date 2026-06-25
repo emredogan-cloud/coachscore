@@ -116,6 +116,26 @@ export const PRICING_LIST: readonly PricingTier[] = SKU_IDS.map(
   (id) => PRICING_CATALOG[id],
 );
 
+/**
+ * Conversion-focused grouping (Phase F — simplify pricing, reduce cognitive
+ * load). The page leads with three PRIMARY tiers — Free (funnel top), Standard
+ * (the $12 "volume workhorse" per MONETIZATION_ANALYSIS.md), and Pro (the $29
+ * anchor that makes Standard feel sensible) — and tucks the situational tiers
+ * (Basic, AccountRescue, Clan/Bulk) into a secondary section so the core
+ * decision is a clean three-way choice. Prices are unchanged: the doc sets them
+ * deliberately below the in-game impulse threshold, so the conversion lever is
+ * clarity, not discounting.
+ */
+export const PRIMARY_SKU_IDS: readonly SkuId[] = ['free', 'standard', 'pro'];
+
+export const PRIMARY_PRICING: readonly PricingTier[] = PRIMARY_SKU_IDS.map(
+  (id) => PRICING_CATALOG[id],
+);
+
+export const SITUATIONAL_PRICING: readonly PricingTier[] = PRICING_LIST.filter(
+  (t) => !PRIMARY_SKU_IDS.includes(t.id),
+);
+
 export function getTier(id: SkuId): PricingTier {
   return PRICING_CATALOG[id];
 }

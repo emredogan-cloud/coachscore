@@ -56,6 +56,24 @@ const POPULAR_GUIDES: readonly { href: string; label: string }[] = [
   },
 ];
 
+const HOW_IT_WORKS: readonly { title: string; detail: string }[] = [
+  {
+    title: 'Submit your account',
+    detail:
+      'Enter your levels, upload screenshots, or paste your player tag — no account needed.',
+  },
+  {
+    title: 'Get scored instantly',
+    detail:
+      'A transparent, deterministic engine grades seven dimensions for the goal you pick.',
+  },
+  {
+    title: 'Get your roadmap',
+    detail:
+      'A prioritized, cost-weighted upgrade plan — AI-drafted and verified by a real coach.',
+  },
+];
+
 const HOME_FAQS: readonly FaqEntry[] = [
   {
     question: 'Is CoachScore free?',
@@ -121,6 +139,37 @@ export default function HomePage() {
       <p className="mt-4 text-center text-xs text-[var(--muted)]">
         Free instant score · no account required · AI-drafted, human-verified.
       </p>
+
+      {/* How it works — answers "how does it work?" in 3 steps */}
+      <section className="mt-10" aria-labelledby="how-heading">
+        <h2
+          id="how-heading"
+          className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold/80"
+        >
+          How it works
+        </h2>
+        <ol className="mt-4 space-y-2.5">
+          {HOW_IT_WORKS.map((step, i) => (
+            <li key={step.title}>
+              <PremiumCard tone="plain" className="flex items-start gap-3 p-4">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-violet-gradient text-sm font-bold text-white shadow-glow-violet-sm">
+                  {i + 1}
+                </span>
+                <div>
+                  <h3 className="font-semibold text-white">{step.title}</h3>
+                  <p className="mt-0.5 text-sm text-[var(--muted)]">
+                    {step.detail}
+                  </p>
+                </div>
+              </PremiumCard>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-3 text-center text-sm text-[var(--muted)]">
+          You get a grade (F–S), the 7-dimension breakdown behind it, and a
+          prioritized upgrade roadmap tuned to your goal.
+        </p>
+      </section>
 
       {/* Grade scale — shield cards */}
       <section className="mt-10" aria-labelledby="grades-heading">

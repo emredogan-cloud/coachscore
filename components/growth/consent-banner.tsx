@@ -32,9 +32,9 @@ export function ConsentBanner() {
   if (decided) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-gray-200 bg-white p-4 text-sm dark:border-gray-800 dark:bg-black">
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[var(--surface)]/95 p-4 text-sm backdrop-blur">
       <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-gray-600 dark:text-gray-300">
+        <p className="text-[var(--muted)]">
           We use privacy-friendly analytics to improve CoachScore. No personal
           data is sold. Allow product analytics?
         </p>
@@ -42,14 +42,14 @@ export function ConsentBanner() {
           <button
             type="button"
             onClick={() => choose('denied')}
-            className="rounded border border-gray-300 px-3 py-1.5 dark:border-gray-700"
+            className="rounded-lg border border-white/15 px-3 py-1.5 font-medium text-[var(--fg)]/90 transition hover:bg-white/5"
           >
             Decline
           </button>
           <button
             type="button"
             onClick={() => choose('granted')}
-            className="rounded bg-black px-3 py-1.5 font-medium text-white dark:bg-violet-gradient dark:text-white"
+            className="rounded-lg bg-violet-gradient px-3 py-1.5 font-medium text-white shadow-glow-violet-sm transition hover:shadow-glow-violet"
           >
             Allow
           </button>
