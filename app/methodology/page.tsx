@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { JsonLdScript } from '@/components/seo/json-ld';
+import { ScoreBreakdown } from '@/components/score-breakdown';
 import { MagicButton, PremiumCard } from '@/components/ui';
 import {
   ALL_GOALS,
@@ -147,7 +148,10 @@ export default function MethodologyPage() {
           Hall. The percentages below are the default “steady progress” weights
           at TH16+; they shift with your goal (see next section).
         </p>
-        <dl className="mt-4 space-y-3">
+        <PremiumCard tone="violet" className="mt-4 p-4">
+          <ScoreBreakdown />
+        </PremiumCard>
+        <dl className="mt-6 space-y-3">
           {DIMENSIONS.map((d) => (
             <PremiumCard key={d.key} tone="plain" className="p-3.5">
               <div className="flex items-baseline justify-between gap-3">

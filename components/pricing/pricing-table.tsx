@@ -1,18 +1,27 @@
-import { COMPARISON, formatPrice, PRICING_LIST } from '@/lib/pricing';
+import {
+  COMPARISON,
+  formatPrice,
+  PRIMARY_PRICING,
+  PRIMARY_SKU_IDS,
+  SITUATIONAL_PRICING,
+} from '@/lib/pricing';
 import { PremiumCard } from '@/components/ui';
 import { BuyButton } from './buy-button';
 
 /**
- * Pricing layer (Phase 4 · premium restyle Phase B): tier "shield" cards from
- * the SKU catalog + a comparison matrix. Purchasable tiers get a checkout
- * button; the free teaser does not. Real prices/tiers preserved; visual style
- * matches the /interface artwork (dark, gold-highlighted most-popular tier).
+ * Pricing layer (Phase 4 · simplified for conversion in Phase F). To cut
+ * cognitive load the page leads with three PRIMARY tiers (Free → Standard★ →
+ * Pro), tucks the situational tiers (Basic / AccountRescue / Clan-Bulk) into a
+ * compact secondary list, and limits the comparison matrix to the primary
+ * three. Real prices/tiers unchanged (set below the in-game impulse threshold —
+ * see MONETIZATION_ANALYSIS.md).
  */
 export function PricingTable() {
   return (
     <div className="space-y-10">
+      {/* Primary tiers — the core three-way decision */}
       <div className="space-y-4">
-        {PRICING_LIST.map((tier) => (
+        {PRIMARY_PRICING.map((tier) => (
           <PremiumCard
             key={tier.id}
             tone={tier.highlighted ? 'gold' : 'violet'}
@@ -65,16 +74,57 @@ export function PricingTable() {
         ))}
       </div>
 
+      {/* Situational tiers — compact, secondary (lower cognitive load) */}
+      {SITUATIONAL_PRICING.length > 0 ? (
+        <div>
+          <h3 className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold/80">
+            Situational plans
+          </h3>
+          <p className="mx-auto mt-1 max-w-sm text-center text-sm text-[var(--muted)]">
+            For specific moments — most players want Standard.
+          </p>
+          <ul className="mt-4 space-y-2">
+            {SITUATIONAL_PRICING.map((tier) => (
+              <li key={tier.id}>
+                <PremiumCard tone="plain" className="p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-baseline gap-2">
+                        <h4 className="font-semibold text-white">
+                          {tier.name}
+                        </h4>
+                        <span className="text-sm font-bold text-gold-gradient">
+                          {formatPrice(tier)}
+                        </span>
+                      </div>
+                      <p className="mt-0.5 truncate text-sm text-[var(--muted)]">
+                        {tier.blurb}
+                      </p>
+                    </div>
+                    {tier.purchasable ? (
+                      <div className="shrink-0">
+                        <BuyButton sku={tier.id} label="Choose" />
+                      </div>
+                    ) : null}
+                  </div>
+                </PremiumCard>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {/* Comparison — limited to the primary three to stay scannable */}
       <div>
         <h3 className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold/80">
-          Compare plans
+          Compare the main plans
         </h3>
         <PremiumCard tone="plain" className="mt-3 overflow-x-auto p-4">
-          <table className="w-full min-w-[560px] text-left text-sm">
+          <table className="w-full text-left text-sm">
             <thead>
               <tr className="text-[var(--muted)]">
                 <th className="py-1 font-medium">Feature</th>
-                {PRICING_LIST.map((t) => (
+                {PRIMARY_PRICING.map((t) => (
                   <th key={t.id} className="py-1 text-center font-medium">
                     {t.name}
                   </th>
@@ -85,10 +135,10 @@ export function PricingTable() {
               {COMPARISON.map((row) => (
                 <tr key={row.feature} className="border-t border-white/5">
                   <td className="py-1.5 text-[var(--fg)]/90">{row.feature}</td>
-                  {PRICING_LIST.map((t) => {
-                    const cell = row.cells[t.id];
+                  {PRIMARY_SKU_IDS.map((id) => {
+                    const cell = row.cells[id];
                     return (
-                      <td key={t.id} className="py-1.5 text-center">
+                      <td key={id} className="py-1.5 text-center">
                         {cell === true ? (
                           <span className="text-brand-gold">✓</span>
                         ) : cell === false ? (
