@@ -19,7 +19,7 @@ import {
 } from '@/lib/activation';
 import { defaultProvider } from '@/lib/ai';
 import type { AiProvider } from '@/lib/ai';
-import { optionalEnv } from '@/lib/env';
+import { appConfig } from '@/lib/env';
 import type { Repositories } from '@/lib/db';
 import { createProductCheckout, type PaymentProvider } from '@/lib/payments';
 import {
@@ -191,8 +191,7 @@ export async function handleProductCheckout(
     );
   }
 
-  const appUrl =
-    deps.appUrl ?? optionalEnv('NEXT_PUBLIC_APP_URL', 'http://localhost:3000');
+  const appUrl = deps.appUrl ?? appConfig.url;
   const provider = deps.provider ?? resolveProvider();
   const repos = deps.repos ?? resolveRepos();
 
