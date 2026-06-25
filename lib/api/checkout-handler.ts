@@ -7,7 +7,7 @@
 
 import { z } from 'zod';
 import { isDatabaseConfigured, isPaymentsConfigured } from '@/lib/activation';
-import { optionalEnv } from '@/lib/env';
+import { appConfig } from '@/lib/env';
 import type { Repositories } from '@/lib/db';
 import { createCheckout, type PaymentProvider } from '@/lib/payments';
 import { isPurchasable, SKU_IDS } from '@/lib/pricing';
@@ -60,8 +60,7 @@ export async function handleCheckout(
     );
   }
 
-  const appUrl =
-    deps.appUrl ?? optionalEnv('NEXT_PUBLIC_APP_URL', 'http://localhost:3000');
+  const appUrl = deps.appUrl ?? appConfig.url;
   const provider = deps.provider ?? resolveProvider();
   const repos = deps.repos ?? resolveRepos();
 
