@@ -1,0 +1,44 @@
+[
+  {
+    "name": "frame-premium",
+    "file": "public/assets/generated/frame-premium.webp",
+    "transparent": true,
+    "usage": "Premium card frame overlay (report hero, premium tiers).",
+    "prompt": "An ornate premium card frame border, only the border (fully transparent center), deep violet (#a855f7) and luminous gold (#e8b339) metallic filigree with subtle inner glow, symmetrical corners, thin elegant fantasy-strategy ornamentation. Transparent background. No text, no characters, no buildings, no logos."
+  },
+  {
+    "name": "aura-violet",
+    "file": "public/assets/generated/aura-violet.webp",
+    "transparent": true,
+    "usage": "Glow overlay behind CTAs / score reveal.",
+    "prompt": "A soft radial violet (#a855f7) magical aura / energy glow on a fully transparent background, smooth, diffuse, no hard edges, faint gold rim light, abstract. No objects, no text, no characters."
+  },
+  {
+    "name": "particles-gold",
+    "file": "public/assets/generated/particles-gold.webp",
+    "transparent": true,
+    "usage": "Particle overlay for premium reveals / share cards.",
+    "prompt": "Scattered fine gold (#e8b339) magical sparkles and dust particles on a fully transparent background, varied sizes, soft bokeh, premium and subtle, abstract. No objects, no text, no characters."
+  },
+  {
+    "name": "divider-ornament",
+    "file": "public/assets/generated/divider-ornament.webp",
+    "transparent": true,
+    "usage": "Section divider across report / guides.",
+    "prompt": "A slim horizontal decorative divider ornament, gold (#e8b339) filigree with a small central violet (#a855f7) gem, symmetrical, elegant fantasy-strategy style, on a fully transparent background. No text, no characters."
+  },
+  {
+    "name": "empty-state-rune",
+    "file": "public/assets/generated/empty-state-rune.webp",
+    "transparent": true,
+    "usage": "Empty-state illustration (no data yet / gated sections).",
+    "prompt": "A glowing arcane crystal/rune emblem (original fantasy, not from any existing game), violet and gold, soft volumetric glow, centered, on a fully transparent background. Premium, calm. No text, no characters, no buildings, no logos."
+  },
+  {
+    "name": "bg-fantasy-dark",
+    "file": "public/assets/generated/bg-fantasy-dark.webp",
+    "transparent": false,
+    "usage": "Hero / section backdrop (low-opacity layer).",
+    "prompt": "A dark atmospheric premium background texture, near-black (#070510) with faint violet (#a855f7) nebula glow upper area and subtle warm gold ember haze below, smooth gradients, no hard edges, very dark so light text stays readable. Abstract, cinematic. No objects, no text, no characters."
+  }
+]

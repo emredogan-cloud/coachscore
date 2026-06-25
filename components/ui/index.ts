@@ -6,3 +6,4 @@ export { MetricCard } from './metric-card';
 export { ScoreRing } from './score-ring';
 export { StatusBadge } from './status-badge';
 export { EmptyState } from './empty-state';
+export { CountUp } from './count-up';

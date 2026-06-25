@@ -3,7 +3,9 @@ import Link from 'next/link';
 import { Disclaimer } from '@/components/disclaimer';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { JsonLdScript } from '@/components/seo/json-ld';
+import { ShareButtons } from '@/components/share/share-buttons';
 import {
+  CountUp,
   MagicButton,
   PremiumCard,
   ScoreRing,
@@ -78,7 +80,7 @@ export default function SampleReportPage() {
         below are made up to show the format.
       </p>
 
-      <PremiumCard tone="gold" glowed className="mt-7 p-5">
+      <PremiumCard tone="gold" glowed className="mt-7 animate-score-reveal p-5">
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-brand-gold/80">
@@ -88,7 +90,11 @@ export default function SampleReportPage() {
               Grade {SAMPLE.grade}
             </p>
             <p className="mt-0.5 text-sm text-[var(--muted)]">
-              {SAMPLE.score}/100 — solid, with a clear path to A.
+              <CountUp
+                to={SAMPLE.score}
+                className="font-semibold text-gold-gradient"
+              />
+              /100 — solid, with a clear path to A.
             </p>
           </div>
           <ScoreRing
@@ -149,6 +155,25 @@ export default function SampleReportPage() {
           </MagicButton>
         </div>
       </PremiumCard>
+
+      <section className="mt-8" aria-labelledby="share-heading">
+        <h2
+          id="share-heading"
+          className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold/80"
+        >
+          Share your result
+        </h2>
+        <p className="mt-2 text-sm text-[var(--muted)]">
+          One tap to share — or copy for Discord and clan chats.
+        </p>
+        <div className="mt-3">
+          <ShareButtons
+            url={canonicalUrl('/sample-report')}
+            text={`I scored Grade ${SAMPLE.grade} (${SAMPLE.score}/100) on CoachScore — rate your Clash of Clans account free:`}
+            imageUrl="/api/share/og"
+          />
+        </div>
+      </section>
 
       <p className="mt-6 text-sm text-[var(--muted)]">
         Want to see how the grade is computed?{' '}

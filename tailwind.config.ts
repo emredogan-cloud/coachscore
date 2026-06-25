@@ -73,12 +73,22 @@ const config: Config = {
           '0%,100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-6px)' },
         },
+        'fade-up': {
+          from: { opacity: '0', transform: 'translateY(16px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'score-reveal': {
+          from: { opacity: '0', transform: 'scale(0.9)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
       },
       animation: {
         'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
         shimmer: 'shimmer 1.6s infinite',
         'count-up': 'count-up 0.5s ease-out both',
         float: 'float 6s ease-in-out infinite',
+        'fade-up': 'fade-up 0.5s ease-out both',
+        'score-reveal': 'score-reveal 0.6s cubic-bezier(0.22,1,0.36,1) both',
       },
     },
   },
