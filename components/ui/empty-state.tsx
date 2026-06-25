@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { PremiumCard } from './premium-card';
 
@@ -24,7 +25,15 @@ export function EmptyState({
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-2xl text-brand-violet-light">
           {icon}
         </div>
-      ) : null}
+      ) : (
+        <Image
+          src="/assets/generated/empty-state-rune.webp"
+          alt=""
+          width={72}
+          height={72}
+          className="mx-auto mb-4 opacity-90"
+        />
+      )}
       <h3 className="text-lg font-semibold text-white">{title}</h3>
       <p className="mx-auto mt-1.5 max-w-sm text-sm text-[var(--muted)]">
         {message}
