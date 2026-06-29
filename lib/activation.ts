@@ -38,9 +38,14 @@ export function isAiConfigured(): boolean {
   return present('ANTHROPIC_API_KEY');
 }
 
-/** Stripe payments (Phase 4 checkout + webhooks). */
+/** LemonSqueezy — the decided Merchant-of-Record buyer-billing provider. */
+export function isLemonSqueezyConfigured(): boolean {
+  return present('LEMONSQUEEZY_API_KEY') && present('LEMONSQUEEZY_STORE_ID');
+}
+
+/** Payments active when EITHER provider is configured (LemonSqueezy preferred). */
 export function isPaymentsConfigured(): boolean {
-  return present('STRIPE_SECRET_KEY');
+  return isLemonSqueezyConfigured() || present('STRIPE_SECRET_KEY');
 }
 
 /** Resend transactional email (Phase 4 delivery). */

@@ -19,7 +19,10 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default function PricingPage() {
-  const { payments } = activationStatus();
+  // Checkout is live only when BOTH a payment provider AND the database are
+  // active (the handler gates on both); reflect that honestly in the banner.
+  const { payments, database } = activationStatus();
+  const checkoutLive = payments && database;
   return (
     <div className="mx-auto max-w-md px-4 py-10">
       <Breadcrumbs
@@ -39,10 +42,10 @@ export default function PricingPage() {
         One-time reports — no subscription. AI-drafted from your real in-game
         data.
       </p>
-      {!payments ? (
+      {!checkoutLive ? (
         <p className="mt-5 rounded-xl border border-amber-500/25 bg-amber-500/10 p-3 text-center text-sm text-amber-200/90">
-          Checkout is not activated yet (Stripe not configured). Browse the
-          plans below — purchasing turns on once payments are live.
+          Checkout is not activated yet. Browse the plans below — purchasing
+          turns on once payments are live.
         </p>
       ) : null}
       <div className="mt-8">
