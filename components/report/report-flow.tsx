@@ -178,12 +178,17 @@ export function ReportFlow() {
         )}
 
         {missing.length > 0 ? (
-          <p className="rounded-xl border border-brand-violet/20 bg-brand-violet/5 p-3 text-xs text-[var(--muted)]">
-            Your {missing.join(' & ')} couldn&apos;t be read from your player
-            tag (the game API doesn&apos;t expose base layout). Your score
-            covers heroes, army, equipment, progression &amp; clan — the
-            dimensions we can read objectively.
-          </p>
+          <div className="rounded-xl border border-brand-violet/20 bg-brand-violet/5 p-3 text-xs text-[var(--muted)]">
+            Your {missing.join(' & ')} aren&apos;t readable from a player tag
+            (the game API doesn&apos;t expose base layout). Your score covers
+            heroes, army, equipment, progression &amp; clan — read objectively.{' '}
+            <Link
+              href="/intake"
+              className="font-medium text-brand-violet-light hover:text-white"
+            >
+              Add a screenshot to complete your defensive grade →
+            </Link>
+          </div>
         ) : null}
 
         {/* Share — directly below the free score (the growth loop) */}
