@@ -1,4 +1,5 @@
 import type { ReportTeaser } from '@/lib/report';
+import { deriveArchetype } from '@/lib/identity';
 import { PremiumCard } from '@/components/ui';
 import { ScoreReveal } from './score-reveal';
 
@@ -39,6 +40,12 @@ export function TeaserView({ teaser }: { teaser: ReportTeaser }) {
         </div>
         <p className="mt-4 text-center text-sm text-[var(--fg)]/90">
           {teaser.headline}
+        </p>
+        {/* EMO-P2 — shareable player identity */}
+        <p className="mt-3 text-center">
+          <span className="inline-block rounded-full bg-brand-violet/15 px-3 py-1 text-xs font-semibold text-brand-violet-light ring-1 ring-brand-violet/30">
+            {deriveArchetype(teaser.goal, teaser.grade).name}
+          </span>
         </p>
       </PremiumCard>
 
