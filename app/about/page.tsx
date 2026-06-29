@@ -14,7 +14,7 @@ export const metadata: Metadata = buildMetadata({
   title: 'About CoachScore — Clash of Clans account rating & coaching',
   description:
     'CoachScore rates Clash of Clans accounts and produces a prioritized, ' +
-    'goal-aware upgrade roadmap — AI-drafted and verified by a real coach. ' +
+    'goal-aware upgrade roadmap — AI-drafted from your real in-game data. ' +
     'Here is who we are and how it works.',
   path: '/about',
   type: 'article',
@@ -65,9 +65,9 @@ export default function AboutPage() {
         <h2 className="text-lg font-semibold text-white">How it works</h2>
         <p className="mt-2 text-[15px] leading-relaxed text-[var(--muted)]">
           A transparent, deterministic engine grades your account — the same
-          inputs always produce the same score. AI then drafts a written
-          roadmap, and a real coach verifies it before you act on it. That
-          “AI-drafted, human-verified” model is the core of everything we ship.{' '}
+          inputs always produce the same score. AI then drafts a written roadmap
+          from your real in-game numbers, so every recommendation is grounded in
+          your account rather than generic advice.{' '}
           <Link
             href="/methodology"
             className="text-brand-violet-light hover:text-white"
@@ -114,7 +114,7 @@ export default function AboutPage() {
       </section>
 
       <div className="mt-9">
-        <MagicButton href="/onboarding" variant="gold" size="lg">
+        <MagicButton href="/report" variant="gold" size="lg">
           Score your account free
         </MagicButton>
       </div>

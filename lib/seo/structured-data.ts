@@ -66,7 +66,7 @@ export function webApplicationJsonLd(siteUrl: string): JsonLd {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     name: ORG_NAME,
-    url: `${siteUrl}/onboarding`,
+    url: `${siteUrl}/report`,
     applicationCategory: 'GameApplication',
     operatingSystem: 'Web (PWA), iOS, Android',
     description:

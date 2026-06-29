@@ -41,15 +41,27 @@ const SUBSCORE_KEYS: readonly SubScoreKey[] = [
   'clanValue',
 ];
 
-/** Compute the seven sub-scores for a normalized account. */
+/**
+ * Compute the seven sub-scores for a normalized account.
+ *
+ * Defense and Walls are returned as `null` when the source could not observe
+ * them (no defense elements / zero total walls) — "unknown" is not "zero". This
+ * lets the composite drop and renormalize them, so a tag-only account (the
+ * official API exposes progression but NOT defenses or walls) is scored
+ * honestly over the dimensions we can actually read, instead of being dragged
+ * down by phantom zeros. A real, fully-observed account always carries them.
+ */
 export function computeSubScores(account: NormalizedAccount): SubScores {
   return {
     heroes: heroScore(account.heroes),
     offense: weightedCompletionScore(account.offense),
-    defense: weightedCompletionScore(account.defense),
+    defense:
+      account.defense.length > 0
+        ? weightedCompletionScore(account.defense)
+        : null,
     equipment: equipmentScore(account.equipment),
     progression: progressionScore(account.progression),
-    walls: wallScore(account.walls),
+    walls: account.walls.total > 0 ? wallScore(account.walls) : null,
     clanValue: clanValueScore(account.clan),
   };
 }

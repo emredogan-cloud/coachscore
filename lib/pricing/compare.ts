@@ -44,17 +44,6 @@ export const COMPARISON: readonly ComparisonRow[] = [
     },
   },
   {
-    feature: 'Human coach review',
-    cells: {
-      free: false,
-      basic: false,
-      standard: true,
-      pro: 'Senior',
-      account_rescue: true,
-      clan: true,
-    },
-  },
-  {
     feature: 'PDF export',
     cells: {
       free: false,
@@ -74,17 +63,6 @@ export const COMPARISON: readonly ComparisonRow[] = [
       pro: false,
       account_rescue: true,
       clan: false,
-    },
-  },
-  {
-    feature: 'Per-seat / roster',
-    cells: {
-      free: false,
-      basic: false,
-      standard: false,
-      pro: false,
-      account_rescue: false,
-      clan: true,
     },
   },
 ];

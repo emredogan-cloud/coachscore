@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { GRADE_BANDS } from '@/lib/core/grade';
+import { ReturnVisitTracker, TrackOnMount } from '@/components/analytics/track';
 import { JsonLdScript } from '@/components/seo/json-ld';
 import { HeroBanner, MagicButton, PremiumCard } from '@/components/ui';
 import { buildMetadata, faqJsonLd, type FaqEntry } from '@/lib/seo';
@@ -16,8 +17,9 @@ import { buildMetadata, faqJsonLd, type FaqEntry } from '@/lib/seo';
 export const metadata: Metadata = buildMetadata({
   title: 'CoachScore — Rate My Clash of Clans Account & Upgrade Roadmap',
   description:
-    'Rate your Clash of Clans account and get a prioritized, goal-aware upgrade ' +
-    'roadmap in under a minute. Free instant score, AI-drafted and human-verified.',
+    'Paste your player tag and get an objective Clash of Clans account score ' +
+    'and a prioritized, goal-aware upgrade roadmap in seconds. Free instant ' +
+    'score, no account needed.',
   path: '/',
 });
 
@@ -58,9 +60,9 @@ const POPULAR_GUIDES: readonly { href: string; label: string }[] = [
 
 const HOW_IT_WORKS: readonly { title: string; detail: string }[] = [
   {
-    title: 'Submit your account',
+    title: 'Paste your player tag',
     detail:
-      'Enter your levels, upload screenshots, or paste your player tag — no account needed.',
+      'Enter your in-game player tag — we read your account automatically. No login, no account needed.',
   },
   {
     title: 'Get scored instantly',
@@ -70,7 +72,7 @@ const HOW_IT_WORKS: readonly { title: string; detail: string }[] = [
   {
     title: 'Get your roadmap',
     detail:
-      'A prioritized, cost-weighted upgrade plan — AI-drafted and verified by a real coach.',
+      'A prioritized, cost-weighted upgrade plan, built from your real in-game numbers.',
   },
 ];
 
@@ -78,12 +80,12 @@ const HOME_FAQS: readonly FaqEntry[] = [
   {
     question: 'Is CoachScore free?',
     answer:
-      'Yes — you can score your Clash of Clans account and see your grade for free, with no account required. The full prioritized upgrade roadmap and specialized tools are paid.',
+      'Yes — you can score your Clash of Clans account and see your grade for free, with no account required. The full prioritized upgrade roadmap is paid.',
   },
   {
     question: 'What does CoachScore do?',
     answer:
-      'It rates your account across seven dimensions (heroes, offense, defense, equipment, progression/rush, walls, and clan value) and gives you a prioritized, goal-aware upgrade roadmap — AI-drafted and verified by a real coach.',
+      'It rates your account across seven dimensions (heroes, offense, defense, equipment, progression/rush, walls, and clan value) and gives you a prioritized, goal-aware upgrade roadmap, built from your real in-game data by a transparent, deterministic engine.',
   },
   {
     question: 'Which Town Halls are supported?',
@@ -107,6 +109,8 @@ export default function HomePage() {
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[460px] bg-[url('/assets/generated/hero-aura-bg.webp')] bg-cover bg-top opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent)]"
       />
       <JsonLdScript data={faqJsonLd(HOME_FAQS)} />
+      <TrackOnMount event="landing_viewed" />
+      <ReturnVisitTracker />
 
       <HeroBanner
         crest
@@ -115,29 +119,25 @@ export default function HomePage() {
       />
 
       <p className="mt-6 text-center text-[15px] leading-relaxed text-[var(--muted)]">
-        Stop guessing what to upgrade next. Get your account scored and receive
-        a prioritized, goal-aware upgrade roadmap —{' '}
+        Stop guessing what to upgrade next. Paste your player tag and get your
+        account scored —{' '}
         <span className="text-white">
-          AI-drafted, verified by a real coach.
+          objective, instant, built from your real in-game data.
         </span>
       </p>
 
-      {/* CTA — primary conversion path into the free teaser */}
+      {/* CTA — primary conversion path into the free score */}
       <div className="mt-8 space-y-3">
-        <MagicButton href="/onboarding" variant="gold" size="lg">
-          Score your account
+        <MagicButton href="/report" variant="gold" size="lg">
+          Analyze my account
         </MagicButton>
-        <div className="flex gap-3">
-          <MagicButton href="/pricing" variant="ghost" className="flex-1">
-            See pricing
-          </MagicButton>
-          <MagicButton href="/products" variant="ghost" className="flex-1">
-            Specialized tools
-          </MagicButton>
-        </div>
+        <MagicButton href="/pricing" variant="ghost" size="lg">
+          See pricing
+        </MagicButton>
       </div>
       <p className="mt-4 text-center text-xs text-[var(--muted)]">
-        Free instant score · no account required · AI-drafted, human-verified.
+        Free instant score · no account required · objective, from your in-game
+        data.
       </p>
 
       {/* How it works — answers "how does it work?" in 3 steps */}
@@ -286,9 +286,9 @@ export default function HomePage() {
         </h2>
         <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">
           CoachScore grades with a transparent, deterministic engine — the same
-          inputs always produce the same score — then a real coach verifies the
-          AI-drafted roadmap before you act on it. Our scoring rubric, editorial
-          process, and a full example report are public.
+          inputs always produce the same score — and the AI-drafted roadmap is
+          built only from your verified in-game data. Our scoring rubric and a
+          full example report are public.
         </p>
         <div className="mt-3 flex flex-wrap gap-3 text-sm">
           <Link

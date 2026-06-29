@@ -18,4 +18,16 @@ describe('reference-data readiness gate', () => {
     const r13 = referenceDataReadiness(13);
     expect(r13.unverifiedFields.every((f) => f.startsWith('TH13 '))).toBe(true);
   });
+
+  it('is paid-ready for TH16/17/18 (verified hero caps + walls)', () => {
+    for (const th of [16, 17, 18]) {
+      expect(referenceDataReadiness(th).ready).toBe(true);
+      expect(() => assertPaidReportAllowed(th)).not.toThrow();
+    }
+  });
+
+  it('treats out-of-range Town Halls as not ready', () => {
+    expect(referenceDataReadiness(99).ready).toBe(false);
+    expect(referenceDataReadiness(3).ready).toBe(false);
+  });
 });

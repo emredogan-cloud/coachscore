@@ -19,7 +19,7 @@ export const metadata: Metadata = buildMetadata({
   title: 'Clash of Clans upgrade guides & free rush checker | CoachScore',
   description:
     'Evergreen Town Hall upgrade guides (TH11–18): what to upgrade first, hero ' +
-    'equipment priority, and a free rush checker. AI-drafted, human-verified.',
+    'equipment priority, and a free rush checker. AI-drafted from versioned reference data.',
   path: '/guides',
 });
 

@@ -97,10 +97,12 @@ export interface NormalizedAccount {
 export interface SubScores {
   readonly heroes: number;
   readonly offense: number;
-  readonly defense: number;
+  /** `null` when not observable (e.g. the official API can't read defenses). */
+  readonly defense: number | null;
   readonly equipment: number | null;
   readonly progression: number;
-  readonly walls: number;
+  /** `null` when not observable (e.g. the official API can't read walls). */
+  readonly walls: number | null;
   readonly clanValue: number;
 }
 

@@ -47,6 +47,13 @@ export interface IntakeFields {
   /** Equipment inputs (TH16+); ignored below TH16. */
   readonly equipment?: EquipmentFields;
   readonly clan: ClanSignals;
+  /**
+   * Dimensions the source could not observe (e.g. the official Clash of Clans
+   * API exposes progression but NOT defenses or walls). Listed dimensions are
+   * normalized to "absent" so the engine drops them and renormalizes, instead
+   * of scoring an unknown as zero. Omitted/empty = everything was observed.
+   */
+  readonly unknownDimensions?: readonly ('defense' | 'walls')[];
 }
 
 export interface IntakeRequest {

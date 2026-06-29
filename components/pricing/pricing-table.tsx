@@ -1,22 +1,26 @@
 import {
   COMPARISON,
   formatPrice,
+  gatedPricing,
   PRIMARY_PRICING,
   PRIMARY_SKU_IDS,
-  SITUATIONAL_PRICING,
 } from '@/lib/pricing';
+import { isFeatureEnabled } from '@/lib/experiments';
 import { PremiumCard } from '@/components/ui';
 import { BuyButton } from './buy-button';
 
 /**
- * Pricing layer (Phase 4 · simplified for conversion in Phase F). To cut
- * cognitive load the page leads with three PRIMARY tiers (Free → Standard★ →
- * Pro), tucks the situational tiers (Basic / AccountRescue / Clan-Bulk) into a
- * compact secondary list, and limits the comparison matrix to the primary
- * three. Real prices/tiers unchanged (set below the in-game impulse threshold —
- * see MONETIZATION_ANALYSIS.md).
+ * Pricing layer (PMF-correction sprint). The public product is a clean three:
+ * Free → Premium Report★ ($7 instant AI) → Account Rescue ($19 instant AI). The
+ * human-reviewed tiers (Standard, Pro) and the Clan/Bulk plan are gated behind
+ * feature flags (default OFF — we don't sell human review we can't staff), so
+ * the situational section is empty until those flags flip. Prices unchanged.
  */
 export function PricingTable() {
+  const situational = gatedPricing({
+    humanReview: isFeatureEnabled('human_review_enabled'),
+    clanPlans: isFeatureEnabled('clan_plans_enabled'),
+  });
   return (
     <div className="space-y-10">
       {/* Primary tiers — the core three-way decision */}
@@ -74,17 +78,17 @@ export function PricingTable() {
         ))}
       </div>
 
-      {/* Situational tiers — compact, secondary (lower cognitive load) */}
-      {SITUATIONAL_PRICING.length > 0 ? (
+      {/* Situational tiers — flag-gated; empty (hidden) by default */}
+      {situational.length > 0 ? (
         <div>
           <h3 className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold/80">
             Situational plans
           </h3>
           <p className="mx-auto mt-1 max-w-sm text-center text-sm text-[var(--muted)]">
-            For specific moments — most players want Standard.
+            For specific moments — most players want the Premium Report.
           </p>
           <ul className="mt-4 space-y-2">
-            {SITUATIONAL_PRICING.map((tier) => (
+            {situational.map((tier) => (
               <li key={tier.id}>
                 <PremiumCard tone="plain" className="p-4">
                   <div className="flex items-center justify-between gap-3">

@@ -5,6 +5,7 @@ import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { JsonLdScript } from '@/components/seo/json-ld';
 import { StatusBadge } from '@/components/ui';
 import { buildMetadata, canonicalUrl, productJsonLd } from '@/lib/seo';
+import { isFeatureEnabled } from '@/lib/experiments';
 import {
   formatProductPrice,
   getProduct,
@@ -15,6 +16,9 @@ import {
 export const dynamicParams = false;
 
 export function generateStaticParams(): { sku: ProductSku }[] {
+  // Hidden in the PMF-correction sprint: generate no SKU pages while the flag is
+  // off, so /products/* 404s. Flip `specialized_products_enabled` to restore.
+  if (!isFeatureEnabled('specialized_products_enabled')) return [];
   return PRODUCT_SKUS.map((sku) => ({ sku }));
 }
 

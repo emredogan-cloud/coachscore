@@ -91,7 +91,41 @@ export const FEATURE_FLAGS: readonly FeatureFlag[] = [
     enabled: true,
     rolloutPct: 100,
   },
+  // --- PMF-correction gates (default OFF). The simplified public product shows
+  // only Free / Premium Report / Account Rescue; everything below is preserved
+  // in code but hidden until it can be genuinely fulfilled (human reviewers
+  // staffed, products built). Flip `enabled` to surface, no code change needed.
+  {
+    key: 'human_review_enabled',
+    description:
+      'Human-reviewed / coach tiers (Standard, Pro) + "verified by a real coach" claims. OFF until coaches are staffed.',
+    enabled: false,
+    rolloutPct: 0,
+  },
+  {
+    key: 'specialized_products_enabled',
+    description:
+      'Specialized one-off tools (ReplayDoctor, BaseDoctor, WarPlan) + /products. OFF until built and fulfillable.',
+    enabled: false,
+    rolloutPct: 0,
+  },
+  {
+    key: 'clan_plans_enabled',
+    description:
+      'Clan / Bulk per-seat plan + clan dashboard. OFF (B2B not built).',
+    enabled: false,
+    rolloutPct: 0,
+  },
 ];
+
+/**
+ * Global (subject-independent) flag check for hard product gates — show/hide a
+ * whole surface, not a per-user rollout. Unknown flags are OFF (deny-by-default).
+ * For per-subject gradual rollout, use `ExperimentService.isEnabled` instead.
+ */
+export function isFeatureEnabled(key: string): boolean {
+  return getFlag(key)?.enabled === true;
+}
 
 export function getExperiment(key: string): Experiment | null {
   return EXPERIMENTS.find((e) => e.key === key) ?? null;

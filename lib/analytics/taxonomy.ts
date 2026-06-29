@@ -12,8 +12,11 @@
 import type { AnalyticsProperties } from './types';
 
 export const ANALYTICS_EVENT_NAMES = [
-  // Acquisition funnel
+  // Acquisition funnel (PMF magic moment: landing → tag → score → report)
   'landing_viewed',
+  'tag_submitted',
+  'score_generated',
+  'return_visit',
   'teaser_started',
   'teaser_completed',
   'signup_completed',
@@ -27,6 +30,7 @@ export const ANALYTICS_EVENT_NAMES = [
   // Viral / referral
   'share_card_generated',
   'share_clicked',
+  'referral_visit',
   'referral_code_created',
   'referral_claimed',
   'referral_qualified',
@@ -53,6 +57,18 @@ export const ANALYTICS_EVENTS: Readonly<
   landing_viewed: {
     category: 'funnel',
     description: 'Visited a landing/SEO page.',
+  },
+  tag_submitted: {
+    category: 'funnel',
+    description: 'Submitted a player tag to analyze (the magic moment).',
+  },
+  score_generated: {
+    category: 'funnel',
+    description: 'An objective score was generated from the account.',
+  },
+  return_visit: {
+    category: 'funnel',
+    description: 'A returning visitor (seen on a prior session).',
   },
   teaser_started: {
     category: 'funnel',
@@ -97,6 +113,10 @@ export const ANALYTICS_EVENTS: Readonly<
   share_clicked: {
     category: 'viral',
     description: 'Clicked a social share target.',
+  },
+  referral_visit: {
+    category: 'referral',
+    description: 'Landed via a referral link (/r/{code}).',
   },
   referral_code_created: {
     category: 'referral',

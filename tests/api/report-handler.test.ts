@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { handleReport, handleReportPdf } from '@/lib/api';
+import { handleReport, handleReportByTag, handleReportPdf } from '@/lib/api';
 import type { IntakeFields } from '@/lib/intake';
 
 const fields: IntakeFields = {
@@ -55,6 +55,24 @@ describe('handleReport', () => {
 
   it('rejects an invalid body with 422', async () => {
     expect((await handleReport({ goal: 'nope', fields })).status).toBe(422);
+  });
+});
+
+describe('handleReportByTag', () => {
+  it('falls back to manual when the CoC API is not activated', async () => {
+    // No COC_API_TOKEN/PROXY in the test env → NotConfigured adapter.
+    const res = await handleReportByTag({
+      playerTag: '#2PP0LYQ',
+      goal: 'rate',
+    });
+    expect(res.status).toBe(200);
+    const b = res.body as { fallbackToManual?: boolean; reason?: string };
+    expect(b.fallbackToManual).toBe(true);
+    expect(b.reason).toBe('coc_api_not_activated');
+  });
+
+  it('rejects an invalid tag-report body', async () => {
+    expect((await handleReportByTag({ goal: 'rate' })).status).toBe(422);
   });
 });
 

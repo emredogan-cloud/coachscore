@@ -30,11 +30,14 @@ function renderGaps(result: CoachScoreResult): string {
 
 function renderSubScores(result: CoachScoreResult): string {
   const s = result.subScores;
-  const eq = s.equipment === null ? 'N/A' : String(s.equipment);
+  // N/A for any sub-score the source could not observe (Equipment below TH16;
+  // Defense/Walls when scored from the tag-only API path).
+  const na = (v: number | null): string =>
+    v === null ? 'N/A' : String(Math.round(v));
   return [
     `overall=${result.overallRounded} grade=${result.grade} rushLabel="${result.rushLabel}"`,
-    `heroes=${Math.round(s.heroes)} offense=${Math.round(s.offense)} defense=${Math.round(s.defense)}`,
-    `equipment=${eq} progression=${Math.round(s.progression)} walls=${Math.round(s.walls)} clanValue=${Math.round(s.clanValue)}`,
+    `heroes=${Math.round(s.heroes)} offense=${Math.round(s.offense)} defense=${na(s.defense)}`,
+    `equipment=${na(s.equipment)} progression=${Math.round(s.progression)} walls=${na(s.walls)} clanValue=${Math.round(s.clanValue)}`,
   ].join('\n');
 }
 

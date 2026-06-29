@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { activationStatus } from '@/lib/activation';
 import { CoachApplyForm } from '@/components/coach/coach-apply-form';
+import { isFeatureEnabled } from '@/lib/experiments';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +15,10 @@ export const metadata: Metadata = {
 };
 
 export default function CoachPage() {
+  // Coaching marketplace is hidden in the PMF-correction sprint (no coaches
+  // staffed → we don't advertise "earn 60%"). Gated behind human_review_enabled
+  // (default OFF); code preserved, flip the flag to re-open applications.
+  if (!isFeatureEnabled('human_review_enabled')) notFound();
   const { database } = activationStatus();
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">

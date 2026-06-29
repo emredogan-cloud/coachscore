@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { track } from '@/components/analytics/track';
 
 /**
  * Share experience (immersion sprint · Section 3). One-tap sharing via the
@@ -23,6 +24,7 @@ export function ShareButtons({
   const full = `${text} ${url}`;
 
   async function nativeShare(): Promise<void> {
+    track('share_clicked', { target: 'native' });
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share({ title: 'CoachScore', text, url });
@@ -35,6 +37,7 @@ export function ShareButtons({
   }
 
   async function copyLink(): Promise<void> {
+    track('share_clicked', { target: 'copy' });
     try {
       await navigator.clipboard.writeText(full);
       setCopied(true);
@@ -77,6 +80,7 @@ export function ShareButtons({
           href={`https://wa.me/?text=${enc(full)}`}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => track('share_clicked', { target: 'whatsapp' })}
         >
           WhatsApp
         </a>
@@ -85,9 +89,18 @@ export function ShareButtons({
           href={`https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(url)}`}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => track('share_clicked', { target: 'x' })}
         >
           X
         </a>
+        <button
+          type="button"
+          className={pill}
+          onClick={copyLink}
+          aria-label="Copy link to share on Discord"
+        >
+          {copied ? 'Copied ✓' : 'Discord'}
+        </button>
         <button type="button" className={pill} onClick={copyLink}>
           {copied ? 'Copied ✓' : 'Copy link'}
         </button>

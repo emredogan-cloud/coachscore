@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title: 'CoachScore — Rate My Account & Upgrade Roadmap for Clash of Clans',
   description:
     'Get your Clash of Clans account scored and receive a prioritized, ' +
-    'goal-aware upgrade roadmap. AI-drafted, human-verified expert coaching.',
+    'goal-aware upgrade roadmap. AI-drafted, built from your real in-game data.',
   applicationName: 'CoachScore',
   robots: { index: true, follow: true },
 };
