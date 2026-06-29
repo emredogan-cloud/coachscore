@@ -1,4 +1,6 @@
+import type { SubScores } from '@/lib/core';
 import type { RenderableReport } from '@/lib/report';
+import { benchmarkVsMaxed } from '@/lib/benchmark';
 import { PremiumCard, ScoreRing } from '@/components/ui';
 
 /**
@@ -30,6 +32,12 @@ function humanize(id: string): string {
 }
 
 export function ReportView({ report }: { report: RenderableReport }) {
+  // HR-4 — objective "you vs a maxed base" benchmark (reuses the tested lib).
+  const subScoreMap = Object.fromEntries(
+    report.subScores.map((s) => [s.key, s.value]),
+  ) as unknown as SubScores;
+  const bench = benchmarkVsMaxed(subScoreMap, report.overall, report.townHall);
+
   return (
     <section aria-labelledby="report-heading" className="space-y-6">
       <h2 id="report-heading" className="sr-only">
@@ -58,6 +66,14 @@ export function ReportView({ report }: { report: RenderableReport }) {
           </div>
         </div>
       </PremiumCard>
+
+      {/* HR-4 — vs a maxed base for your Town Hall */}
+      <p className="text-center text-sm text-[var(--muted)]">
+        {bench.headline}
+        {bench.biggest
+          ? ` Biggest gap to a maxed base: ${bench.biggest.label}.`
+          : ''}
+      </p>
 
       {/* Diagnosis */}
       <div>
