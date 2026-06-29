@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { resolveCreatorCode } from '@/lib/growth';
 import { parseReferralParam } from '@/lib/referrals';
 
 export const dynamic = 'force-dynamic';
@@ -20,11 +21,16 @@ export async function GET(
   { params }: { params: Promise<{ code: string }> },
 ): Promise<NextResponse> {
   const { code } = await params;
-  const valid = parseReferralParam(code);
-  const dest = new URL(valid ? '/report?invited=1' : '/report', request.url);
+  // Accept a per-user referral code OR a registered creator vanity code.
+  const referral = parseReferralParam(code);
+  const attributed = referral ?? resolveCreatorCode(code)?.code ?? null;
+  const dest = new URL(
+    attributed ? '/report?invited=1' : '/report',
+    request.url,
+  );
   const res = NextResponse.redirect(dest);
-  if (valid) {
-    res.cookies.set(REF_COOKIE, valid, {
+  if (attributed) {
+    res.cookies.set(REF_COOKIE, attributed, {
       path: '/',
       maxAge: THIRTY_DAYS,
       sameSite: 'lax',
