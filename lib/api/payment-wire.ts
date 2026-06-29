@@ -9,14 +9,23 @@
 import { createDrizzleRepositories, type Repositories } from '@/lib/db';
 import { requireEnv } from '@/lib/env';
 import {
+  createLemonSqueezyProvider,
   createStripeProvider,
   handleStripeWebhook,
+  isLemonSqueezyConfigured,
   type PaymentProvider,
   type WebhookResult,
 } from '@/lib/payments';
 
+/**
+ * Prefer LemonSqueezy (the decided Merchant-of-Record buyer-billing provider)
+ * when configured; fall back to Stripe otherwise. Either throws its own
+ * NotConfigured error when neither is provisioned.
+ */
 export function resolveProvider(): PaymentProvider {
-  return createStripeProvider();
+  return isLemonSqueezyConfigured()
+    ? createLemonSqueezyProvider()
+    : createStripeProvider();
 }
 
 export function resolveRepos(): Repositories {

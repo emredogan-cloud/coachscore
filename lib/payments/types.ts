@@ -14,6 +14,12 @@ export interface CheckoutInput {
   /** Our order id, echoed back on the session (reconciliation). */
   readonly clientReferenceId?: string;
   readonly customerEmail?: string;
+  /**
+   * The SKU id (report tier or product). Amount-based providers (Stripe) ignore
+   * it; variant-based providers (LemonSqueezy) resolve the pre-configured
+   * variant from it.
+   */
+  readonly sku?: string;
 }
 
 export interface CheckoutSession {

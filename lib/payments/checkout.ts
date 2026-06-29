@@ -76,6 +76,7 @@ export async function createCheckout(
     cancelUrl: input.cancelUrl,
     clientReferenceId: order.id,
     customerEmail: input.customerEmail,
+    sku: input.sku,
   });
 
   await deps.repos.orders.update(order.id, {
@@ -129,6 +130,7 @@ export async function createProductCheckout(
     cancelUrl: input.cancelUrl,
     clientReferenceId: order.id,
     customerEmail: input.customerEmail,
+    sku: input.sku,
   });
 
   await deps.repos.orders.update(order.id, {

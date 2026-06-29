@@ -24,6 +24,14 @@ export {
   createStripeProvider,
 } from './stripe-adapter';
 export {
+  LemonSqueezyPaymentProvider,
+  LemonSqueezyNotConfiguredError,
+  LemonSqueezyVariantNotConfiguredError,
+  createLemonSqueezyProvider,
+  isLemonSqueezyConfigured,
+  variantForSku,
+} from './lemonsqueezy-adapter';
+export {
   createCheckout,
   createProductCheckout,
   NotPurchasableError,
