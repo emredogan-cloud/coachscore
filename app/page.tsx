@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { GRADE_BANDS } from '@/lib/core/grade';
 import { ReturnVisitTracker, TrackOnMount } from '@/components/analytics/track';
+import { DemoScore } from '@/components/home/demo-score';
 import { JsonLdScript } from '@/components/seo/json-ld';
 import { HeroBanner, MagicButton, PremiumCard } from '@/components/ui';
 import { buildMetadata, faqJsonLd, type FaqEntry } from '@/lib/seo';
@@ -114,8 +115,8 @@ export default function HomePage() {
 
       <HeroBanner
         crest
-        headline="Rate your Clash of Clans account & get an upgrade roadmap"
-        tagline="Expert account rating"
+        headline="Is your Clash of Clans account actually good — or secretly rushed?"
+        tagline="Free, objective account rating"
       />
 
       <p className="mt-6 text-center text-[15px] leading-relaxed text-[var(--muted)]">
@@ -125,6 +126,11 @@ export default function HomePage() {
           objective, instant, built from your real in-game data.
         </span>
       </p>
+
+      {/* FP-2 — show the value in motion before any click */}
+      <div className="mt-8 flex justify-center">
+        <DemoScore />
+      </div>
 
       {/* CTA — primary conversion path into the free score */}
       <div className="mt-8 space-y-3">
@@ -139,6 +145,26 @@ export default function HomePage() {
         Free instant score · no account required · objective, from your in-game
         data.
       </p>
+
+      {/* FP-4 — real trust signals (replacing the removed "human-verified" claim) */}
+      <ul
+        className="mt-5 flex flex-wrap justify-center gap-2"
+        aria-label="Why you can trust the grade"
+      >
+        {[
+          'Read from the official API',
+          'Transparent, deterministic engine',
+          'Public methodology',
+          'TH16–18 verified',
+        ].map((signal) => (
+          <li
+            key={signal}
+            className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-[var(--fg)]/80"
+          >
+            {signal}
+          </li>
+        ))}
+      </ul>
 
       {/* How it works — answers "how does it work?" in 3 steps */}
       <section className="mt-10" aria-labelledby="how-heading">

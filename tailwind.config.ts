@@ -90,6 +90,13 @@ const config: Config = {
         'fade-up': 'fade-up 0.5s ease-out both',
         'score-reveal': 'score-reveal 0.6s cubic-bezier(0.22,1,0.36,1) both',
       },
+      // DESIGN-P0 — one shared easing system (CSS-first, no JS motion lib):
+      // `settle` for reveals (formation over appearance) and `overshoot` for
+      // confirmations/stamps. The global reduced-motion rule disables motion.
+      transitionTimingFunction: {
+        settle: 'cubic-bezier(0.16,1,0.3,1)',
+        overshoot: 'cubic-bezier(0.34,1.56,0.64,1)',
+      },
     },
   },
   plugins: [],
