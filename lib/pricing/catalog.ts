@@ -25,18 +25,18 @@ export const PRICING_CATALOG: Readonly<Record<SkuId, PricingTier>> = {
   },
   basic: {
     id: 'basic',
-    name: 'Basic',
+    name: 'Premium Report',
     priceUsdCents: 700,
     currency: 'usd',
     fulfillment: 'instant_ai',
-    blurb: 'Instant, AI-generated full report. Fast and self-serve.',
+    blurb: 'Your full report, generated instantly from your account data.',
     features: [
-      'All seven sub-scores + percentile context',
-      'AI-generated prioritized upgrade roadmap',
+      'Every sub-score we can read, with your weak spots',
+      'Prioritized, goal-aware upgrade roadmap',
       'Printable PDF export',
       'Delivered instantly',
     ],
-    highlighted: false,
+    highlighted: true,
     perSeat: false,
     purchasable: true,
   },
@@ -77,14 +77,14 @@ export const PRICING_CATALOG: Readonly<Record<SkuId, PricingTier>> = {
   },
   account_rescue: {
     id: 'account_rescue',
-    name: 'AccountRescue',
+    name: 'Account Rescue',
     priceUsdCents: 1900,
     currency: 'usd',
-    fulfillment: 'human_reviewed',
+    fulfillment: 'instant_ai',
     blurb:
-      'For returning/rushed accounts: a de-rush plan and catch-up roadmap.',
+      'For returning or rushed accounts: an instant de-rush and catch-up roadmap.',
     features: [
-      'Everything in Standard',
+      'Everything in the Premium Report',
       'Targeted de-rush plan',
       '"What changed" meta primer',
       '30-day catch-up roadmap',
@@ -117,24 +117,47 @@ export const PRICING_LIST: readonly PricingTier[] = SKU_IDS.map(
 );
 
 /**
- * Conversion-focused grouping (Phase F — simplify pricing, reduce cognitive
- * load). The page leads with three PRIMARY tiers — Free (funnel top), Standard
- * (the $12 "volume workhorse" per MONETIZATION_ANALYSIS.md), and Pro (the $29
- * anchor that makes Standard feel sensible) — and tucks the situational tiers
- * (Basic, AccountRescue, Clan/Bulk) into a secondary section so the core
- * decision is a clean three-way choice. Prices are unchanged: the doc sets them
- * deliberately below the in-game impulse threshold, so the conversion lever is
- * clarity, not discounting.
+ * Public product surface (PMF-correction sprint). The simplified, honest public
+ * product is a clean three: Free (funnel top) → Premium Report ($7, instant AI)
+ * → Account Rescue ($19, instant AI de-rush). These are the only tiers we can
+ * fulfill today without staffed human coaches.
+ *
+ * The human-reviewed tiers (Standard, Pro) and the per-seat Clan/Bulk plan are
+ * preserved in `PRICING_CATALOG` but live behind feature flags (`human_review_
+ * enabled`, `clan_plans_enabled`, default OFF — see lib/experiments) and surface
+ * via `gatedPricing(...)`. Prices are unchanged (set below the in-game impulse
+ * threshold); the conversion lever is clarity, not discounting.
  */
-export const PRIMARY_SKU_IDS: readonly SkuId[] = ['free', 'standard', 'pro'];
+export const PRIMARY_SKU_IDS: readonly SkuId[] = [
+  'free',
+  'basic',
+  'account_rescue',
+];
 
 export const PRIMARY_PRICING: readonly PricingTier[] = PRIMARY_SKU_IDS.map(
   (id) => PRICING_CATALOG[id],
 );
 
-export const SITUATIONAL_PRICING: readonly PricingTier[] = PRICING_LIST.filter(
-  (t) => !PRIMARY_SKU_IDS.includes(t.id),
+/** Tiers preserved in code but gated behind feature flags (default hidden). */
+export const GATED_SKU_IDS: readonly SkuId[] = ['standard', 'pro', 'clan'];
+
+export const SITUATIONAL_PRICING: readonly PricingTier[] = GATED_SKU_IDS.map(
+  (id) => PRICING_CATALOG[id],
 );
+
+/**
+ * Which gated tiers are currently visible, given flag state. Pure: caller passes
+ * the resolved flags so this module stays free of an experiments import.
+ * Standard/Pro need human review staffed; Clan needs the B2B plan switched on.
+ */
+export function gatedPricing(flags: {
+  humanReview: boolean;
+  clanPlans: boolean;
+}): readonly PricingTier[] {
+  return SITUATIONAL_PRICING.filter((t) =>
+    t.id === 'clan' ? flags.clanPlans : flags.humanReview,
+  );
+}
 
 export function getTier(id: SkuId): PricingTier {
   return PRICING_CATALOG[id];

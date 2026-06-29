@@ -4,6 +4,7 @@ import { PricingTable } from '@/components/pricing/pricing-table';
 import { ProductCards } from '@/components/products/product-cards';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { HeroBanner } from '@/components/ui';
+import { isFeatureEnabled } from '@/lib/experiments';
 import { buildMetadata } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
@@ -11,8 +12,9 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildMetadata({
   title: 'Pricing — one-time Clash of Clans account reports | CoachScore',
   description:
-    'One-time CoachScore reports: a free teaser, instant AI reports, and ' +
-    'human-verified coaching tiers. No subscription.',
+    'One-time CoachScore reports: a free score teaser and instant, ' +
+    'AI-generated full reports built from your real in-game data. No ' +
+    'subscription, no account needed.',
   path: '/pricing',
 });
 
@@ -34,7 +36,8 @@ export default function PricingPage() {
         />
       </div>
       <p className="mt-5 text-center text-[15px] text-[var(--muted)]">
-        One-time reports — no subscription. AI-drafted, human-verified coaching.
+        One-time reports — no subscription. AI-drafted from your real in-game
+        data.
       </p>
       {!payments ? (
         <p className="mt-5 rounded-xl border border-amber-500/25 bg-amber-500/10 p-3 text-center text-sm text-amber-200/90">
@@ -46,21 +49,23 @@ export default function PricingPage() {
         <PricingTable />
       </div>
 
-      <section className="mt-14" aria-labelledby="addons-heading">
-        <h2
-          id="addons-heading"
-          className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold/80"
-        >
-          Specialized coaching tools
-        </h2>
-        <p className="mx-auto mt-2 max-w-sm text-center text-sm text-[var(--muted)]">
-          Targeted, one-off analysis — submit an attack replay, a base layout,
-          or your next war and get an instant report a coach can verify.
-        </p>
-        <div className="mt-6">
-          <ProductCards />
-        </div>
-      </section>
+      {isFeatureEnabled('specialized_products_enabled') ? (
+        <section className="mt-14" aria-labelledby="addons-heading">
+          <h2
+            id="addons-heading"
+            className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold/80"
+          >
+            Specialized coaching tools
+          </h2>
+          <p className="mx-auto mt-2 max-w-sm text-center text-sm text-[var(--muted)]">
+            Targeted, one-off analysis — submit an attack replay, a base layout,
+            or your next war and get an instant report.
+          </p>
+          <div className="mt-6">
+            <ProductCards />
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

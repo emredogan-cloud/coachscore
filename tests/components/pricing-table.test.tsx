@@ -3,20 +3,27 @@ import { describe, expect, it } from 'vitest';
 import { PricingTable } from '@/components/pricing/pricing-table';
 
 describe('PricingTable', () => {
-  it('leads with the primary tiers, the highlighted plan, prices, and the comparison', () => {
+  it('shows the simplified public three (Free → Premium Report★ → Account Rescue)', () => {
     const html = renderToStaticMarkup(<PricingTable />);
-    // Primary three lead the page (Free → Standard★ → Pro).
+    // The honest public product: Free, Premium Report ($7), Account Rescue ($19).
     expect(html).toContain('Free Teaser');
-    expect(html).toContain('Standard');
-    expect(html).toContain('Pro');
-    expect(html).toContain('$12');
+    expect(html).toContain('Premium Report');
+    expect(html).toContain('Account Rescue');
+    expect(html).toContain('$7');
+    expect(html).toContain('$19');
     expect(html).toContain('Most popular');
     expect(html).toContain('Free with any account score');
-    // Situational tiers are tucked into a secondary section (lower load).
-    expect(html).toContain('Situational plans');
-    expect(html).toContain('AccountRescue');
-    // Comparison limited to the primary plans.
     expect(html).toContain('Compare the main plans');
-    expect(html).toContain('Human coach review');
+    expect(html).toContain('De-rush plan');
+  });
+
+  it('hides the human-reviewed + clan tiers and their claims by default', () => {
+    // human_review_enabled / clan_plans_enabled default OFF — no Standard/Pro,
+    // no Clan/Bulk, no "human coach review" claim, no situational section.
+    const html = renderToStaticMarkup(<PricingTable />);
+    expect(html).not.toContain('Situational plans');
+    expect(html).not.toContain('Human coach review');
+    expect(html).not.toContain('Clan / Bulk');
+    expect(html).not.toContain('per roster');
   });
 });

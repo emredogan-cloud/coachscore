@@ -150,7 +150,7 @@ export default function SampleReportPage() {
           Get your real grade — free, in under a minute.
         </p>
         <div className="mt-3">
-          <MagicButton href="/onboarding" variant="gold">
+          <MagicButton href="/report" variant="gold">
             Score my account free
           </MagicButton>
         </div>

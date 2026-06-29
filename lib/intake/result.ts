@@ -60,7 +60,15 @@ export function buildIntakeResult(
   const account = normalizeIntake(fields);
   const readiness = referenceDataReadiness(fields.townHall);
   const confidence = options.confidence ?? 1;
-  const fieldsNeedingConfirmation = options.fieldsNeedingConfirmation ?? [];
+  // Dimensions the source couldn't observe (e.g. defenses/walls over the tag
+  // API) are surfaced as "needs confirmation" so the UI can prompt for a
+  // screenshot to complete them. Deduped with any explicitly-passed fields.
+  const fieldsNeedingConfirmation = [
+    ...new Set([
+      ...(options.fieldsNeedingConfirmation ?? []),
+      ...(fields.unknownDimensions ?? []),
+    ]),
+  ];
 
   const snapshot = createSnapshot({
     account,

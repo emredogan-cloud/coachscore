@@ -12,10 +12,10 @@ import type { Goal } from '@/lib/core';
 import {
   CocApiNotConfiguredError,
   InvalidPlayerTagError,
-  NotConfiguredCocAdapter,
   parsePlayerTag,
   type CocApiAdapter,
 } from './coc-adapter';
+import { createCocAdapter } from './coc-api-client';
 import { buildIntakeResult, failedResult } from './result';
 import type { IntakeResult } from './types';
 
@@ -23,13 +23,16 @@ export interface TagIntakeDeps {
   readonly adapter: CocApiAdapter;
 }
 
-const defaultDeps: TagIntakeDeps = { adapter: new NotConfiguredCocAdapter() };
-
 export async function intakeByTag(
   rawTag: string,
   goal: Goal,
-  deps: TagIntakeDeps = defaultDeps,
+  deps?: TagIntakeDeps,
 ): Promise<IntakeResult> {
+  // Resolve the adapter lazily per request: the real proxy client when the CoC
+  // API is configured, else the NotConfigured stub (→ a clean notActivated
+  // result the UI turns into the manual-entry fallback).
+  const adapter = deps?.adapter ?? createCocAdapter();
+
   let tag: string;
   try {
     tag = parsePlayerTag(rawTag);
@@ -41,7 +44,7 @@ export async function intakeByTag(
   }
 
   try {
-    const data = await deps.adapter.fetchAccount(tag);
+    const data = await adapter.fetchAccount(tag);
     return buildIntakeResult('tag', data.fields, goal, { note: tag });
   } catch (err) {
     if (err instanceof CocApiNotConfiguredError) {

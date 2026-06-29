@@ -6,7 +6,13 @@ export type {
   Assignment,
 } from './types';
 export { hashFraction, assignVariant, evaluateFlag } from './assignment';
-export { EXPERIMENTS, FEATURE_FLAGS, getExperiment, getFlag } from './catalog';
+export {
+  EXPERIMENTS,
+  FEATURE_FLAGS,
+  getExperiment,
+  getFlag,
+  isFeatureEnabled,
+} from './catalog';
 export {
   ExperimentService,
   ExperimentError,

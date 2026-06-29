@@ -69,15 +69,24 @@ export function normalizeIntake(fields: IntakeFields): NormalizedAccount {
           maxLevelSum: 0,
         };
 
+  const unknown = new Set(fields.unknownDimensions ?? []);
+
   return {
     townHall: fields.townHall,
     heroes,
     offense: [percentElement('meta-offense', fields.offensePercent)],
-    defense: [percentElement('key-defense', fields.defensePercent)],
-    walls: {
-      atOrAboveThMax: Math.max(0, Math.floor(fields.walls.atOrAboveThMax)),
-      total: Math.max(0, Math.floor(fields.walls.total)),
-    },
+    // "Unknown" dimensions (e.g. defenses/walls the official API can't read) are
+    // left absent so the engine drops + renormalizes them rather than scoring an
+    // unobserved dimension as zero.
+    defense: unknown.has('defense')
+      ? []
+      : [percentElement('key-defense', fields.defensePercent)],
+    walls: unknown.has('walls')
+      ? { atOrAboveThMax: 0, total: 0 }
+      : {
+          atOrAboveThMax: Math.max(0, Math.floor(fields.walls.atOrAboveThMax)),
+          total: Math.max(0, Math.floor(fields.walls.total)),
+        },
     equipment,
     clan: {
       donationBehavior: clamp01(fields.clan.donationBehavior),

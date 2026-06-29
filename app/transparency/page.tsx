@@ -30,7 +30,7 @@ const SECTIONS: readonly { title: string; body: string }[] = [
   },
   {
     title: 'Refunds & disputes',
-    body: 'If a human-verified report does not meet the quality we promise, we have a defined dispute and refund path. Coaching judgement is honest, not flattering — a low grade is still a correct result.',
+    body: 'If a paid report does not meet the quality we promise, we have a defined dispute and refund path. The grade is honest, not flattering — a low grade is still a correct result.',
   },
   {
     title: 'Honest data',
@@ -95,7 +95,7 @@ export default function TransparencyPage() {
       </p>
 
       <div className="mt-9">
-        <MagicButton href="/onboarding" variant="gold" size="lg">
+        <MagicButton href="/report" variant="gold" size="lg">
           Score your account free
         </MagicButton>
       </div>

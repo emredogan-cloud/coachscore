@@ -52,12 +52,18 @@ describe('comparison matrix', () => {
     }
   });
 
-  it('encodes the human-review tier boundary', () => {
-    const humanReview = COMPARISON.find(
-      (r) => r.feature === 'Human coach review',
-    );
-    expect(humanReview?.cells.basic).toBe(false);
-    expect(humanReview?.cells.standard).toBe(true);
-    expect(humanReview?.cells.pro).toBe('Senior');
+  it('does not advertise human review in the public comparison', () => {
+    // PMF-correction sprint: the "Human coach review" row was removed — we don't
+    // sell human review we can't staff.
+    expect(
+      COMPARISON.find((r) => r.feature === 'Human coach review'),
+    ).toBeUndefined();
+  });
+
+  it('encodes the de-rush plan as the Account Rescue differentiator', () => {
+    const deRush = COMPARISON.find((r) => r.feature === 'De-rush plan');
+    expect(deRush?.cells.account_rescue).toBe(true);
+    expect(deRush?.cells.basic).toBe(false);
+    expect(deRush?.cells.free).toBe(false);
   });
 });

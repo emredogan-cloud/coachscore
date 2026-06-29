@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { requestCheckout } from '@/app/report/actions';
+import { track } from '@/components/analytics/track';
 import type { SkuId } from '@/lib/pricing';
 import { MagicButton } from '@/components/ui';
 
@@ -12,6 +13,7 @@ export function BuyButton({ sku, label }: { sku: SkuId; label: string }) {
 
   async function buy() {
     setStatus('loading');
+    track('checkout_started', { sku });
     try {
       const res = await requestCheckout({ sku });
       if (res.status === 200) {

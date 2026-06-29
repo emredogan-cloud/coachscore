@@ -136,7 +136,7 @@ export default function MethodologyPage() {
         CoachScore turns a Clash of Clans account into a single grade and a
         prioritized upgrade roadmap. The grade is produced by a transparent,
         deterministic engine — the same inputs always produce the same score —
-        and the written roadmap is AI-drafted, then verified by a real coach.
+        and the written roadmap is AI-drafted from your real in-game numbers.
       </p>
 
       <section className="mt-8">
@@ -213,14 +213,14 @@ export default function MethodologyPage() {
 
       <section className="mt-8">
         <h2 className="text-lg font-semibold text-white">
-          AI-drafted, human-verified — and honest about data
+          AI-drafted from your data — and honest about it
         </h2>
         <p className="mt-2 text-[15px] leading-relaxed text-[var(--muted)]">
-          The score is deterministic; the roadmap prose is drafted by AI and
-          verified by a coach before it reaches you. Town Hall caps come from a
-          versioned reference table: verified values are sourced, and
-          best-effort values are explicitly flagged for verification rather than
-          presented as certain. See our{' '}
+          The score is deterministic; the roadmap prose is drafted by AI from
+          your real in-game numbers. Town Hall caps come from a versioned
+          reference table: verified values are sourced, and best-effort values
+          are explicitly flagged for verification rather than presented as
+          certain. See our{' '}
           <Link
             href="/editorial-standards"
             className="text-brand-violet-light hover:text-white"
@@ -257,7 +257,7 @@ export default function MethodologyPage() {
           See your own grade across all seven dimensions — free.
         </p>
         <div className="mt-3">
-          <MagicButton href="/onboarding" variant="gold">
+          <MagicButton href="/report" variant="gold">
             Score my account free
           </MagicButton>
         </div>

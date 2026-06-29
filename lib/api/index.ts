@@ -19,6 +19,7 @@ export {
 } from './intake-handler';
 export {
   handleReport,
+  handleReportByTag,
   handleReportPdf,
   type ReportHandlerDeps,
   type PdfResult,

@@ -148,7 +148,7 @@ export default async function GuidePage({
       <PremiumCard tone="gold" glowed className="mt-9 p-5 text-center">
         <p className="font-medium text-white">{guide.ctaText}</p>
         <div className="mt-3">
-          <MagicButton href="/onboarding" variant="gold">
+          <MagicButton href="/report" variant="gold">
             Score my account free
           </MagicButton>
         </div>

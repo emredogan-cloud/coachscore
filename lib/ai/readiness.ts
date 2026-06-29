@@ -11,17 +11,60 @@
  * flagged as using unverified data. See FINAL_EXECUTION_REPORT / docs.
  */
 
-import { validateReferenceTable } from '@/lib/game-data';
+import {
+  getTownHallReference,
+  MAX_TOWN_HALL,
+  MIN_TOWN_HALL,
+  type HeroId,
+} from '@/lib/game-data';
 import type { ReferenceReadiness } from './types';
 
 /**
- * Compute readiness for a Town Hall by filtering the reference table's
- * verification debt to that TH. Pure.
+ * The heroes whose per-Town-Hall caps DETERMINE the paid score and have a
+ * documented, verifiable source. Dragon Duke (the newest, 6th hero) is excluded:
+ * its per-TH caps aren't reliably documented yet, it carries the smallest hero
+ * weight, and the player's DD level still comes from the live API — its cap only
+ * clamps an already-real number. It stays flagged in the table but does not gate.
+ */
+const SCORE_GATING_HEROES: readonly HeroId[] = [
+  'barbarianKing',
+  'archerQueen',
+  'grandWarden',
+  'royalChampion',
+  'minionPrince',
+];
+
+/**
+ * Compute paid-readiness for a Town Hall from the reference data that actually
+ * DETERMINES the score: the per-TH hero caps (the dominant dimension) plus the
+ * wall max level. The "representative" offense/defense category placeholders are
+ * NOT score-determining (the tag path derives offense from the live API and
+ * excludes defenses/walls it can't read), so they are reported as residual debt
+ * elsewhere but do not block a paid report. Pure.
  */
 export function referenceDataReadiness(townHall: number): ReferenceReadiness {
-  const { verificationDebt } = validateReferenceTable();
-  const prefix = `TH${townHall} `;
-  const unverifiedFields = verificationDebt.filter((d) => d.startsWith(prefix));
+  if (
+    !Number.isInteger(townHall) ||
+    townHall < MIN_TOWN_HALL ||
+    townHall > MAX_TOWN_HALL
+  ) {
+    return {
+      ready: false,
+      unverifiedCount: 1,
+      unverifiedFields: [`TH${townHall} is outside the supported range`],
+    };
+  }
+  const row = getTownHallReference(townHall);
+  const unverifiedFields: string[] = [];
+  for (const id of SCORE_GATING_HEROES) {
+    const cap = row.heroes[id];
+    if (cap.unlocked && cap.needsVerification) {
+      unverifiedFields.push(`TH${townHall} hero "${id}"`);
+    }
+  }
+  if (row.categories.walls.needsVerification) {
+    unverifiedFields.push(`TH${townHall} category "walls"`);
+  }
   return {
     ready: unverifiedFields.length === 0,
     unverifiedCount: unverifiedFields.length,

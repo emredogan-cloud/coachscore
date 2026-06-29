@@ -8,6 +8,7 @@
  * than throwing so callers (CI vs. report) decide how to react.
  */
 
+import { isFeatureEnabled } from '@/lib/experiments';
 import { PRODUCT_SKUS } from '@/lib/products';
 import { relatedGuides, inboundLinkCount } from './internal-links';
 import { SEO_GUIDES, type SeoGuide } from './pages';
@@ -217,13 +218,17 @@ export function validateSitemap(
       });
     }
   }
-  for (const sku of PRODUCT_SKUS) {
-    if (!urls.includes(`${baseUrl}/products/${sku}`)) {
-      issues.push({
-        level: 'error',
-        where: 'sitemap',
-        message: `missing product ${sku}.`,
-      });
+  // Product SKU pages are only sitemapped when the specialized-products flag is
+  // on (PMF-correction sprint hides them by default); require them only then.
+  if (isFeatureEnabled('specialized_products_enabled')) {
+    for (const sku of PRODUCT_SKUS) {
+      if (!urls.includes(`${baseUrl}/products/${sku}`)) {
+        issues.push({
+          level: 'error',
+          where: 'sitemap',
+          message: `missing product ${sku}.`,
+        });
+      }
     }
   }
   return issues;

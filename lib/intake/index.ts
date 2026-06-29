@@ -15,6 +15,23 @@ export {
   type CocAccountData,
 } from './coc-adapter';
 export {
+  ProxyCocAdapter,
+  TokenBucket,
+  createCocAdapter,
+  CocPlayerNotFoundError,
+  CocApiAccessError,
+  CocApiUnavailableError,
+  type ProxyCocAdapterOptions,
+} from './coc-api-client';
+export {
+  CocPlayerSchema,
+  CocPlayerItemSchema,
+  CocErrorSchema,
+  type CocPlayer,
+  type CocPlayerItem,
+} from './coc-api-schema';
+export { mapCocPlayerToFields } from './coc-mapper';
+export {
   buildIntakeResult,
   failedResult,
   type BuildResultOptions,

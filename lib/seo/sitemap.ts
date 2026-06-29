@@ -7,6 +7,7 @@
  * tiered `priority` (hubs/pillars high, long-tail low) per roadmap §6.3/§9.7.
  */
 
+import { isFeatureEnabled } from '@/lib/experiments';
 import { PRODUCT_SKUS } from '@/lib/products';
 import { lastModifiedForPath } from './freshness';
 import { SEO_GUIDES } from './pages';
@@ -44,8 +45,6 @@ const STATIC_PATHS: readonly PathEntry[] = [
   { path: '/guides', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/methodology', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/pricing', changeFrequency: 'weekly', priority: 0.8 },
-  { path: '/products', changeFrequency: 'weekly', priority: 0.7 },
-  { path: '/onboarding', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/sample-report', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/editorial-standards', changeFrequency: 'monthly', priority: 0.5 },
@@ -62,12 +61,18 @@ function guidePriority(kind: string): number {
 export function buildSitemap(baseUrl: string): readonly SitemapEntry[] {
   const paths: PathEntry[] = [...STATIC_PATHS];
 
-  for (const sku of PRODUCT_SKUS) {
-    paths.push({
-      path: `/products/${sku}`,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    });
+  // Specialized one-off products (ReplayDoctor/BaseDoctor/WarPlan) are hidden
+  // by default in the PMF-correction sprint — only sitemap them when the flag is
+  // on, so we never advertise pages that 404 (the pages gate on the same flag).
+  if (isFeatureEnabled('specialized_products_enabled')) {
+    paths.push({ path: '/products', changeFrequency: 'weekly', priority: 0.7 });
+    for (const sku of PRODUCT_SKUS) {
+      paths.push({
+        path: `/products/${sku}`,
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      });
+    }
   }
   for (const guide of SEO_GUIDES) {
     paths.push({

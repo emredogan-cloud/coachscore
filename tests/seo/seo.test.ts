@@ -216,15 +216,18 @@ describe('freshness', () => {
 });
 
 describe('sitemap + robots', () => {
-  it('covers core, EEAT, product, and guide pages with valid lastmod', () => {
+  it('covers core, EEAT, and guide pages with valid lastmod', () => {
     const entries = buildSitemap('https://coachscore.app');
     const urls = entries.map((e) => e.url);
     // Home URL matches the canonical (no trailing slash).
     expect(urls).toContain('https://coachscore.app');
     expect(urls).toContain('https://coachscore.app/methodology');
     expect(urls).toContain('https://coachscore.app/about');
+    // PMF-correction sprint: the retired /onboarding interstitial and the
+    // hidden specialized products are NOT sitemapped (flag off by default).
+    expect(urls).not.toContain('https://coachscore.app/onboarding');
     for (const sku of PRODUCT_SKUS) {
-      expect(urls).toContain(`https://coachscore.app/products/${sku}`);
+      expect(urls).not.toContain(`https://coachscore.app/products/${sku}`);
     }
     expect(urls).toContain(
       'https://coachscore.app/guides/th14-upgrade-order-2026',

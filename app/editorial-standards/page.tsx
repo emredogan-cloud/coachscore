@@ -14,17 +14,17 @@ import {
 export const metadata: Metadata = buildMetadata({
   title: 'Editorial standards — how CoachScore content is made & verified',
   description:
-    'How CoachScore drafts, verifies, dates and corrects its content: ' +
-    'AI-drafted, human-verified, sourced from a versioned reference table, with ' +
-    'no fabricated reviews or ratings.',
+    'How CoachScore drafts, dates and corrects its content: AI-drafted from ' +
+    'our deterministic engine and a versioned reference table, with no ' +
+    'fabricated reviews or ratings.',
   path: '/editorial-standards',
   type: 'article',
 });
 
 const STANDARDS: readonly { title: string; body: string }[] = [
   {
-    title: 'AI-drafted, human-verified',
-    body: 'Every roadmap and guide is drafted by AI grounded in our scoring engine and reference data, then reviewed by a person before publication. The deterministic grade itself is computed, not written.',
+    title: 'AI-drafted, grounded in real data',
+    body: 'Every roadmap and guide is drafted by AI grounded in our deterministic scoring engine and versioned reference data — never free-form opinion. The grade itself is computed, not written, so the same inputs always produce the same score.',
   },
   {
     title: 'Sourced, with honest uncertainty',
@@ -101,7 +101,7 @@ export default function EditorialStandardsPage() {
       </p>
 
       <div className="mt-9">
-        <MagicButton href="/onboarding" variant="gold" size="lg">
+        <MagicButton href="/report" variant="gold" size="lg">
           Score your account free
         </MagicButton>
       </div>

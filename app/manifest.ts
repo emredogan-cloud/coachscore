@@ -10,7 +10,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: 'CoachScore',
     description:
       'Rate your Clash of Clans account and get a prioritized, goal-aware ' +
-      'upgrade roadmap. AI-drafted, human-verified.',
+      'upgrade roadmap. AI-drafted, built from your real in-game data.',
     start_url: '/',
     scope: '/',
     display: 'standalone',
