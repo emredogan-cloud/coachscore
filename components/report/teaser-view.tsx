@@ -1,5 +1,6 @@
 import type { ReportTeaser } from '@/lib/report';
-import { PremiumCard, ScoreRing } from '@/components/ui';
+import { PremiumCard } from '@/components/ui';
+import { ScoreReveal } from './score-reveal';
 
 /**
  * Free-teaser view (Phase 4 · premium + dark-native rebuild). Reveals the grade
@@ -18,7 +19,7 @@ export function TeaserView({ teaser }: { teaser: ReportTeaser }) {
 
       <PremiumCard tone="gold" glowed className="p-6">
         <div className="flex items-center justify-center gap-5">
-          <ScoreRing
+          <ScoreReveal
             value={teaser.overall}
             grade={teaser.grade}
             size={108}
