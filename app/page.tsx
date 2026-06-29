@@ -330,6 +330,12 @@ export default function HomePage() {
             Sample report
           </Link>
           <Link
+            href="/examples"
+            className="text-brand-violet-light hover:text-white"
+          >
+            Example transformations
+          </Link>
+          <Link
             href="/editorial-standards"
             className="text-brand-violet-light hover:text-white"
           >
