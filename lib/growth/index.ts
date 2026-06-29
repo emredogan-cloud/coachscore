@@ -12,3 +12,10 @@ export {
   type GrowthDashboard,
 } from './metrics';
 export { GrowthService } from './service';
+export {
+  CREATOR_CODES,
+  normalizeCreatorCode,
+  isCreatorCodeFormat,
+  resolveCreatorCode,
+  type CreatorCode,
+} from './creator-codes';
