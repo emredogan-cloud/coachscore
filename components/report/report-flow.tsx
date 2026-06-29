@@ -7,6 +7,7 @@ import type { RenderableReport, ReportTeaser } from '@/lib/report';
 import { requestReport, requestReportByTag } from '@/app/report/actions';
 import { track } from '@/components/analytics/track';
 import { ManualEntryForm } from '@/components/intake/manual-entry-form';
+import { ScoreHistory } from '@/components/report/score-history';
 import { ShareButtons } from '@/components/share/share-buttons';
 import { ReportView } from './report-view';
 import { TeaserView } from './teaser-view';
@@ -190,6 +191,18 @@ export function ReportFlow() {
             </Link>
           </div>
         ) : null}
+
+        {/* P1-A — progress over time (the retention spine) */}
+        <ScoreHistory
+          entry={{
+            tag: data.playerTag ?? `manual-th${t.townHall}`,
+            grade: t.grade,
+            overall: t.overall,
+            townHall: t.townHall,
+            goal: t.goal,
+            rushLabel: data.report?.rushLabel,
+          }}
+        />
 
         {/* Share — directly below the free score (the growth loop) */}
         <div>
