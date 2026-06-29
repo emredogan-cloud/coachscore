@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { TrackOnMount } from '@/components/analytics/track';
 import { ReportFlow } from '@/components/report/report-flow';
+import { WarRoomIntro } from '@/components/report/war-room-intro';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +26,7 @@ export default async function ReportPage({
   const { invited } = await searchParams;
   return (
     <div className="mx-auto max-w-md px-4 py-10">
+      <WarRoomIntro />
       {invited ? (
         <>
           <TrackOnMount event="referral_visit" />
