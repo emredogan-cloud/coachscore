@@ -22,13 +22,20 @@ const report = assembleReport({
 });
 
 describe('ReportView', () => {
-  it('renders diagnosis, roadmap, indicators, and version', () => {
+  it('renders the premium report: score, breakdown, diagnosis, roadmap', () => {
     const html = renderToStaticMarkup(<ReportView report={report} />);
     expect(html).toContain('CoachScore Report');
     expect(html).toContain('Diagnosis');
+    expect(html).toContain('Dimension breakdown');
     expect(html).toContain('Upgrade roadmap');
-    expect(html).toContain('Reference verified for paid use');
-    expect(html).toContain(report.version.composite);
+    expect(html).toContain(report.grade);
+  });
+
+  it('does NOT leak internal QA metadata to the buyer (P1-D)', () => {
+    const html = renderToStaticMarkup(<ReportView report={report} />);
+    expect(html).not.toContain('Reference verified for paid use');
+    expect(html).not.toContain('flagged for human review');
+    expect(html).not.toContain(report.version.composite);
   });
 });
 
