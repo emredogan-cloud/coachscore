@@ -194,7 +194,8 @@ const ASSETS: readonly AssetSpec[] = [
     transparent: true,
     quality: 'medium',
     maxEdge: 320,
-    usage: 'Account Rescue pricing tier emblem (pairs with star/crown shields).',
+    usage:
+      'Account Rescue pricing tier emblem (pairs with star/crown shields).',
   },
 ];
 
