@@ -15,14 +15,18 @@ The official Clash of Clans API is now a **first-class, production-grade intake 
 | Production client | `lib/intake/coc-api-client.ts` | `ProxyCocAdapter` — real HTTP client with **caching, retries+backoff, rate limiting, validation, graceful typed errors**; `createCocAdapter()` factory + `TokenBucket`. |
 | Wiring | `lib/intake/tag.ts`, `lib/api/report-handler.ts`, `app/report/actions.ts` | `intakeByTag` uses the real adapter when configured; `handleReportByTag` is the primary report path with manual fallback. |
 | UI | `components/report/report-flow.tsx`, `app/report/page.tsx` | Player-tag input + "Analyze My Account" is the primary flow; manual entry is the advanced fallback. |
-| Tests | `tests/intake/coc-api.test.ts` | Mapper + adapter (200/404/403/429/503, cache, tag-encoding, invalid-tag) + tag-path scoring. 14 tests. |
+| Tests | `tests/intake/coc-api.test.ts` | Mapper + adapter (200/404/403/429/503, cache, tag-encoding, invalid-tag, **retry-after honored + capped, cache eviction, singleton memo**) + tag-path scoring. **19 tests.** |
 
 ### Production qualities (built, per the brief's requirements)
-- **Caching** — per-tag in-memory cache, default **120 s** TTL; serves **stale-on-error** if the upstream fails after retries.
-- **Retries** — exponential backoff (250 ms·2ⁿ, capped 4 s) with jitter on 429/5xx/network; **404 and 403 are not retried** (terminal).
+- **Caching** — per-tag in-memory cache, default **120 s** TTL; serves **stale-on-error** if the upstream fails after retries. **Bounded** (default 500 entries, oldest evicted) so a long-lived warm instance can't grow memory without limit.
+- **Process singleton** — `createCocAdapter()` memoizes one adapter per process (keyed on the credentials), so the cache and the rate-limiter token bucket actually persist across warm serverless invocations instead of being rebuilt — and discarded — on every request.
+- **Retries** — exponential backoff (250 ms·2ⁿ, capped 4 s) with jitter on 429/5xx/network; a server-supplied **`retry-after`** header (delta-seconds **or** HTTP-date) now takes precedence over our backoff, bounded by `maxRetryAfterMs` (default 30 s) so a hostile/absurd value can't stall a request. **404 and 403 are not retried** (terminal).
 - **Rate limiting** — `TokenBucket` (~8 req/s, burst 8) to stay under the API's ~10 req/token/s throttle.
 - **Validation** — Zod at the network boundary; a partial/changed payload never reaches the engine.
 - **Graceful errors** — typed: `CocPlayerNotFoundError` (404 → "tag not found" UX), `CocApiAccessError` (403 → ops alert, token/IP misconfig), `CocApiUnavailableError` (429/5xx/maintenance → retry then friendly fallback), `CocApiNotConfiguredError` (no creds → manual fallback). 8 s request timeout via `AbortController`.
+
+### Feature 5 hardening (PMF Critical Features sprint)
+A focused audit of the correction-sprint adapter surfaced three production gaps, now closed: (1) `createCocAdapter()` was instantiated **per request**, so the cache + token bucket were effectively dead across warm invocations → now a **process singleton**; (2) the header comment claimed it honored `retry-after` but `backoffMs` was pure exponential → now it **genuinely honors `retry-after`** (capped); (3) the cache `Map` **never evicted** → now **size-bounded**. No dead code was found to remove (`TokenBucket`/`ProxyCocAdapterOptions` are intentional, exported module API). UX is unchanged: still NotConfigured → manual-entry fallback until activated.
 
 ## The infrastructure required to go live (the one real blocker)
 

@@ -3,10 +3,12 @@ import {
   DEFAULT_REMINDER_SETTINGS,
   dueReminders,
   emailChannel,
+  FREQUENCY_OPTIONS,
   frequencyDays,
   localNotificationChannel,
   nextReminder,
   normalizeSettings,
+  REMINDER_CHANNELS,
   webPushChannel,
   type ReminderSettings,
   type ReminderState,
@@ -96,12 +98,41 @@ describe('nextReminder', () => {
     expect(r.message).toContain('Grand Warden');
   });
 
-  it('computes a concrete dueAt', () => {
+  it.each([
+    ['weekly', 7],
+    ['biweekly', 14],
+    ['monthly', 30],
+  ] as const)('dueAt for %s is lastScored + %d days', (frequency, days) => {
     const r = nextReminder(
-      state({ settings: { enabled: true, frequency: 'weekly' } }),
+      state({ settings: { enabled: true, frequency } }),
       NOW,
     );
-    expect(r.dueAtMs).toBe(NOW + 7 * DAY);
+    expect(r.dueAtMs).toBe(NOW + days * DAY);
+  });
+});
+
+describe('frequency options + channel registry', () => {
+  it('exposes the three user-facing cadences (off is the disable toggle, not an option)', () => {
+    expect(FREQUENCY_OPTIONS.map((o) => o.value)).toEqual([
+      'weekly',
+      'biweekly',
+      'monthly',
+    ]);
+    for (const o of FREQUENCY_OPTIONS)
+      expect(o.label.length).toBeGreaterThan(0);
+  });
+
+  it('REMINDER_CHANNELS lists the three channels with unique kinds', () => {
+    const kinds = REMINDER_CHANNELS.map((c) => c.kind);
+    expect(kinds).toEqual(['local', 'web_push', 'email']);
+    expect(new Set(kinds).size).toBe(3);
+  });
+
+  it('every channel exposes available() + deliver()', () => {
+    for (const c of REMINDER_CHANNELS) {
+      expect(typeof c.available).toBe('function');
+      expect(typeof c.deliver).toBe('function');
+    }
   });
 });
 
