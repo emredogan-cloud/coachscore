@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   summarizeProgress,
   type ProgressSummary,
@@ -63,7 +64,13 @@ export function ScoreHistory({ entry }: { entry: Omit<ScoreEntry, 'at'> }) {
     return (
       <p className="text-xs text-[var(--muted)]">
         Saved to this device — re-check after your next upgrade to watch your
-        grade climb.
+        grade climb.{' '}
+        <Link
+          href="/settings/notifications"
+          className="text-brand-violet-light hover:text-white"
+        >
+          Get reminded →
+        </Link>
       </p>
     );
   }
