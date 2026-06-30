@@ -56,6 +56,17 @@ export const EXPERIMENTS: readonly Experiment[] = [
     variants: EVEN('ai_only', 'human_default'),
   },
   {
+    key: 'report_price_point',
+    title: 'Premium Report price point',
+    hypothesis:
+      'An impulse-range price (under ~$5) for the Premium Report lifts conversion enough to beat the $7 control on revenue-per-visitor.',
+    metric: 'revenue_per_visitor',
+    // DRAFT until a payment-provider variant exists per price point — display
+    // and charge must resolve the same sticky price (see lib/pricing/experiment).
+    status: 'draft',
+    variants: EVEN('control', 'p2', 'p4'),
+  },
+  {
     key: 'seo_cta_variant',
     title: 'SEO page CTA',
     hypothesis:
@@ -113,6 +124,15 @@ export const FEATURE_FLAGS: readonly FeatureFlag[] = [
     key: 'clan_plans_enabled',
     description:
       'Clan / Bulk per-seat plan + clan dashboard. OFF (B2B not built).',
+    enabled: false,
+    rolloutPct: 0,
+  },
+  {
+    key: 'regional_pricing_enabled',
+    description:
+      'GeoIP currency localization on the pricing surface (USD/TRY/EUR/GBP). ' +
+      'OFF until a payment-provider variant exists per (sku, currency); the ' +
+      'app shows USD until then. See lib/pricing/regional.',
     enabled: false,
     rolloutPct: 0,
   },
