@@ -18,10 +18,18 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#070510',
     icons: [
       { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+      // PNG maskable icons (Phase 1) — Android adaptive icons need raster +
+      // a safe zone; the shield sits within the inner 66% of a dark canvas.
       {
-        src: '/icon.svg',
-        sizes: 'any',
-        type: 'image/svg+xml',
+        src: '/icon-192-maskable.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+      {
+        src: '/icon-512-maskable.png',
+        sizes: '512x512',
+        type: 'image/png',
         purpose: 'maskable',
       },
     ],

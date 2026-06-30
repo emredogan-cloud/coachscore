@@ -40,5 +40,40 @@
     "transparent": false,
     "usage": "Hero / section backdrop (low-opacity layer).",
     "prompt": "A dark atmospheric premium background texture, near-black (#070510) with faint violet (#a855f7) nebula glow upper area and subtle warm gold ember haze below, smooth gradients, no hard edges, very dark so light text stays readable. Abstract, cinematic. No objects, no text, no characters."
+  },
+  {
+    "name": "brand-shield-star",
+    "file": "public/assets/generated/brand-shield-star.webp",
+    "transparent": true,
+    "usage": "Favicon/logo CONCEPT A (reproduced as crisp SVG for production).",
+    "prompt": "A premium emblem: a heraldic shield with a luminous gold (#e8b339) metallic border and a deep violet (#a855f7) gradient field, a single bold gold four-point star/spark centered, subtle inner glow, crisp symmetrical vector-like form, original fantasy-strategy brand mark. Centered, transparent background. No text, no letters, no characters, no existing-game elements."
+  },
+  {
+    "name": "brand-shield-crown",
+    "file": "public/assets/generated/brand-shield-crown.webp",
+    "transparent": true,
+    "usage": "Favicon/logo CONCEPT B (reproduced as crisp SVG for production).",
+    "prompt": "A premium emblem: a heraldic shield with a luminous gold (#e8b339) metallic border and a deep violet (#a855f7) gradient field, a small ornate gold crown centered, subtle inner glow, crisp symmetrical vector-like form, original fantasy-strategy brand mark. Centered, transparent background. No text, no letters, no characters, no existing-game elements."
+  },
+  {
+    "name": "brand-shield-chevron",
+    "file": "public/assets/generated/brand-shield-chevron.webp",
+    "transparent": true,
+    "usage": "Favicon/logo CONCEPT C (reproduced as crisp SVG for production).",
+    "prompt": "A premium emblem: a heraldic shield with a luminous gold (#e8b339) metallic border and a deep violet (#a855f7) gradient field, two stacked bold gold upward chevrons (rank/ascent motif) centered, subtle inner glow, crisp symmetrical vector-like form, original fantasy-strategy brand mark. Centered, transparent background. No text, no letters, no characters, no existing-game elements."
+  },
+  {
+    "name": "mascot-tactician",
+    "file": "public/assets/generated/mascot-tactician.webp",
+    "transparent": true,
+    "usage": "CoachScore Copilot mascot (header + avatar) and brand character.",
+    "prompt": "A premium original mascot bust: a noble armored strategist — a sleek fantasy helmet with calm glowing violet (#a855f7) eyes, polished gold (#e8b339) and dark-violet armor, set within a subtle gold-bordered shield silhouette, soft volumetric rim glow, intelligent and trustworthy expression, painted game-quality 3D render style. Original character, NOT from any existing game. Centered, transparent background. No text, no logos, no real-world brands."
+  },
+  {
+    "name": "copilot-fab",
+    "file": "public/assets/generated/copilot-fab.webp",
+    "transparent": true,
+    "usage": "Floating Copilot launcher button (FAB) emblem.",
+    "prompt": "A small premium app launcher emblem: a gold (#e8b339) bordered heraldic shield with a deep violet (#a855f7) field containing a simple glowing rounded chat-bubble glyph, soft outer glow, crisp and recognizable at small sizes, original fantasy-strategy style. Centered, transparent background. No text, no letters, no characters, no existing-game elements."
   }
 ]

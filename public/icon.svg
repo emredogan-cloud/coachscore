@@ -1,6 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="CoachScore">
-  <rect width="512" height="512" rx="96" fill="#0a0a0a" />
-  <text x="50%" y="52%" dominant-baseline="middle" text-anchor="middle"
-        font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
-        font-size="240" font-weight="700" fill="#ffffff">CS</text>
+  <defs>
+    <linearGradient id="cs-gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7d774"/>
+      <stop offset="0.5" stop-color="#e8b339"/>
+      <stop offset="1" stop-color="#a9781e"/>
+    </linearGradient>
+    <linearGradient id="cs-violet" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#7c3aed"/>
+      <stop offset="1" stop-color="#3b146e"/>
+    </linearGradient>
+    <linearGradient id="cs-chev" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fce39a"/>
+      <stop offset="1" stop-color="#e0a82e"/>
+    </linearGradient>
+  </defs>
+  <!-- Shield silhouette (gold border) -->
+  <path d="M256 60 C300 60 360 72 404 92 C414 96 420 104 420 116 C420 250 400 360 256 456 C112 360 92 250 92 116 C92 104 98 96 108 92 C152 72 212 60 256 60 Z" fill="url(#cs-gold)"/>
+  <!-- Violet field (inset) -->
+  <path d="M256 60 C300 60 360 72 404 92 C414 96 420 104 420 116 C420 250 400 360 256 456 C112 360 92 250 92 116 C92 104 98 96 108 92 C152 72 212 60 256 60 Z"
+        fill="url(#cs-violet)" stroke="#2a0f52" stroke-width="6"
+        transform="translate(256 258) scale(0.82) translate(-256 -258)"/>
+  <!-- Rank / ascent chevrons -->
+  <g fill="url(#cs-chev)">
+    <path d="M256 168 L332 234 L332 272 L256 206 L180 272 L180 234 Z"/>
+    <path d="M256 242 L332 308 L332 346 L256 280 L180 346 L180 308 Z"/>
+  </g>
 </svg>
