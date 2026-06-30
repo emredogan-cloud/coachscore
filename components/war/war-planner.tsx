@@ -2,7 +2,16 @@
 
 import { useState } from 'react';
 import { assessWarReadiness, type WarGoal, type WarReadiness } from '@/lib/war';
-import { PremiumCard, ScoreRing } from '@/components/ui';
+import {
+  EyebrowPill,
+  MagicButton,
+  PremiumCard,
+  ScoreRing,
+  SectionDivider,
+  StatusBadge,
+  TrustBar,
+  type TrustItem,
+} from '@/components/ui';
 
 /**
  * War Intelligence UI (Feature 1). A coarse, plain-language input (Town Hall +
@@ -35,6 +44,171 @@ const DEV: readonly { label: string; value: number }[] = [
 
 const field =
   'mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-brand-violet/50 focus:outline-none';
+
+type BadgeTone = 'gold' | 'success' | 'info' | 'warning' | 'inactive';
+
+/** Readiness tier → readiness-card StatusBadge tone (presentation only). */
+const READINESS_TONE: Record<string, BadgeTone> = {
+  'Elite War Ready': 'gold',
+  'War Ready': 'success',
+  'Partially Ready': 'warning',
+  'Not Ready': 'inactive',
+};
+
+/** Army tier letter → its StatusBadge tone (S/A gold-green, B violet, else warn). */
+function armyTierTone(tier: string): BadgeTone {
+  const t = tier.trim().toUpperCase().charAt(0);
+  if (t === 'S') return 'gold';
+  if (t === 'A') return 'success';
+  if (t === 'B') return 'info';
+  return 'warning';
+}
+
+/**
+ * IP-SAFE abstract army emblem — a deterministic CSS/SVG crest, NOT Clash troop
+ * art. A rotated gem core over concentric arcs; hue is seeded from the army id
+ * so each army reads as a distinct sigil while staying on the violet→gold brand.
+ * Pure, hook-free, decorative (aria-hidden).
+ */
+function ArmyEmblem({ seed }: { seed: string }) {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  const hue = 250 + (h % 80); // violet (250) → gold-ish (330), brand-aligned
+  const a = `hsl(${hue} 70% 62%)`;
+  const b = `hsl(${(hue + 40) % 360} 75% 56%)`;
+  return (
+    <span
+      aria-hidden
+      className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03]"
+    >
+      <svg viewBox="0 0 40 40" className="h-7 w-7">
+        <defs>
+          <linearGradient id={`ae-${h}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor={a} />
+            <stop offset="100%" stopColor={b} />
+          </linearGradient>
+        </defs>
+        <circle
+          cx="20"
+          cy="20"
+          r="15"
+          fill="none"
+          stroke="rgba(255,255,255,0.12)"
+          strokeWidth="1.5"
+        />
+        <path
+          d={`M20 7 A13 13 0 0 1 ${20 + 13 * Math.sin((h % 6) + 1)} ${20 - 13 * Math.cos((h % 6) + 1)}`}
+          fill="none"
+          stroke={`url(#ae-${h})`}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+        <rect
+          x="13"
+          y="13"
+          width="14"
+          height="14"
+          rx="3"
+          transform="rotate(45 20 20)"
+          fill={`url(#ae-${h})`}
+          opacity="0.9"
+        />
+      </svg>
+    </span>
+  );
+}
+
+function Chevron() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      className="h-4 w-4 shrink-0 text-[var(--muted)]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 6l6 6-6 6" />
+    </svg>
+  );
+}
+
+const TRUST_ITEMS: readonly TrustItem[] = [
+  {
+    title: 'Deterministic',
+    subtitle: 'Same inputs, same plan',
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12 3l7 3v6c0 4-3 6-7 9-4-3-7-5-7-9V6l7-3z" />
+        <path d="M9 12l2 2 4-4" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Patch-aware',
+    subtitle: 'Tuned to the current meta',
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M21 12a9 9 0 1 1-3-6.7" />
+        <path d="M21 4v5h-5" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Fieldable only',
+    subtitle: 'Never an impossible army',
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M20 6L9 17l-5-5" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Goal-aware',
+    subtitle: 'War · CWL · trophy · more',
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="12" cy="12" r="0.5" />
+      </svg>
+    ),
+  },
+];
 
 export function WarPlanner() {
   const [townHall, setTownHall] = useState(16);
@@ -134,76 +308,84 @@ export function WarPlanner() {
           </div>
         </fieldset>
 
-        <button
-          type="button"
-          onClick={analyze}
-          className="inline-flex w-full items-center justify-center rounded-xl bg-violet-gradient px-5 py-3 font-semibold text-white shadow-glow-violet-sm transition hover:shadow-glow-violet"
-        >
+        <MagicButton type="button" variant="violet" size="lg" onClick={analyze}>
           Analyze my war readiness
-        </button>
+        </MagicButton>
       </div>
 
       {result !== null ? (
-        <div className="space-y-5">
+        <div className="space-y-6">
           <PremiumCard tone="gold" glowed className="p-6">
-            <div className="flex items-center justify-center gap-5">
+            <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:justify-center">
               <ScoreRing
                 value={result.score}
                 grade={result.tier === 'Elite War Ready' ? 'S' : undefined}
                 size={116}
                 label="War readiness"
               />
-              <div className="text-left">
-                <p className="text-2xl font-extrabold text-gold-gradient">
+              <div className="text-center sm:text-left">
+                <EyebrowPill tone="gold">War readiness</EyebrowPill>
+                <p className="mt-2 text-2xl font-extrabold text-gold-gradient">
                   {result.tier}
                 </p>
-                <p className="mt-1 text-sm text-[var(--muted)]">
+                <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                  <StatusBadge tone={READINESS_TONE[result.tier] ?? 'inactive'}>
+                    {result.tier}
+                  </StatusBadge>
+                </div>
+                <p className="mt-2 text-sm text-[var(--muted)]">
                   Projected: {result.warTier}
+                  {result.timeToReadyDays !== null &&
+                  result.timeToReadyDays > 0 ? (
+                    <>
+                      {' · '}~{result.timeToReadyDays} days to war-ready
+                    </>
+                  ) : null}
                 </p>
-                {result.timeToReadyDays !== null &&
-                result.timeToReadyDays > 0 ? (
-                  <p className="text-xs text-[var(--muted)]">
-                    ~{result.timeToReadyDays} days to war-ready
-                  </p>
-                ) : null}
               </div>
             </div>
-            <p className="mt-4 text-center text-sm text-[var(--fg)]/90">
+            <p className="mt-5 rounded-xl border border-brand-gold/20 bg-brand-gold/[0.06] px-4 py-3 text-center text-sm leading-relaxed text-[var(--fg)]/90">
               {result.explanation}
             </p>
           </PremiumCard>
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-brand-gold/80">
-              Recommended armies
-            </h3>
-            <ul className="mt-3 space-y-2.5">
+            <SectionDivider className="mb-4">Recommended armies</SectionDivider>
+            <ul className="space-y-2.5">
               {result.recommendedArmies.map((a) => (
                 <li key={a.id}>
                   <PremiumCard tone="violet" className="p-4">
-                    <div className="flex items-center justify-between gap-2">
-                      <h4 className="font-semibold text-white">{a.name}</h4>
-                      <span className="flex items-center gap-2 text-xs">
-                        <span className="rounded-full bg-white/10 px-2 py-0.5 font-bold text-brand-gold-light">
-                          Tier {a.tier}
-                        </span>
-                        <span
-                          className={
-                            a.ready ? 'text-emerald-400' : 'text-amber-300'
-                          }
-                        >
-                          {a.ready ? 'Ready' : `${a.fit}% fit`}
-                        </span>
-                      </span>
+                    <div className="flex items-start gap-3">
+                      <ArmyEmblem seed={a.id} />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="font-semibold text-white">{a.name}</h4>
+                          <div className="flex shrink-0 items-center gap-2 text-xs">
+                            <StatusBadge tone={armyTierTone(a.tier)}>
+                              Tier {a.tier}
+                            </StatusBadge>
+                            <span
+                              className={`font-semibold ${
+                                a.ready ? 'text-emerald-400' : 'text-amber-300'
+                              }`}
+                            >
+                              {a.ready ? 'Ready' : `${a.fit}% fit`}
+                            </span>
+                            <Chevron />
+                          </div>
+                        </div>
+                        <p className="mt-1 text-sm text-[var(--muted)]">
+                          {a.why}
+                        </p>
+                        {a.missing.length > 0 ? (
+                          <ul className="mt-2 space-y-0.5 text-xs text-brand-gold-light/90">
+                            {a.missing.map((m) => (
+                              <li key={m}>• {m}</li>
+                            ))}
+                          </ul>
+                        ) : null}
+                      </div>
                     </div>
-                    <p className="mt-1 text-sm text-[var(--muted)]">{a.why}</p>
-                    {a.missing.length > 0 ? (
-                      <ul className="mt-2 space-y-0.5 text-xs text-amber-300/90">
-                        {a.missing.map((m) => (
-                          <li key={m}>• {m}</li>
-                        ))}
-                      </ul>
-                    ) : null}
                   </PremiumCard>
                 </li>
               ))}
@@ -212,16 +394,40 @@ export function WarPlanner() {
 
           {result.upgradePriorities.length > 0 ? (
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-brand-gold/80">
+              <SectionDivider className="mb-4">
                 Upgrade priorities for attacking
-              </h3>
-              <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-[var(--fg)]/90">
-                {result.upgradePriorities.map((u) => (
-                  <li key={u}>{u}</li>
+              </SectionDivider>
+              <ol className="space-y-2.5">
+                {result.upgradePriorities.map((u, i) => (
+                  <li key={u}>
+                    <PremiumCard
+                      tone="plain"
+                      className="flex items-center gap-3 p-4"
+                    >
+                      <span
+                        aria-hidden
+                        className="relative flex h-9 w-9 shrink-0 items-center justify-center"
+                      >
+                        <span className="absolute inset-0 rotate-45 rounded-[10px] bg-violet-gradient shadow-glow-violet-sm" />
+                        <span className="relative text-sm font-extrabold text-white">
+                          {i + 1}
+                        </span>
+                      </span>
+                      <p className="text-sm leading-snug text-[var(--fg)]/90">
+                        {u}
+                      </p>
+                    </PremiumCard>
+                  </li>
                 ))}
               </ol>
+              <p className="mt-3 text-center text-xs text-[var(--muted)]">
+                Each finished upgrade adds to your TH cap — closing the gap to a
+                maxed, war-ready base.
+              </p>
             </div>
           ) : null}
+
+          <TrustBar items={TRUST_ITEMS} />
         </div>
       ) : null}
     </div>

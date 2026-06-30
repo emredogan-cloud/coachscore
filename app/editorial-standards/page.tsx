@@ -1,8 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Breadcrumbs } from '@/components/seo/breadcrumbs';
+import type { ReactNode } from 'react';
 import { JsonLdScript } from '@/components/seo/json-ld';
-import { MagicButton, PremiumCard } from '@/components/ui';
+import {
+  Breadcrumbs,
+  EyebrowPill,
+  MagicButton,
+  PremiumCard,
+  SectionDivider,
+  TrustBar,
+} from '@/components/ui';
 import {
   articleJsonLd,
   buildMetadata,
@@ -44,6 +51,19 @@ const STANDARDS: readonly { title: string; body: string }[] = [
   },
 ];
 
+// Abstract, IP-safe SVG glyph (no game art) reused for trust rows.
+const shieldGlyph: ReactNode = (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden
+  >
+    <path d="M12 2l8 3v6c0 5-3.5 8-8 11-4.5-3-8-6-8-11V5l8-3z" />
+  </svg>
+);
+
 export default function EditorialStandardsPage() {
   return (
     <article className="mx-auto max-w-md px-4 py-10">
@@ -56,55 +76,96 @@ export default function EditorialStandardsPage() {
         })}
       />
       <Breadcrumbs
-        items={[
-          { name: 'Home', href: '/' },
-          { name: 'Editorial standards', href: '/editorial-standards' },
-        ]}
+        items={[{ label: 'Home', href: '/' }, { label: 'Editorial standards' }]}
       />
+
+      <div className="mt-4">
+        <EyebrowPill tone="violet">
+          Updated {freshnessLabel(CONTENT_REVISION_DATE)}
+        </EyebrowPill>
+      </div>
+
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white">
-        Editorial standards
+        Editorial <span className="text-violet-gradient">standards</span>
       </h1>
-      <p className="mt-1.5 text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
-        Updated {freshnessLabel(CONTENT_REVISION_DATE)}
-      </p>
       <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">
         These are the rules CoachScore content is held to. They exist so the
         advice you act on is accurate, honestly sourced, and current — the same
         bar we hold the paid roadmap to.
       </p>
 
+      <SectionDivider className="mt-10">Our standards</SectionDivider>
+
       <div className="mt-7 space-y-3">
         {STANDARDS.map((s) => (
-          <PremiumCard key={s.title} tone="plain" className="p-4">
+          <PremiumCard key={s.title} tone="plain" className="p-5">
             <h2 className="font-semibold text-white">{s.title}</h2>
-            <p className="mt-1.5 text-sm text-[var(--muted)]">{s.body}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-[var(--muted)]">
+              {s.body}
+            </p>
           </PremiumCard>
         ))}
       </div>
 
-      <p className="mt-7 text-[15px] leading-relaxed text-[var(--muted)]">
-        See the scoring detail on the{' '}
-        <Link
-          href="/methodology"
-          className="text-brand-violet-light hover:text-white"
-        >
-          methodology page
-        </Link>{' '}
-        and our data handling on the{' '}
-        <Link
-          href="/transparency"
-          className="text-brand-violet-light hover:text-white"
-        >
-          transparency page
-        </Link>
-        .
-      </p>
+      <TrustBar
+        className="mt-8"
+        items={[
+          {
+            icon: shieldGlyph,
+            title: 'Computed, not written',
+            subtitle: 'The grade is deterministic',
+          },
+          {
+            icon: shieldGlyph,
+            title: 'Sourced caps',
+            subtitle: 'Versioned reference table',
+          },
+          {
+            icon: shieldGlyph,
+            title: 'No fabrication',
+            subtitle: 'No invented reviews',
+          },
+          {
+            icon: shieldGlyph,
+            title: 'Kept fresh',
+            subtitle: 'Re-dated on every patch',
+          },
+        ]}
+      />
 
-      <div className="mt-9">
-        <MagicButton href="/report" variant="gold" size="lg">
-          Score your account free
-        </MagicButton>
-      </div>
+      <PremiumCard tone="violet" className="mt-8 p-5">
+        <p className="text-[15px] leading-relaxed text-[var(--muted)]">
+          See the scoring detail on the{' '}
+          <Link
+            href="/methodology"
+            className="text-brand-violet-light hover:text-white"
+          >
+            methodology page
+          </Link>{' '}
+          and our data handling on the{' '}
+          <Link
+            href="/transparency"
+            className="text-brand-violet-light hover:text-white"
+          >
+            transparency page
+          </Link>
+          .
+        </p>
+      </PremiumCard>
+
+      <PremiumCard tone="gold" glowed className="mt-10 p-6 text-center">
+        <p className="text-lg font-bold text-white">
+          Get your honest grade — free
+        </p>
+        <p className="mt-1 text-sm text-[var(--muted)]">
+          Held to the same bar as everything above.
+        </p>
+        <div className="mt-4">
+          <MagicButton href="/report" variant="gold" size="lg">
+            Score your account free
+          </MagicButton>
+        </div>
+      </PremiumCard>
     </article>
   );
 }

@@ -1,9 +1,22 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ScoreBreakdown } from '@/components/score-breakdown';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { JsonLdScript } from '@/components/seo/json-ld';
-import { MagicButton, PremiumCard } from '@/components/ui';
+import {
+  EyebrowPill,
+  MagicButton,
+  PremiumCard,
+  SectionDivider,
+} from '@/components/ui';
+import type { Goal } from '@/lib/core';
+import { EQUIPMENT_MIN_TOWN_HALL } from '@/lib/core';
+import {
+  getTownHallReference,
+  heroIdsUnlockedAt,
+  type HeroId,
+} from '@/lib/game-data';
 import {
   articleJsonLd,
   buildMetadata,
@@ -17,6 +30,7 @@ import {
   relatedGuides,
   SEO_GUIDE_SLUGS,
   type JsonLd,
+  type SeoGuide,
 } from '@/lib/seo';
 
 export const dynamicParams = false;
@@ -42,6 +56,52 @@ export async function generateMetadata({
     path: `/guides/${guide.slug}`,
     type: 'article',
   });
+}
+
+const HERO_NAMES: Readonly<Record<HeroId, string>> = {
+  barbarianKing: 'Barbarian King',
+  archerQueen: 'Archer Queen',
+  grandWarden: 'Grand Warden',
+  royalChampion: 'Royal Champion',
+  minionPrince: 'Minion Prince',
+  dragonDuke: 'Dragon Duke',
+};
+
+/** Eyebrow tag pills, derived from the guide's existing kind / Town-Hall. */
+function guideEyebrows(
+  guide: SeoGuide,
+): { label: string; tone: 'gold' | 'violet' }[] {
+  const out: { label: string; tone: 'gold' | 'violet' }[] = [];
+  if (guide.townHall !== null)
+    out.push({ label: `TH${guide.townHall}`, tone: 'violet' });
+  const focus: Record<SeoGuide['kind'], string> = {
+    rush_check: 'Rush focus',
+    upgrade_order: 'Upgrade order',
+    equipment_priority: 'Equipment focus',
+  };
+  out.push({ label: focus[guide.kind], tone: 'gold' });
+  return out;
+}
+
+/** Map a guide to the scoring goal whose weights best describe its emphasis. */
+function goalFor(kind: SeoGuide['kind']): Goal {
+  if (kind === 'rush_check') return 'derush';
+  return 'war';
+}
+
+/**
+ * Real per-Town-Hall hero level caps from the verified reference table. The
+ * numbers are exact reference data (no fabrication); a best-effort flag is
+ * surfaced when the table marks any cap as unverified.
+ */
+function heroLevelRows(townHall: number) {
+  const ref = getTownHallReference(townHall);
+  return heroIdsUnlockedAt(townHall).map((id) => ({
+    id,
+    name: HERO_NAMES[id],
+    maxLevel: ref.heroes[id].maxLevel,
+    needsVerification: ref.heroes[id].needsVerification,
+  }));
 }
 
 export default async function GuidePage({
@@ -91,8 +151,16 @@ export default async function GuidePage({
     );
   }
 
+  // Presentation-only: hero caps + dimension weights are read live (not faked).
+  const heroRows = guide.townHall !== null ? heroLevelRows(guide.townHall) : [];
+  const anyUnverified = heroRows.some((r) => r.needsVerification);
+  const tier =
+    guide.townHall !== null && guide.townHall >= EQUIPMENT_MIN_TOWN_HALL
+      ? 'th16plus'
+      : 'below16';
+
   return (
-    <article className="mx-auto max-w-md px-4 py-10">
+    <article className="mx-auto max-w-2xl px-4 py-10">
       <JsonLdScript data={jsonLd} />
       <Breadcrumbs
         items={[
@@ -101,31 +169,41 @@ export default async function GuidePage({
           { name: guide.h1, href: `/guides/${guide.slug}` },
         ]}
       />
-      <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white">
-        {guide.h1}
-      </h1>
-      <p className="mt-1.5 text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
-        Updated {freshnessLabel(updated)} · data {gameDataVersion()}
-      </p>
-      <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">
-        {guide.intro}
-      </p>
+
+      <header className="mt-4">
+        <div className="flex flex-wrap gap-2">
+          {guideEyebrows(guide).map((e) => (
+            <EyebrowPill key={e.label} tone={e.tone}>
+              {e.label}
+            </EyebrowPill>
+          ))}
+        </div>
+        <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
+          {guide.h1}
+        </h1>
+        <p className="mt-2 text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
+          Updated {freshnessLabel(updated)} · data {gameDataVersion()}
+        </p>
+        <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">
+          {guide.intro}
+        </p>
+      </header>
 
       {guide.dataPoints.length > 0 ? (
-        <PremiumCard tone="plain" className="mt-7 p-4">
+        <PremiumCard tone="violet" glowed className="mt-8 p-6">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-brand-gold/80">
             {guide.townHall !== null
               ? `TH${guide.townHall} reference (max levels)`
               : 'At a glance'}
           </h2>
-          <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+          <dl className="mt-4 grid grid-cols-2 gap-x-5 gap-y-2.5 text-sm">
             {guide.dataPoints.map((dp) => (
               <div
                 key={dp.label}
-                className="flex items-baseline justify-between gap-2 border-b border-white/5 pb-1.5"
+                className="flex items-baseline justify-between gap-2 border-b border-white/8 pb-2"
               >
                 <dt className="text-[var(--muted)]">{dp.label}</dt>
-                <dd className="text-right font-medium text-[var(--fg)]/90">
+                <dd className="text-right font-semibold text-white">
                   {dp.value}
                 </dd>
               </div>
@@ -134,20 +212,79 @@ export default async function GuidePage({
         </PremiumCard>
       ) : null}
 
-      {guide.sections.map((section) => (
-        <section key={section.heading} className="mt-7">
-          <h2 className="text-lg font-semibold text-white">
-            {section.heading}
-          </h2>
-          <p className="mt-2 text-[15px] leading-relaxed text-[var(--muted)]">
-            {section.body}
+      {/* How the grade is weighted — real CoachScore weights, not fabricated. */}
+      <section className="mt-12" aria-labelledby="weights-heading">
+        <SectionDivider className="mb-5">
+          <span id="weights-heading">How the grade is weighted</span>
+        </SectionDivider>
+        <PremiumCard tone="plain" className="p-6">
+          <p className="mb-4 text-sm leading-relaxed text-[var(--muted)]">
+            CoachScore grades seven dimensions and orders your roadmap by
+            cost-weighted impact. These are the live weights for this
+            guide&rsquo;s emphasis — the bars show how much each dimension moves
+            your grade.
           </p>
-        </section>
-      ))}
+          <ScoreBreakdown goal={goalFor(guide.kind)} tier={tier} />
+        </PremiumCard>
+      </section>
 
-      <PremiumCard tone="gold" glowed className="mt-9 p-5 text-center">
-        <p className="font-medium text-white">{guide.ctaText}</p>
-        <div className="mt-3">
+      {/* Hero level caps — exact reference numbers for this Town Hall. */}
+      {heroRows.length > 0 ? (
+        <section className="mt-12" aria-labelledby="hero-levels-heading">
+          <SectionDivider className="mb-5">
+            <span id="hero-levels-heading">Hero level caps</span>
+          </SectionDivider>
+          <PremiumCard tone="plain" className="overflow-hidden p-0">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/8 text-left">
+                  <th className="px-5 py-3 font-semibold text-white/90">
+                    Hero
+                  </th>
+                  <th className="px-5 py-3 text-right font-semibold text-white/90">
+                    Max level at TH{guide.townHall}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {heroRows.map((r) => (
+                  <tr
+                    key={r.id}
+                    className="border-b border-white/8 last:border-0"
+                  >
+                    <td className="px-5 py-3 text-[var(--muted)]">{r.name}</td>
+                    <td className="px-5 py-3 text-right font-bold text-brand-gold tabular-nums">
+                      {r.maxLevel}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </PremiumCard>
+          {anyUnverified ? (
+            <p className="mt-2 text-xs text-[var(--muted)]/80">
+              Best-effort values from the CoachScore reference table — confirm
+              against the live game for edge cases.
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+
+      {/* Body sections */}
+      <div className="mt-12 space-y-8">
+        {guide.sections.map((section) => (
+          <section key={section.heading}>
+            <h2 className="text-xl font-bold text-white">{section.heading}</h2>
+            <p className="mt-2.5 text-[15px] leading-relaxed text-[var(--muted)]">
+              {section.body}
+            </p>
+          </section>
+        ))}
+      </div>
+
+      <PremiumCard tone="gold" glowed className="mt-12 p-6 text-center">
+        <p className="text-lg font-semibold text-white">{guide.ctaText}</p>
+        <div className="mt-4 flex justify-center">
           <MagicButton href="/report" variant="gold">
             Score my account free
           </MagicButton>
@@ -155,42 +292,43 @@ export default async function GuidePage({
       </PremiumCard>
 
       {guide.faqs.length > 0 ? (
-        <section className="mt-9">
-          <h2 className="text-lg font-semibold text-white">FAQ</h2>
-          <dl className="mt-3 space-y-4">
+        <section className="mt-12" aria-labelledby="faq-heading">
+          <SectionDivider className="mb-5">
+            <span id="faq-heading">FAQ</span>
+          </SectionDivider>
+          <div className="space-y-3">
             {guide.faqs.map((faq) => (
-              <div key={faq.question}>
-                <dt className="font-medium text-[var(--fg)]/90">
-                  {faq.question}
-                </dt>
-                <dd className="mt-1 text-sm text-[var(--muted)]">
+              <PremiumCard key={faq.question} tone="plain" className="p-5">
+                <h3 className="font-semibold text-white">{faq.question}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-[var(--muted)]">
                   {faq.answer}
-                </dd>
-              </div>
+                </p>
+              </PremiumCard>
             ))}
-          </dl>
+          </div>
         </section>
       ) : null}
 
       {related.length > 0 ? (
-        <section className="mt-9" aria-labelledby="related-heading">
-          <h2
-            id="related-heading"
-            className="text-xs font-semibold uppercase tracking-wider text-brand-violet-light"
-          >
-            Related guides
-          </h2>
-          <ul className="mt-3 space-y-2">
+        <section className="mt-12" aria-labelledby="related-heading">
+          <SectionDivider className="mb-5">
+            <span id="related-heading">Related guides</span>
+          </SectionDivider>
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {related.map((link) => (
               <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="flex items-center justify-between gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-[var(--fg)]/90 transition hover:border-brand-violet/40 hover:text-white"
-                >
-                  {link.label}
-                  <span aria-hidden className="text-brand-violet-light">
-                    →
-                  </span>
+                <Link href={link.href} className="block h-full">
+                  <PremiumCard
+                    tone="plain"
+                    className="flex h-full items-center justify-between gap-2 p-4 transition hover:shadow-glow-violet-sm"
+                  >
+                    <span className="text-sm font-medium text-white/90">
+                      {link.label}
+                    </span>
+                    <span aria-hidden className="text-brand-violet-light">
+                      →
+                    </span>
+                  </PremiumCard>
                 </Link>
               </li>
             ))}
@@ -198,10 +336,10 @@ export default async function GuidePage({
         </section>
       ) : null}
 
-      <nav className="mt-9 border-t border-white/10 pt-5 text-sm">
+      <nav className="mt-10 border-t border-white/8 pt-5 text-sm">
         <Link
           href="/methodology"
-          className="text-brand-violet-light hover:text-white"
+          className="text-brand-violet-light transition hover:text-white"
         >
           How CoachScore grades accounts →
         </Link>
