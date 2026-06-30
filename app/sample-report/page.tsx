@@ -1,18 +1,23 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { Disclaimer } from '@/components/disclaimer';
-import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { JsonLdScript } from '@/components/seo/json-ld';
 import { ShareButtons } from '@/components/share/share-buttons';
 import {
-  CountUp,
+  Breadcrumbs,
+  DimensionBar,
+  EyebrowPill,
+  GradeBadge,
   MagicButton,
   PremiumCard,
   ScoreRing,
-  StatusBadge,
+  SectionDivider,
+  TrustBar,
 } from '@/components/ui';
 import {
   articleJsonLd,
+  breadcrumbJsonLd,
   buildMetadata,
   canonicalUrl,
   CONTENT_REVISION_DATE,
@@ -49,124 +54,172 @@ const SAMPLE = {
   ],
 };
 
+// Abstract, IP-safe SVG glyphs (no game art) for the dimension rows.
+const shieldGlyph: ReactNode = (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden
+  >
+    <path d="M12 2l8 3v6c0 5-3.5 8-8 11-4.5-3-8-6-8-11V5l8-3z" />
+  </svg>
+);
+
+// Strongest / weakest dimensions, derived from the same illustrative numbers
+// (presentation only — no scoring logic). `reduce` keeps the result non-nullable
+// for the type checker (the array is a non-empty literal).
+const strongest = SAMPLE.dimensions.reduce((a, b) => (b.pct > a.pct ? b : a));
+const weakest = SAMPLE.dimensions.reduce((a, b) => (b.pct < a.pct ? b : a));
+
 export default function SampleReportPage() {
   return (
     <article className="mx-auto max-w-md px-4 py-10">
       <JsonLdScript
-        data={articleJsonLd({
-          headline: 'Sample CoachScore report',
-          description: metadata.description as string,
-          url: canonicalUrl('/sample-report'),
-          dateModified: CONTENT_REVISION_DATE,
-        })}
-      />
-      <Breadcrumbs
-        items={[
-          { name: 'Home', href: '/' },
-          { name: 'Sample report', href: '/sample-report' },
+        data={[
+          articleJsonLd({
+            headline: 'Sample CoachScore report',
+            description: metadata.description as string,
+            url: canonicalUrl('/sample-report'),
+            dateModified: CONTENT_REVISION_DATE,
+          }),
+          breadcrumbJsonLd([
+            { name: 'Home', url: canonicalUrl('/') },
+            { name: 'Sample report', url: canonicalUrl('/sample-report') },
+          ]),
         ]}
       />
-      <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white">
-        A sample CoachScore report
-      </h1>
-      <div className="mt-2">
-        <StatusBadge tone="warning">
+
+      <Breadcrumbs
+        items={[{ label: 'Home', href: '/' }, { label: 'Sample report' }]}
+      />
+
+      <div className="mt-4">
+        <EyebrowPill tone="violet">
           Illustrative example — not a real account
-        </StatusBadge>
+        </EyebrowPill>
       </div>
+
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white">
+        A sample <span className="text-violet-gradient">CoachScore</span> report
+      </h1>
       <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">
-        This is what a finished report looks like: a single grade, the seven
-        dimension breakdown behind it, and a prioritized roadmap. The numbers
-        below are made up to show the format.
+        This is what a finished report looks like: a single grade, the dimension
+        breakdown behind it, and a prioritized roadmap. The numbers below are
+        made up to show the format.
       </p>
 
-      <PremiumCard tone="gold" glowed className="mt-7 animate-score-reveal p-5">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-brand-gold/80">
+      {/* Hero result card */}
+      <PremiumCard tone="gold" glowed className="mt-7 animate-score-reveal p-6">
+        <div className="flex items-start gap-4">
+          <GradeBadge grade={SAMPLE.grade} size="lg" />
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-gold/80">
               Town Hall {SAMPLE.townHall} · war goal
             </p>
             <p className="mt-1 text-2xl font-extrabold text-white">
               Grade {SAMPLE.grade}
             </p>
             <p className="mt-0.5 text-sm text-[var(--muted)]">
-              <CountUp
-                to={SAMPLE.score}
-                className="font-semibold text-gold-gradient"
-              />
+              <span className="font-semibold text-gold-gradient">
+                {SAMPLE.score}
+              </span>
               /100 — solid, with a clear path to A.
             </p>
           </div>
           <ScoreRing
             value={SAMPLE.score}
             grade={SAMPLE.grade}
+            size={104}
             label="Overall"
           />
         </div>
+
+        <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
+          <div className="rounded-xl border border-grade-a/30 bg-grade-a/10 px-3.5 py-2.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-grade-a">
+              Your strongest dimension
+            </p>
+            <p className="mt-0.5 text-sm font-semibold text-white">
+              {strongest.label} {strongest.pct}%
+            </p>
+          </div>
+          <div className="rounded-xl border border-brand-gold/30 bg-brand-gold/10 px-3.5 py-2.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-gold-light">
+              Your biggest opportunity
+            </p>
+            <p className="mt-0.5 text-sm font-semibold text-white">
+              {weakest.label} {weakest.pct}%
+            </p>
+          </div>
+        </div>
       </PremiumCard>
 
-      <section className="mt-6">
-        <h2 className="text-lg font-semibold text-white">
-          Dimension breakdown
-        </h2>
-        <ul className="mt-3 space-y-2.5">
-          {SAMPLE.dimensions.map((d) => (
-            <li key={d.label}>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-[var(--fg)]/90">{d.label}</span>
-                <span className="font-medium text-[var(--muted)]">
-                  {d.pct}%
+      {/* Two-column: breakdown + roadmap */}
+      <div className="mt-7 grid gap-5 sm:grid-cols-2">
+        <PremiumCard tone="violet" className="p-5">
+          <SectionDivider className="mb-4">Dimension breakdown</SectionDivider>
+          <div className="space-y-3.5">
+            {SAMPLE.dimensions.map((d) => (
+              <DimensionBar
+                key={d.label}
+                label={d.label}
+                percent={d.pct}
+                icon={shieldGlyph}
+              />
+            ))}
+          </div>
+        </PremiumCard>
+
+        <PremiumCard tone="plain" className="p-5">
+          <SectionDivider className="mb-4">Prioritized roadmap</SectionDivider>
+          <ol className="space-y-3">
+            {SAMPLE.roadmap.map((rec, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gold-gradient text-[11px] font-extrabold text-ink-950 shadow-glow-gold-sm">
+                  {i + 1}
                 </span>
-              </div>
-              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-                <div
-                  className="h-full rounded-full bg-violet-gradient"
-                  style={{ width: `${d.pct}%` }}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+                <span className="text-sm leading-relaxed text-[var(--fg)]/90">
+                  {rec}
+                </span>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-4 rounded-xl border-l-2 border-brand-violet-light/60 bg-brand-violet/10 px-3.5 py-2.5">
+            <p className="text-xs leading-relaxed text-brand-violet-light">
+              Each step is ordered by grade gained per resource spent — do them
+              top to bottom for the fastest climb.
+            </p>
+          </div>
+        </PremiumCard>
+      </div>
 
-      <section className="mt-7">
-        <h2 className="text-lg font-semibold text-white">
-          Prioritized roadmap
-        </h2>
-        <ol className="mt-3 space-y-2 text-sm text-[var(--fg)]/90">
-          {SAMPLE.roadmap.map((rec, i) => (
-            <li key={i} className="flex gap-2.5">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-gold/20 text-[11px] font-bold text-brand-gold-light">
-                {i + 1}
-              </span>
-              {rec}
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <PremiumCard tone="gold" glowed className="mt-9 p-5 text-center">
-        <p className="font-medium text-white">
-          Get your real grade — free, in under a minute.
+      {/* CTA banner */}
+      <PremiumCard tone="gold" glowed className="mt-9 p-6 text-center">
+        <p className="text-lg font-bold text-white">
+          Get your real grade — free
         </p>
-        <div className="mt-3">
-          <MagicButton href="/report" variant="gold">
+        <p className="mt-1 text-sm text-[var(--muted)]">
+          In under a minute, from your own in-game data.
+        </p>
+        <div className="mt-4">
+          <MagicButton href="/report" variant="gold" size="lg">
             Score my account free
           </MagicButton>
         </div>
       </PremiumCard>
 
-      <section className="mt-8" aria-labelledby="share-heading">
-        <h2
-          id="share-heading"
-          className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold/80"
-        >
+      {/* Share */}
+      <section className="mt-10" aria-labelledby="share-heading">
+        <h2 id="share-heading" className="sr-only">
           Share your result
         </h2>
-        <p className="mt-2 text-sm text-[var(--muted)]">
+        <SectionDivider>Share your result</SectionDivider>
+        <p className="mt-3 text-center text-sm text-[var(--muted)]">
           One tap to share — or copy for Discord and clan chats.
         </p>
-        <div className="mt-3">
+        <div className="mt-4">
           <ShareButtons
             url={canonicalUrl('/sample-report')}
             text={`I scored Grade ${SAMPLE.grade} (${SAMPLE.score}/100) on CoachScore — rate your Clash of Clans account free:`}
@@ -175,7 +228,34 @@ export default function SampleReportPage() {
         </div>
       </section>
 
-      <p className="mt-6 text-sm text-[var(--muted)]">
+      {/* Trust bar */}
+      <TrustBar
+        className="mt-10"
+        items={[
+          {
+            icon: shieldGlyph,
+            title: '100% Transparent',
+            subtitle: 'Deterministic engine',
+          },
+          {
+            icon: shieldGlyph,
+            title: 'Official API',
+            subtitle: 'Your real in-game data',
+          },
+          {
+            icon: shieldGlyph,
+            title: 'Privacy first',
+            subtitle: 'No login stored',
+          },
+          {
+            icon: shieldGlyph,
+            title: 'Built by players',
+            subtitle: 'For players',
+          },
+        ]}
+      />
+
+      <p className="mt-8 text-center text-sm text-[var(--muted)]">
         Want to see how the grade is computed?{' '}
         <Link
           href="/methodology"

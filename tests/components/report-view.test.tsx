@@ -27,7 +27,9 @@ describe('ReportView', () => {
     expect(html).toContain('CoachScore Report');
     expect(html).toContain('Diagnosis');
     expect(html).toContain('Dimension breakdown');
-    expect(html).toContain('Upgrade roadmap');
+    // Phase 3 restyle renamed the section to match the reference ("Prioritized
+    // roadmap"); the roadmap content itself is unchanged.
+    expect(html).toContain('Prioritized roadmap');
     expect(html).toContain(report.grade);
   });
 

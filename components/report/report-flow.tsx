@@ -9,6 +9,7 @@ import { track } from '@/components/analytics/track';
 import { ManualEntryForm } from '@/components/intake/manual-entry-form';
 import { ScoreHistory } from '@/components/report/score-history';
 import { ShareButtons } from '@/components/share/share-buttons';
+import { MagicButton, SectionDivider } from '@/components/ui';
 import { ReportView } from './report-view';
 import { TeaserView } from './teaser-view';
 
@@ -206,26 +207,24 @@ export function ReportFlow() {
 
         {/* Share — directly below the free score (the growth loop) */}
         <div>
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-gold/80">
-            Share your grade
-          </h3>
+          <SectionDivider className="mb-3">Share your grade</SectionDivider>
           <ShareButtons url={shareUrl} text={shareText} imageUrl={cardUrl} />
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {data.report === null ? (
-            <button
+            <MagicButton
               type="button"
+              variant="gold"
               onClick={() => void previewFull()}
               disabled={submitting}
-              className={primaryBtn}
             >
               {submitting ? 'Loading…' : 'Preview the full report'}
-            </button>
+            </MagicButton>
           ) : null}
-          <Link href="/pricing" className={ghostBtn}>
+          <MagicButton href="/pricing" variant="ghost">
             See pricing
-          </Link>
+          </MagicButton>
           <button type="button" onClick={reset} className={ghostBtn}>
             Start over
           </button>

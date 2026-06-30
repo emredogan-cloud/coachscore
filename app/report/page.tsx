@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { TrackOnMount } from '@/components/analytics/track';
 import { ReportFlow } from '@/components/report/report-flow';
 import { WarRoomIntro } from '@/components/report/war-room-intro';
+import { EyebrowPill } from '@/components/ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,7 +36,10 @@ export default async function ReportPage({
           </p>
         </>
       ) : null}
-      <h1 className="text-center text-3xl font-extrabold tracking-tight text-violet-gradient">
+      <div className="flex justify-center">
+        <EyebrowPill tone="violet">Free · Objective · Instant</EyebrowPill>
+      </div>
+      <h1 className="mt-3 text-center text-3xl font-extrabold tracking-tight text-violet-gradient">
         Analyze your account
       </h1>
       <p className="mt-3 text-center text-[15px] text-[var(--muted)]">

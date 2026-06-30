@@ -1,15 +1,13 @@
 import type { ReportTeaser } from '@/lib/report';
 import { deriveArchetype } from '@/lib/identity';
-import { PremiumCard } from '@/components/ui';
+import { EyebrowPill, GradeBadge, PremiumCard } from '@/components/ui';
 import { ScoreReveal } from './score-reveal';
 
 /**
  * Free-teaser view (Phase 4 · premium + dark-native rebuild). Reveals the grade
- * + score (as a gradient score ring — the paywall centerpiece) and the single
- * top weakness, then shows the locked premium sections as the conversion
- * prompt. Presentational + hook-free. Dark-native, high-contrast (the old
- * light-theme `bg-amber-50`/`text-gray-500` classes were invisible in the
- * dark-only app — Phase L fix).
+ * + score (as an animated gradient score ring — the paywall centerpiece) and
+ * the single top weakness, then shows the locked premium sections as the
+ * conversion prompt. Presentational + hook-free. Dark-native, high-contrast.
  */
 export function TeaserView({ teaser }: { teaser: ReportTeaser }) {
   return (
@@ -27,13 +25,11 @@ export function TeaserView({ teaser }: { teaser: ReportTeaser }) {
             label="Your score"
           />
           <div className="text-left">
+            <GradeBadge grade={teaser.grade} size="md" className="mb-1" />
             <p
-              className="text-5xl font-extrabold leading-none text-gold-gradient"
+              className="text-sm text-[var(--muted)]"
               data-testid="teaser-grade"
             >
-              {teaser.grade}
-            </p>
-            <p className="mt-1 text-sm text-[var(--muted)]">
               {teaser.overall}/100
             </p>
           </div>
@@ -43,9 +39,9 @@ export function TeaserView({ teaser }: { teaser: ReportTeaser }) {
         </p>
         {/* EMO-P2 — shareable player identity */}
         <p className="mt-3 text-center">
-          <span className="inline-block rounded-full bg-brand-violet/15 px-3 py-1 text-xs font-semibold text-brand-violet-light ring-1 ring-brand-violet/30">
+          <EyebrowPill tone="violet">
             {deriveArchetype(teaser.goal, teaser.grade).name}
-          </span>
+          </EyebrowPill>
         </p>
       </PremiumCard>
 
@@ -63,19 +59,32 @@ export function TeaserView({ teaser }: { teaser: ReportTeaser }) {
         </PremiumCard>
       ) : null}
 
-      <div>
+      <PremiumCard tone="violet" className="p-5">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-brand-violet-light">
           Unlock the full report
         </h3>
-        <ul className="mt-2 space-y-1.5 text-sm text-[var(--muted)]">
+        <ul className="mt-3 space-y-2 text-sm text-[var(--muted)]">
           {teaser.lockedSections.map((section) => (
-            <li key={section} className="flex items-center gap-2">
-              <span aria-hidden>🔒</span>
+            <li key={section} className="flex items-center gap-2.5">
+              <span
+                aria-hidden
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-brand-gold/15 text-brand-gold-light"
+              >
+                <svg
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden
+                >
+                  <path d="M17 9V7a5 5 0 0 0-10 0v2H5v13h14V9h-2zM9 7a3 3 0 0 1 6 0v2H9V7z" />
+                </svg>
+              </span>
               {section}
             </li>
           ))}
         </ul>
-      </div>
+      </PremiumCard>
     </section>
   );
 }
