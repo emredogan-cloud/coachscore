@@ -3,11 +3,13 @@
 import { useReducer, useState } from 'react';
 import type { ActivationStatus } from '@/lib/activation';
 import type { HandlerResult, IntakeResponseBody } from '@/lib/api';
+import type { Goal } from '@/lib/core';
 import {
   submitManualIntake,
   submitScreenshotIntake,
   submitTagIntake,
 } from '@/app/intake/actions';
+import { MagicButton, SectionDivider, TrustBar } from '@/components/ui';
 import { ConfidenceCorrection } from './confidence-correction';
 import { ManualEntryForm } from './manual-entry-form';
 import { ReviewScreen } from './review-screen';
@@ -32,8 +34,50 @@ const PATHS: readonly { id: IntakePath; label: string; desc: string }[] = [
   { id: 'tag', label: 'Player tag', desc: 'Fetch via the Clash of Clans API.' },
 ];
 
-const pillClass =
-  'rounded-md border border-gray-300 px-4 py-3 text-left text-sm hover:border-black dark:border-gray-700 dark:hover:border-white';
+const GOALS: readonly { value: Goal; label: string }[] = [
+  { value: 'rate', label: 'Rate my account' },
+  { value: 'progress', label: 'Steady progress' },
+  { value: 'war', label: 'Win wars / CWL' },
+  { value: 'trophy', label: 'Push trophies' },
+  { value: 'derush', label: 'De-rush' },
+  { value: 'recruit', label: 'Get recruited' },
+];
+
+// Dark-native input/select base (NO `dark:` prefixes — there is no `dark` class
+// on <html>, so they would be inert; style the dark surface directly).
+const inputClass =
+  'mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-[var(--muted)]/60 focus:border-brand-violet/50 focus:outline-none';
+
+// Trust assurances shown near the bottom of the intake flow.
+const trustIcon = (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden
+  >
+    <path d="M12 2l8 3v6c0 5-3.5 8-8 11-4.5-3-8-6-8-11V5l8-3z" />
+  </svg>
+);
+const TRUST_ITEMS = [
+  { icon: trustIcon, title: 'Free & instant', subtitle: 'No signup to score' },
+  {
+    icon: trustIcon,
+    title: '100% objective',
+    subtitle: 'Deterministic engine',
+  },
+  {
+    icon: trustIcon,
+    title: 'Private & secure',
+    subtitle: 'You control your data',
+  },
+  {
+    icon: trustIcon,
+    title: 'Built for players',
+    subtitle: 'Plain-language input',
+  },
+];
 
 export function IntakeWizard({ activation }: { activation: ActivationStatus }) {
   const [state, dispatch] = useReducer(wizardReducer, initialWizardState);
@@ -87,7 +131,7 @@ export function IntakeWizard({ activation }: { activation: ActivationStatus }) {
       {state.error !== null ? (
         <p
           role="alert"
-          className="mb-4 rounded bg-red-50 p-2 text-sm text-red-700 dark:bg-red-950/40"
+          className="mb-4 rounded-xl border border-red-500/25 bg-red-500/10 p-3 text-sm text-red-200"
         >
           {state.error}
         </p>
@@ -99,11 +143,13 @@ export function IntakeWizard({ activation }: { activation: ActivationStatus }) {
             <button
               key={p.id}
               type="button"
-              className={pillClass}
+              className="group rounded-2xl border border-white/8 bg-white/[0.03] p-4 text-left transition hover:border-brand-violet/40 hover:bg-white/[0.06] hover:shadow-glow-violet-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-violet-light/70"
               onClick={() => dispatch({ type: 'choosePath', path: p.id })}
             >
-              <span className="block font-semibold">{p.label}</span>
-              <span className="mt-1 block text-xs text-gray-500">{p.desc}</span>
+              <span className="block font-semibold text-white">{p.label}</span>
+              <span className="mt-1 block text-xs text-[var(--muted)]">
+                {p.desc}
+              </span>
             </button>
           ))}
         </div>
@@ -113,7 +159,7 @@ export function IntakeWizard({ activation }: { activation: ActivationStatus }) {
         <div className="space-y-4">
           <button
             type="button"
-            className="text-sm text-gray-500 underline"
+            className="text-sm text-[var(--muted)] underline-offset-4 transition hover:text-white hover:underline"
             onClick={() => dispatch({ type: 'back' })}
           >
             ← Choose a different method
@@ -138,30 +184,74 @@ export function IntakeWizard({ activation }: { activation: ActivationStatus }) {
           ) : null}
 
           {state.path === 'tag' ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {!activation.cocApi ? (
-                <p className="rounded bg-amber-50 p-2 text-sm text-amber-700 dark:bg-amber-950/40">
+                <p className="rounded-xl border border-amber-500/25 bg-amber-500/10 p-3 text-sm text-amber-200/90">
                   Tag intake needs the Clash of Clans API proxy (not activated).
                   Submitting will report it as not activated.
                 </p>
               ) : null}
               <label className="block text-sm">
-                Player tag
-                <input
-                  className="w-full rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-900"
-                  value={tag}
-                  placeholder="#2PP0..."
-                  onChange={(e) => setTag(e.target.value)}
-                />
+                <span className="font-medium text-white">Player tag</span>
+                <span className="relative mt-1 block">
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-base font-bold text-brand-gold"
+                  >
+                    #
+                  </span>
+                  <input
+                    className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-8 pr-3 text-sm text-white placeholder:text-[var(--muted)]/60 focus:border-brand-violet/50 focus:outline-none"
+                    value={tag}
+                    placeholder="2PP0..."
+                    onChange={(e) => setTag(e.target.value)}
+                  />
+                </span>
               </label>
-              <button
+              <label className="block text-sm">
+                <span className="font-medium text-white">Goal</span>
+                <select
+                  className={inputClass}
+                  value={state.goal}
+                  onChange={(e) =>
+                    dispatch({
+                      type: 'setGoal',
+                      goal: e.target.value as Goal,
+                    })
+                  }
+                >
+                  {GOALS.map((g) => (
+                    <option
+                      key={g.value}
+                      value={g.value}
+                      className="bg-[#0b0a14]"
+                    >
+                      {g.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <MagicButton
+                variant="violet"
+                size="lg"
                 type="button"
                 onClick={onTag}
                 disabled={state.submitting || tag.trim() === ''}
-                className="rounded bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-violet-gradient dark:text-white"
               >
-                {state.submitting ? 'Fetching…' : 'Fetch & score'}
-              </button>
+                {state.submitting ? 'Fetching…' : 'Analyze my account'}
+              </MagicButton>
+              <p className="text-center text-sm text-[var(--muted)]">
+                No tag handy?{' '}
+                <button
+                  type="button"
+                  className="font-medium text-brand-violet-light underline-offset-4 transition hover:text-white hover:underline"
+                  onClick={() =>
+                    dispatch({ type: 'choosePath', path: 'manual' })
+                  }
+                >
+                  Enter your levels manually
+                </button>
+              </p>
             </div>
           ) : null}
         </div>
@@ -180,11 +270,18 @@ export function IntakeWizard({ activation }: { activation: ActivationStatus }) {
           ) : null}
           <button
             type="button"
-            className="mt-6 text-sm text-gray-500 underline"
+            className="mt-6 text-sm text-[var(--muted)] underline-offset-4 transition hover:text-white hover:underline"
             onClick={() => dispatch({ type: 'reset' })}
           >
             Start over
           </button>
+        </div>
+      ) : null}
+
+      {state.step !== 'review' ? (
+        <div className="mt-10 space-y-5">
+          <SectionDivider>Why CoachScore</SectionDivider>
+          <TrustBar items={TRUST_ITEMS} />
         </div>
       ) : null}
     </div>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { Goal } from '@/lib/core';
+import { MagicButton } from '@/components/ui';
 import { ScreenshotDropzone } from './screenshot-dropzone';
 
 type MediaType = 'image/png' | 'image/jpeg' | 'image/webp';
@@ -75,13 +76,14 @@ export function ScreenshotUpload({
           onChange={(e) => setContext(e.target.value)}
         />
       </label>
-      <button
+      <MagicButton
+        variant="violet"
+        size="lg"
         type="submit"
         disabled={submitting || files.length === 0}
-        className="inline-flex w-full items-center justify-center rounded-xl bg-violet-gradient px-5 py-3 font-semibold text-white shadow-glow-violet-sm transition hover:shadow-glow-violet disabled:opacity-50"
       >
         {submitting ? 'Reading…' : 'Complete my defense score'}
-      </button>
+      </MagicButton>
     </form>
   );
 }

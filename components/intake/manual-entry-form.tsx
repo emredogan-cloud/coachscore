@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { Goal } from '@/lib/core';
+import { MagicButton } from '@/components/ui';
 
 /**
  * Manual-entry fallback (UX-P0 redesign). The old form exposed raw model inputs
@@ -84,7 +85,7 @@ function Choice<T extends number>({
             className={`rounded-full border px-3 py-1.5 text-sm transition ${
               value === o.value
                 ? 'border-brand-violet bg-violet-gradient text-white shadow-glow-violet-sm'
-                : 'border-white/10 bg-white/5 text-[var(--fg)]/80 hover:border-brand-violet/40'
+                : 'border-white/10 bg-white/5 text-[var(--muted)] hover:border-brand-violet/40 hover:text-white'
             }`}
           >
             {o.label}
@@ -232,13 +233,14 @@ export function ManualEntryForm({
         onChange={setClan}
       />
 
-      <button
+      <MagicButton
+        variant="violet"
+        size="lg"
         type="submit"
         disabled={submitting}
-        className="inline-flex w-full items-center justify-center rounded-xl bg-violet-gradient px-5 py-3 font-semibold text-white shadow-glow-violet-sm transition hover:shadow-glow-violet disabled:opacity-50"
       >
         {submitting ? 'Scoring…' : 'Get my CoachScore'}
-      </button>
+      </MagicButton>
     </form>
   );
 }
