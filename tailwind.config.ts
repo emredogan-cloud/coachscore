@@ -81,6 +81,11 @@ const config: Config = {
           from: { opacity: '0', transform: 'scale(0.9)' },
           to: { opacity: '1', transform: 'scale(1)' },
         },
+        // Phase 5 — Copilot panel entrance: grows up from the FAB corner.
+        'panel-in': {
+          from: { opacity: '0', transform: 'translateY(12px) scale(0.96)' },
+          to: { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
         // EMO-P0 — CSS confetti burst (no JS lib): each particle flies outward
         // along its own --tx/--ty and fades. Disabled by the reduced-motion rule.
         celebrate: {
@@ -98,6 +103,7 @@ const config: Config = {
         float: 'float 6s ease-in-out infinite',
         'fade-up': 'fade-up 0.5s ease-out both',
         'score-reveal': 'score-reveal 0.6s cubic-bezier(0.22,1,0.36,1) both',
+        'panel-in': 'panel-in 0.32s cubic-bezier(0.16,1,0.3,1) both',
         celebrate: 'celebrate 0.9s ease-out forwards',
       },
       // DESIGN-P0 — one shared easing system (CSS-first, no JS motion lib):

@@ -192,7 +192,7 @@ export function Copilot() {
       ) : null}
 
       {open ? (
-        <div className="fixed bottom-4 right-4 z-40 flex h-[32rem] max-h-[calc(100vh-2rem)] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-brand-gold/25 bg-ink-950/95 shadow-glow-violet backdrop-blur-md">
+        <div className="fixed bottom-4 right-4 z-40 flex h-[32rem] max-h-[calc(100vh-2rem)] w-[min(23rem,calc(100vw-2rem))] origin-bottom-right animate-panel-in flex-col overflow-hidden rounded-2xl border border-brand-gold/25 bg-ink-950/95 shadow-glow-violet backdrop-blur-md">
           <header className="px-4 pb-2 pt-3">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5">

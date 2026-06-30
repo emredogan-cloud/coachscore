@@ -7,6 +7,7 @@
 ### Premium panel (`components/copilot/copilot.tsx`)
 - **Launcher (FAB):** the plain violet circle → the original **glowing shield+chat emblem** (`copilot-fab.webp`) with a violet glow, replacing the generic icon.
 - **Panel:** dark `ink-950/95` glass with a **gold-tinted border + violet glow**, a header lockup (the **tactician mascot** `mascot-tactician.webp` + "CoachScore **Copilot**" + "Strategy advisor · grounded in your data"), and a **gold gem divider** under the header.
+- **Opening animation:** the panel plays a `panel-in` entrance (CSS-only, no JS motion lib) — it **grows up from the FAB corner** (`origin-bottom-right`, opacity 0→1 + `translateY(12px) scale(0.96)`→rest) on the shared `settle` easing `cubic-bezier(0.16,1,0.3,1)`. Disabled by the global `prefers-reduced-motion` rule.
 - **Messages:** assistant turns get a small **mascot avatar**, a bordered bubble, a **timestamp**, and a hover **Copy** button; user turns are violet-gradient bubbles with a timestamp. A **typing indicator** (three pulsing dots) shows while the first token is pending.
 - **Input:** rounded dark field + a violet **send icon** button (paper-plane).
 - Preserved verbatim: streaming reader, localStorage **memory** + **Clear/forget**, the "first turn must be user" guard, and graceful 503/429 handling.
