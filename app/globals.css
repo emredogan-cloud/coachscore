@@ -30,6 +30,7 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family:
+    var(--font-display),
     ui-sans-serif,
     system-ui,
     -apple-system,
