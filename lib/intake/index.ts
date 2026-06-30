@@ -39,6 +39,18 @@ export {
 export { intakeManual } from './manual';
 export { intakeByTag, type TagIntakeDeps } from './tag';
 export {
+  UPLOAD_LIMITS,
+  validateUpload,
+  type UploadCandidate,
+  type UploadValidation,
+} from './upload-limits';
+export {
+  DEFENSE_CONFIDENCE_THRESHOLD,
+  completeDefense,
+  type DefenseExtraction,
+  type DefenseCompletion,
+} from './defense-completion';
+export {
   intakeByScreenshot,
   applyCorrections,
   mapExtractedToFields,

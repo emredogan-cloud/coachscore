@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { Goal } from '@/lib/core';
+import { ScreenshotDropzone } from './screenshot-dropzone';
 
 type MediaType = 'image/png' | 'image/jpeg' | 'image/webp';
 
@@ -21,7 +22,7 @@ async function fileToImage(
 }
 
 const inputClass =
-  'w-full rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-900';
+  'mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-brand-violet/50 focus:outline-none';
 
 export function ScreenshotUpload({
   goal,
@@ -47,13 +48,13 @@ export function ScreenshotUpload({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {!activated ? (
-        <p className="rounded bg-amber-50 p-2 text-sm text-amber-700 dark:bg-amber-950/40">
-          Screenshot OCR is not activated yet (needs an AI key). You can still
-          submit; the server will report it as not activated.
+        <p className="rounded-xl border border-amber-500/25 bg-amber-500/10 p-3 text-sm text-amber-200/90">
+          Screenshot reading is not activated yet (needs an AI key). You can
+          still submit; the server will report it as not activated.
         </p>
       ) : null}
       <label className="block text-sm">
-        Town Hall
+        <span className="font-medium text-white">Town Hall</span>
         <input
           className={inputClass}
           type="number"
@@ -63,32 +64,23 @@ export function ScreenshotUpload({
           onChange={(e) => setTownHall(Number(e.target.value) || 14)}
         />
       </label>
+      <ScreenshotDropzone onFiles={setFiles} disabled={submitting} />
       <label className="block text-sm">
-        Screenshots
-        <input
-          className={inputClass}
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          multiple
-          onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
-        />
-      </label>
-      <label className="block text-sm">
-        Context (optional)
+        <span className="font-medium text-white">Context (optional)</span>
         <input
           className={inputClass}
           type="text"
           value={context}
-          placeholder="e.g. TH14 war account"
+          placeholder="e.g. TH16 war account"
           onChange={(e) => setContext(e.target.value)}
         />
       </label>
       <button
         type="submit"
         disabled={submitting || files.length === 0}
-        className="rounded bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-violet-gradient dark:text-white"
+        className="inline-flex w-full items-center justify-center rounded-xl bg-violet-gradient px-5 py-3 font-semibold text-white shadow-glow-violet-sm transition hover:shadow-glow-violet disabled:opacity-50"
       >
-        {submitting ? 'Reading…' : 'Extract & score'}
+        {submitting ? 'Reading…' : 'Complete my defense score'}
       </button>
     </form>
   );
