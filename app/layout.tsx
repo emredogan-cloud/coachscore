@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import { Outfit } from 'next/font/google';
 import { Copilot } from '@/components/copilot/copilot';
-import { Disclaimer } from '@/components/disclaimer';
 import { ConsentBanner } from '@/components/growth/consent-banner';
 import { RegisterServiceWorker } from '@/components/pwa/register-sw';
 import { JsonLdScript } from '@/components/seo/json-ld';
+import { SiteFooter, SiteNav } from '@/components/ui';
 import {
   organizationJsonLd,
   orgLogoUrl,
@@ -70,9 +70,10 @@ export default function RootLayout({
     <html lang="en" className={display.variable}>
       <body className="flex min-h-screen flex-col">
         <JsonLdScript data={siteJsonLd} />
+        <SiteNav />
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-white/10">
-          <Disclaimer />
+        <footer className="border-t border-white/8">
+          <SiteFooter />
         </footer>
         <ConsentBanner />
         <Copilot />
