@@ -137,9 +137,14 @@ export default function HomePage() {
         <MagicButton href="/report" variant="gold" size="lg">
           Analyze my account
         </MagicButton>
-        <MagicButton href="/pricing" variant="ghost" size="lg">
-          See pricing
-        </MagicButton>
+        <div className="flex gap-3">
+          <MagicButton href="/war" variant="ghost" className="flex-1">
+            War readiness
+          </MagicButton>
+          <MagicButton href="/pricing" variant="ghost" className="flex-1">
+            See pricing
+          </MagicButton>
+        </div>
       </div>
       <p className="mt-4 text-center text-xs text-[var(--muted)]">
         Free instant score · no account required · objective, from your in-game
