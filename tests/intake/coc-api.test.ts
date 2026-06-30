@@ -5,6 +5,7 @@ import {
   CocApiUnavailableError,
   CocPlayerNotFoundError,
   CocPlayerSchema,
+  createCocAdapter,
   mapCocPlayerToFields,
   normalizeIntake,
   ProxyCocAdapter,
@@ -219,5 +220,134 @@ describe('ProxyCocAdapter', () => {
     const { a, urls } = adapter([{ status: 200, body: TH16_PLAYER }]);
     await expect(a.fetchAccount('not a tag!')).rejects.toThrow();
     expect(urls).toHaveLength(0);
+  });
+
+  it('honors a retry-after header over exponential backoff', async () => {
+    const queue: FakeResponse[] = [
+      { status: 429, body: { reason: 'requestThrottled' } },
+      { status: 200, body: TH16_PLAYER },
+    ];
+    let i = 0;
+    const impl = (_url: string) => {
+      const r = queue[Math.min(i, queue.length - 1)] ?? { status: 500 };
+      i += 1;
+      const headers: Record<string, string> =
+        r.status === 429 ? { 'retry-after': '2' } : {};
+      return Promise.resolve({
+        ok: r.status >= 200 && r.status < 300,
+        status: r.status,
+        headers: {
+          get: (n: string): string | null => headers[n.toLowerCase()] ?? null,
+        },
+        json: (): Promise<unknown> => Promise.resolve(r.body ?? {}),
+        text: (): Promise<string> => Promise.resolve(''),
+      });
+    };
+    const delays: number[] = [];
+    const a = new ProxyCocAdapter({
+      token: 'T',
+      baseUrl: 'https://cocproxy.royaleapi.dev',
+      fetchImpl: impl,
+      sleep: (ms: number): Promise<void> => {
+        delays.push(ms);
+        return Promise.resolve();
+      },
+      limiter: noopLimiter,
+      maxRetries: 3,
+    });
+    const data = await a.fetchAccount('#2PP0LYQ');
+    expect(data.fields.townHall).toBe(16);
+    // 2s from the header, not the ~250ms+jitter exponential backoff.
+    expect(delays[0]).toBe(2000);
+  });
+
+  it('caps an absurd retry-after to maxRetryAfterMs', async () => {
+    let i = 0;
+    const impl = (_url: string) => {
+      const status = i === 0 ? 503 : 200;
+      i += 1;
+      const headers: Record<string, string> =
+        status === 503 ? { 'retry-after': '99999' } : {};
+      return Promise.resolve({
+        ok: status === 200,
+        status,
+        headers: {
+          get: (n: string): string | null => headers[n.toLowerCase()] ?? null,
+        },
+        json: (): Promise<unknown> =>
+          Promise.resolve(status === 200 ? TH16_PLAYER : {}),
+        text: (): Promise<string> => Promise.resolve(''),
+      });
+    };
+    const delays: number[] = [];
+    const a = new ProxyCocAdapter({
+      token: 'T',
+      baseUrl: 'https://cocproxy.royaleapi.dev',
+      fetchImpl: impl,
+      sleep: (ms: number): Promise<void> => {
+        delays.push(ms);
+        return Promise.resolve();
+      },
+      limiter: noopLimiter,
+      maxRetries: 2,
+      maxRetryAfterMs: 5_000,
+    });
+    await a.fetchAccount('#2PP0LYQ');
+    expect(delays[0]).toBe(5_000);
+  });
+
+  it('evicts the oldest cached player past maxCacheEntries', async () => {
+    const { impl, urls } = fakeFetch([{ status: 200, body: TH16_PLAYER }]);
+    const a = new ProxyCocAdapter({
+      token: 'T',
+      baseUrl: 'https://cocproxy.royaleapi.dev',
+      fetchImpl: impl,
+      sleep: noopSleep,
+      limiter: noopLimiter,
+      maxCacheEntries: 1,
+    });
+    await a.fetchAccount('#2PP0LYQ'); // fetch A → cache {A}
+    await a.fetchAccount('#2PP0LYQ'); // A cached → no fetch
+    await a.fetchAccount('#2PP0LY'); // fetch B → evicts A, cache {B}
+    await a.fetchAccount('#2PP0LYQ'); // A was evicted → fetch again
+    expect(urls).toHaveLength(3);
+  });
+});
+
+describe('createCocAdapter (process singleton)', () => {
+  function withEnv(
+    token: string | undefined,
+    url: string | undefined,
+    fn: () => void,
+  ) {
+    const prevToken = process.env.COC_API_TOKEN;
+    const prevUrl = process.env.COC_API_PROXY_URL;
+    if (token === undefined) delete process.env.COC_API_TOKEN;
+    else process.env.COC_API_TOKEN = token;
+    if (url === undefined) delete process.env.COC_API_PROXY_URL;
+    else process.env.COC_API_PROXY_URL = url;
+    try {
+      fn();
+    } finally {
+      if (prevToken === undefined) delete process.env.COC_API_TOKEN;
+      else process.env.COC_API_TOKEN = prevToken;
+      if (prevUrl === undefined) delete process.env.COC_API_PROXY_URL;
+      else process.env.COC_API_PROXY_URL = prevUrl;
+    }
+  }
+
+  it('reuses one ProxyCocAdapter across calls when configured', () => {
+    withEnv('TEST_TOKEN', 'https://cocproxy.royaleapi.dev', () => {
+      const a = createCocAdapter();
+      const b = createCocAdapter();
+      expect(a).toBe(b);
+      expect(a).toBeInstanceOf(ProxyCocAdapter);
+    });
+  });
+
+  it('returns a non-proxy NotConfigured adapter when creds are absent', () => {
+    withEnv(undefined, undefined, () => {
+      expect(createCocAdapter()).not.toBeInstanceOf(ProxyCocAdapter);
+    });
   });
 });
