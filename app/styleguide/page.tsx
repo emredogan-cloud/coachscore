@@ -11,6 +11,11 @@ import {
   SectionDivider,
   TrustBar,
 } from '@/components/ui';
+import {
+  formatLocalizedPrice,
+  PRICE_POINT_CENTS,
+  SUPPORTED_CURRENCIES,
+} from '@/lib/pricing';
 
 /**
  * Internal design-system styleguide (Phase 2) — renders every premium primitive
@@ -95,6 +100,49 @@ export default function StyleguidePage() {
           <p className="mt-1 text-sm text-[var(--muted)]">
             Gold border + glow.
           </p>
+        </PremiumCard>
+      </div>
+
+      <SectionDivider>
+        Pricing experiment &amp; regional · Phase 7
+      </SectionDivider>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <PremiumCard className="p-5">
+          <h3 className="font-bold text-white">Premium Report price points</h3>
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            <code className="text-brand-gold-light">report_price_point</code>{' '}
+            experiment (draft) — sticky per visitor.
+          </p>
+          <ul className="mt-3 space-y-1.5 text-sm text-[var(--fg)]/90">
+            {Object.entries(PRICE_POINT_CENTS).map(([variant, cents]) => (
+              <li key={variant} className="flex justify-between gap-4">
+                <span className="text-[var(--muted)]">
+                  {variant === 'control' ? 'control (catalog)' : variant}
+                </span>
+                <span className="font-bold text-gold-gradient">
+                  ${cents / 100}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </PremiumCard>
+        <PremiumCard className="p-5">
+          <h3 className="font-bold text-white">Regional pricing</h3>
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            GeoIP currency localization — Premium Report, USD fallback.
+          </p>
+          <ul className="mt-3 space-y-1.5 text-sm text-[var(--fg)]/90">
+            {SUPPORTED_CURRENCIES.map((currency) => (
+              <li key={currency} className="flex justify-between gap-4">
+                <span className="uppercase text-[var(--muted)]">
+                  {currency}
+                </span>
+                <span className="font-bold text-white">
+                  {formatLocalizedPrice('basic', currency)}
+                </span>
+              </li>
+            ))}
+          </ul>
         </PremiumCard>
       </div>
 
