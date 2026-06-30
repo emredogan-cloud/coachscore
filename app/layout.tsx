@@ -4,7 +4,7 @@ import { Copilot } from '@/components/copilot/copilot';
 import { ConsentBanner } from '@/components/growth/consent-banner';
 import { RegisterServiceWorker } from '@/components/pwa/register-sw';
 import { JsonLdScript } from '@/components/seo/json-ld';
-import { SiteFooter, SiteNav } from '@/components/ui';
+import { BackButton, SiteFooter, SiteNav } from '@/components/ui';
 import {
   organizationJsonLd,
   orgLogoUrl,
@@ -71,7 +71,10 @@ export default function RootLayout({
       <body className="flex min-h-screen flex-col">
         <JsonLdScript data={siteJsonLd} />
         <SiteNav />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1">
+          <BackButton />
+          {children}
+        </main>
         <footer className="border-t border-white/8">
           <SiteFooter />
         </footer>

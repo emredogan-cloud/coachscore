@@ -9,6 +9,7 @@ export { EmptyState } from './empty-state';
 export { CountUp } from './count-up';
 // Phase 2 — design-system primitives unified to /interface/new.
 export { BrandMark } from './brand-mark';
+export { BackButton, parentPath } from './back-button';
 export { SiteNav, type NavLink } from './site-nav';
 export { SiteFooter } from './site-footer';
 export { Breadcrumbs, type Crumb } from './breadcrumbs';
