@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
-import { HeroBanner } from '@/components/ui';
+import { EyebrowPill, HeroBanner } from '@/components/ui';
 import { WarPlanner } from '@/components/war/war-planner';
 import { buildMetadata } from '@/lib/seo';
 
@@ -27,7 +27,13 @@ export default function WarPage() {
           crest
           headline="Are you war-ready?"
           tagline="Army recommendations + attack upgrade priorities"
-        />
+        >
+          <div className="relative mt-4 flex justify-center">
+            <EyebrowPill tone="violet">
+              Meta armies · Attack priorities · War ETA
+            </EyebrowPill>
+          </div>
+        </HeroBanner>
       </div>
       <p className="mt-5 text-center text-[15px] text-[var(--muted)]">
         Players don&apos;t pay for scores — they pay to know{' '}
