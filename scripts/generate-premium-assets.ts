@@ -112,6 +112,58 @@ const ASSETS: readonly AssetSpec[] = [
     maxEdge: 800,
     usage: 'Hero / section backdrop (low-opacity layer).',
   },
+
+  // ── Phase 1 · branding identity (original, IP-safe — no Supercell likeness) ──
+  {
+    name: 'brand-shield-star',
+    prompt:
+      'A premium emblem: a heraldic shield with a luminous gold (#e8b339) metallic border and a deep violet (#a855f7) gradient field, a single bold gold four-point star/spark centered, subtle inner glow, crisp symmetrical vector-like form, original fantasy-strategy brand mark. Centered, transparent background. No text, no letters, no characters, no existing-game elements.',
+    size: '1024x1024',
+    transparent: true,
+    quality: 'high',
+    maxEdge: 512,
+    usage: 'Favicon/logo CONCEPT A (reproduced as crisp SVG for production).',
+  },
+  {
+    name: 'brand-shield-crown',
+    prompt:
+      'A premium emblem: a heraldic shield with a luminous gold (#e8b339) metallic border and a deep violet (#a855f7) gradient field, a small ornate gold crown centered, subtle inner glow, crisp symmetrical vector-like form, original fantasy-strategy brand mark. Centered, transparent background. No text, no letters, no characters, no existing-game elements.',
+    size: '1024x1024',
+    transparent: true,
+    quality: 'high',
+    maxEdge: 512,
+    usage: 'Favicon/logo CONCEPT B (reproduced as crisp SVG for production).',
+  },
+  {
+    name: 'brand-shield-chevron',
+    prompt:
+      'A premium emblem: a heraldic shield with a luminous gold (#e8b339) metallic border and a deep violet (#a855f7) gradient field, two stacked bold gold upward chevrons (rank/ascent motif) centered, subtle inner glow, crisp symmetrical vector-like form, original fantasy-strategy brand mark. Centered, transparent background. No text, no letters, no characters, no existing-game elements.',
+    size: '1024x1024',
+    transparent: true,
+    quality: 'high',
+    maxEdge: 512,
+    usage: 'Favicon/logo CONCEPT C (reproduced as crisp SVG for production).',
+  },
+  {
+    name: 'mascot-tactician',
+    prompt:
+      'A premium original mascot bust: a noble armored strategist — a sleek fantasy helmet with calm glowing violet (#a855f7) eyes, polished gold (#e8b339) and dark-violet armor, set within a subtle gold-bordered shield silhouette, soft volumetric rim glow, intelligent and trustworthy expression, painted game-quality 3D render style. Original character, NOT from any existing game. Centered, transparent background. No text, no logos, no real-world brands.',
+    size: '1024x1024',
+    transparent: true,
+    quality: 'high',
+    maxEdge: 640,
+    usage: 'CoachScore Copilot mascot (header + avatar) and brand character.',
+  },
+  {
+    name: 'copilot-fab',
+    prompt:
+      'A small premium app launcher emblem: a gold (#e8b339) bordered heraldic shield with a deep violet (#a855f7) field containing a simple glowing rounded chat-bubble glyph, soft outer glow, crisp and recognizable at small sizes, original fantasy-strategy style. Centered, transparent background. No text, no letters, no characters, no existing-game elements.',
+    size: '1024x1024',
+    transparent: true,
+    quality: 'medium',
+    maxEdge: 256,
+    usage: 'Floating Copilot launcher button (FAB) emblem.',
+  },
 ];
 
 function readKey(): string {

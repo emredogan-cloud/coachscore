@@ -45,7 +45,9 @@ export interface MetaInput {
 
 export function buildMetadata(input: MetaInput): Metadata {
   const url = canonicalUrl(input.path);
-  const image = canonicalUrl(input.ogImagePath ?? '/api/share/og');
+  // Default to the branded static OG card (Phase 1). Pages that want a
+  // score-specific card (report sharing) pass ogImagePath → /api/share/og?…
+  const image = canonicalUrl(input.ogImagePath ?? '/og-image.png');
   return {
     title: input.title,
     description: input.description,

@@ -23,6 +23,16 @@ export const metadata: Metadata = {
     'goal-aware upgrade roadmap. AI-drafted, built from your real in-game data.',
   applicationName: 'CoachScore',
   robots: { index: true, follow: true },
+  // Premium shield brand mark (Phase 1) — SVG favicon (sharp at any size) +
+  // PNG apple-touch-icon (iOS doesn't render SVG touch icons).
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192-maskable.png', sizes: '192x192', type: 'image/png' },
+    ],
+    shortcut: '/icon.svg',
+    apple: '/apple-icon.png',
+  },
 };
 
 export const viewport: Viewport = {
