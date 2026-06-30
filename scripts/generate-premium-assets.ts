@@ -164,6 +164,39 @@ const ASSETS: readonly AssetSpec[] = [
     maxEdge: 256,
     usage: 'Floating Copilot launcher button (FAB) emblem.',
   },
+
+  // ── Phase 4 · supplementary decorative scene art (original, IP-safe) ──
+  {
+    name: 'art-altar-shield',
+    prompt:
+      'A premium fantasy emblem illustration: a glowing crystalline shield with a deep violet (#a855f7) gem core and luminous gold (#e8b339) trim, floating above a dark stone altar/pedestal with rising violet magical energy and faint gold embers, soft volumetric glow, cinematic, original fantasy-strategy art (NOT from any existing game). Centered on a transparent background. No text, no characters, no buildings, no logos.',
+    size: '1024x1024',
+    transparent: true,
+    quality: 'high',
+    maxEdge: 640,
+    usage: 'Trust / "why you can trust the grade" section illustration.',
+  },
+  {
+    name: 'art-treasure',
+    prompt:
+      'A premium fantasy treasure chest, open and overflowing with gold (#e8b339) coins and a few glowing violet (#a855f7) gems, warm inner glow, ornate gold-and-dark-wood chest, original fantasy art (NOT from any existing game), painted game-quality render. Centered on a transparent background. No text, no characters, no buildings, no logos.',
+    size: '1024x1024',
+    transparent: true,
+    quality: 'high',
+    maxEdge: 560,
+    usage: 'CTA-banner reward illustration (report / pricing / guides).',
+  },
+  {
+    name: 'shield-rescue',
+    prompt:
+      'A premium emblem: a heraldic shield with a luminous gold (#e8b339) metallic border and a deep violet (#a855f7) gradient field, a stylized gold life-ring / recovery rune centered, subtle inner glow, crisp symmetrical vector-like form, original fantasy-strategy brand mark. Centered, transparent background. No text, no letters, no characters, no existing-game elements.',
+    size: '1024x1024',
+    transparent: true,
+    quality: 'medium',
+    maxEdge: 320,
+    usage:
+      'Account Rescue pricing tier emblem (pairs with star/crown shields).',
+  },
 ];
 
 function readKey(): string {

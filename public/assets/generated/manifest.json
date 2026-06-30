@@ -75,5 +75,26 @@
     "transparent": true,
     "usage": "Floating Copilot launcher button (FAB) emblem.",
     "prompt": "A small premium app launcher emblem: a gold (#e8b339) bordered heraldic shield with a deep violet (#a855f7) field containing a simple glowing rounded chat-bubble glyph, soft outer glow, crisp and recognizable at small sizes, original fantasy-strategy style. Centered, transparent background. No text, no letters, no characters, no existing-game elements."
+  },
+  {
+    "name": "art-altar-shield",
+    "file": "public/assets/generated/art-altar-shield.webp",
+    "transparent": true,
+    "usage": "Trust / \"why you can trust the grade\" section illustration.",
+    "prompt": "A premium fantasy emblem illustration: a glowing crystalline shield with a deep violet (#a855f7) gem core and luminous gold (#e8b339) trim, floating above a dark stone altar/pedestal with rising violet magical energy and faint gold embers, soft volumetric glow, cinematic, original fantasy-strategy art (NOT from any existing game). Centered on a transparent background. No text, no characters, no buildings, no logos."
+  },
+  {
+    "name": "art-treasure",
+    "file": "public/assets/generated/art-treasure.webp",
+    "transparent": true,
+    "usage": "CTA-banner reward illustration (report / pricing / guides).",
+    "prompt": "A premium fantasy treasure chest, open and overflowing with gold (#e8b339) coins and a few glowing violet (#a855f7) gems, warm inner glow, ornate gold-and-dark-wood chest, original fantasy art (NOT from any existing game), painted game-quality render. Centered on a transparent background. No text, no characters, no buildings, no logos."
+  },
+  {
+    "name": "shield-rescue",
+    "file": "public/assets/generated/shield-rescue.webp",
+    "transparent": true,
+    "usage": "Account Rescue pricing tier emblem (pairs with star/crown shields).",
+    "prompt": "A premium emblem: a heraldic shield with a luminous gold (#e8b339) metallic border and a deep violet (#a855f7) gradient field, a stylized gold life-ring / recovery rune centered, subtle inner glow, crisp symmetrical vector-like form, original fantasy-strategy brand mark. Centered, transparent background. No text, no letters, no characters, no existing-game elements."
   }
 ]
