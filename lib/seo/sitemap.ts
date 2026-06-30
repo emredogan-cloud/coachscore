@@ -44,6 +44,7 @@ const STATIC_PATHS: readonly PathEntry[] = [
   { path: '/', changeFrequency: 'weekly', priority: 1 },
   { path: '/guides', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/methodology', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/war', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/pricing', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/sample-report', changeFrequency: 'monthly', priority: 0.6 },
