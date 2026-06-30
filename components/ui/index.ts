@@ -7,3 +7,13 @@ export { ScoreRing } from './score-ring';
 export { StatusBadge } from './status-badge';
 export { EmptyState } from './empty-state';
 export { CountUp } from './count-up';
+// Phase 2 — design-system primitives unified to /interface/new.
+export { BrandMark } from './brand-mark';
+export { SiteNav, type NavLink } from './site-nav';
+export { SiteFooter } from './site-footer';
+export { Breadcrumbs, type Crumb } from './breadcrumbs';
+export { SectionDivider } from './section-divider';
+export { EyebrowPill } from './eyebrow-pill';
+export { TrustBar, type TrustItem } from './trust-bar';
+export { GradeBadge } from './grade-badge';
+export { DimensionBar } from './dimension-bar';

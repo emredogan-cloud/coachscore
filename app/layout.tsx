@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Outfit } from 'next/font/google';
 import { Copilot } from '@/components/copilot/copilot';
 import { Disclaimer } from '@/components/disclaimer';
 import { ConsentBanner } from '@/components/growth/consent-banner';
@@ -12,6 +13,16 @@ import {
   websiteJsonLd,
 } from '@/lib/seo';
 import './globals.css';
+
+// Premium display + body face (Phase 2). Outfit — a confident geometric sans
+// that matches the bold headline feel of /interface/new. Exposed as
+// --font-display (consumed by tailwind `font-display` + the body in globals.css).
+const display = Outfit({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-display',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   // Absolute base for canonical/OG/Twitter URL resolution (fixes the localhost
@@ -56,7 +67,7 @@ export default function RootLayout({
   ];
 
   return (
-    <html lang="en">
+    <html lang="en" className={display.variable}>
       <body className="flex min-h-screen flex-col">
         <JsonLdScript data={siteJsonLd} />
         <main className="flex-1">{children}</main>
