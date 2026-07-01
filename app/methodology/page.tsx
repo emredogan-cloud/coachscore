@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
@@ -237,24 +238,41 @@ export default function MethodologyPage() {
         ]}
       />
 
-      <header className="mt-4">
-        <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-          How <span className="text-violet-gradient">CoachScore</span> grades an
-          account
-        </h1>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <EyebrowPill tone="violet">Engine v{ENGINE_VERSION}</EyebrowPill>
-          <EyebrowPill>Data {gameDataVersion()}</EyebrowPill>
-          <EyebrowPill tone="violet">
-            Updated {freshnessLabel(CONTENT_REVISION_DATE)}
-          </EyebrowPill>
+      <header className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+        <div className="min-w-0 sm:order-1">
+          <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            How <span className="text-violet-gradient">CoachScore</span> grades
+            an account
+          </h1>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <EyebrowPill tone="violet">Engine v{ENGINE_VERSION}</EyebrowPill>
+            <EyebrowPill>Data {gameDataVersion()}</EyebrowPill>
+            <EyebrowPill tone="violet">
+              Updated {freshnessLabel(CONTENT_REVISION_DATE)}
+            </EyebrowPill>
+          </div>
+          <p className="mt-4 text-[15px] leading-relaxed text-[var(--muted)] sm:text-base">
+            CoachScore turns a Clash of Clans account into a single grade and a
+            prioritized upgrade roadmap. The grade is produced by a transparent,
+            deterministic engine — the same inputs always produce the same score
+            — and the written roadmap is AI-drafted from your real in-game
+            numbers.
+          </p>
         </div>
-        <p className="mt-4 text-[15px] leading-relaxed text-[var(--muted)] sm:text-base">
-          CoachScore turns a Clash of Clans account into a single grade and a
-          prioritized upgrade roadmap. The grade is produced by a transparent,
-          deterministic engine — the same inputs always produce the same score —
-          and the written roadmap is AI-drafted from your real in-game numbers.
-        </p>
+        <div
+          className="relative order-first shrink-0 self-center sm:order-2"
+          aria-hidden
+        >
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(55%_55%_at_50%_50%,rgba(168,85,247,0.24),transparent_70%)]" />
+          <Image
+            src="/assets/generated/art-scroll-map.webp"
+            alt=""
+            width={220}
+            height={147}
+            priority
+            className="h-auto w-40 drop-shadow-[0_10px_34px_rgba(168,85,247,0.3)] sm:w-52"
+          />
+        </div>
       </header>
 
       <SectionDivider className="mt-12">

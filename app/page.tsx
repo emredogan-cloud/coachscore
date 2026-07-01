@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { GRADE_BANDS } from '@/lib/core/grade';
 import { ReturnVisitTracker, TrackOnMount } from '@/components/analytics/track';
@@ -360,6 +361,56 @@ export default function HomePage() {
           You get a grade (F–S), the 7-dimension breakdown behind it, and a
           prioritized upgrade roadmap tuned to your goal.
         </p>
+      </section>
+
+      {/* ── From rushed to war-ready (visual storytelling) ──────────────── */}
+      <section className="mt-12" aria-labelledby="climb-heading">
+        <h2 id="climb-heading" className="sr-only">
+          From rushed to war-ready
+        </h2>
+        <SectionDivider>From rushed to war-ready</SectionDivider>
+        <PremiumCard tone="violet" glowed className="mt-5 p-6">
+          <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-5">
+            <div className="relative shrink-0" aria-hidden>
+              <div className="absolute inset-0 -z-10 bg-[radial-gradient(55%_55%_at_50%_50%,rgba(124,58,237,0.2),transparent_70%)]" />
+              <Image
+                src="/assets/generated/art-village.webp"
+                alt=""
+                width={168}
+                height={168}
+                className="h-auto w-28 opacity-95 sm:w-32"
+              />
+            </div>
+            <svg
+              width="34"
+              height="34"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+              className="rotate-90 text-brand-gold sm:rotate-0"
+            >
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+            <div className="relative shrink-0" aria-hidden>
+              <div className="absolute inset-0 -z-10 bg-[radial-gradient(55%_55%_at_50%_50%,rgba(168,85,247,0.28),transparent_70%)]" />
+              <Image
+                src="/assets/generated/hero-fortress.webp"
+                alt=""
+                width={208}
+                height={208}
+                className="h-auto w-40 drop-shadow-[0_10px_34px_rgba(168,85,247,0.35)] sm:w-44"
+              />
+            </div>
+          </div>
+          <p className="mt-4 text-center text-sm text-[var(--fg)]/90">
+            CoachScore shows you exactly what to upgrade next — so a rushed base
+            becomes a maxed, war-ready stronghold, in the right order.
+          </p>
+        </PremiumCard>
       </section>
 
       {/* ── Grade scale ─────────────────────────────────────────────────── */}
