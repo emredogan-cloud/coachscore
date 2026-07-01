@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 220" preserveAspectRatio="xMidYMax slice" fill="none">
+  <!-- Original fantasy castle skyline silhouette (IP-safe, generic medieval).
+       Rendered near-black so it reads as a faint horizon behind content. -->
+  <defs>
+    <linearGradient id="cs-horizon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#120a26"/>
+      <stop offset="1" stop-color="#070510"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#cs-horizon)">
+    <!-- curtain wall baseline with merlons -->
+    <path d="M0 220 V150 h40 v-14 h24 v14 h40 v-14 h24 v14 h40 V150 h1208 V220 Z"/>
+    <!-- left tower -->
+    <path d="M120 220 V96 h14 v-14 h12 v14 h14 v-14 h12 v14 h14 V96 h4 L232 62 254 96 h4 V220 Z" transform="translate(-140 0)"/>
+    <!-- tower A -->
+    <path d="M250 220 V110 h12 v-12 h10 v12 h12 v-12 h10 v12 h12 V110 h2 L305 80 336 110 h2 V220 Z"/>
+    <!-- tower B (tall, central-left) -->
+    <path d="M470 220 V70 h14 v-16 h12 v16 h14 v-16 h12 v16 h14 V70 h4 L544 30 574 70 h4 V220 Z"/>
+    <!-- keep block (center) -->
+    <path d="M660 220 V120 h16 v-16 h14 v16 h16 v-16 h14 v16 h16 v-16 h14 v16 h16 V120 h6 L806 78 850 120 h6 V220 Z"/>
+    <!-- tower C -->
+    <path d="M980 220 V96 h12 v-14 h10 v14 h12 v-14 h10 v14 h12 V96 h2 L1032 64 1062 96 h2 V220 Z"/>
+    <!-- right tower (tall) -->
+    <path d="M1180 220 V84 h14 v-14 h12 v14 h14 v-14 h12 v14 h14 V84 h4 L1252 44 1282 84 h4 V220 Z"/>
+    <!-- far-right wall stub -->
+    <path d="M1360 220 V150 h40 v-14 h24 v14 h16 V220 Z"/>
+  </g>
+</svg>

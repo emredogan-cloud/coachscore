@@ -40,22 +40,24 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Fixed aurora backdrop — radial violet/gold glows over the near-black base. */
+/* Fixed aurora backdrop — radial violet/gold glows over the near-black base.
+   The subtle, very slow "breathe" makes the magic light feel alive without a
+   JS motion lib; disabled by the reduced-motion rule below. */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   pointer-events: none;
   background:
     radial-gradient(
       60% 40% at 50% -5%,
-      rgba(124, 58, 237, 0.28),
+      rgba(124, 58, 237, 0.3),
       transparent 70%
     ),
     radial-gradient(
       45% 35% at 100% 8%,
-      rgba(232, 179, 57, 0.1),
+      rgba(232, 179, 57, 0.11),
       transparent 70%
     ),
     radial-gradient(
@@ -64,6 +66,36 @@ body::before {
       transparent 70%
     ),
     var(--bg);
+  animation: atmosphere-breathe 26s ease-in-out infinite;
+}
+
+/* Depth layer — top fog, a faint fantasy castle-silhouette horizon, and an edge
+   vignette. Pure CSS + one tiny crisp SVG; sits above the aurora, behind all
+   content. Kept very dark so light text stays fully legible. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      120% 55% at 50% 0%,
+      rgba(168, 85, 247, 0.08),
+      transparent 60%
+    ),
+    radial-gradient(100% 100% at 50% 48%, transparent 58%, rgba(0, 0, 0, 0.5)),
+    url('/castle-horizon.svg') 50% 100% / 100% auto no-repeat;
+}
+
+@keyframes atmosphere-breathe {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 @layer utilities {

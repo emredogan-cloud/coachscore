@@ -96,5 +96,47 @@
     "transparent": true,
     "usage": "Account Rescue pricing tier emblem (pairs with star/crown shields).",
     "prompt": "A premium emblem: a heraldic shield with a luminous gold (#e8b339) metallic border and a deep violet (#a855f7) gradient field, a stylized gold life-ring / recovery rune centered, subtle inner glow, crisp symmetrical vector-like form, original fantasy-strategy brand mark. Centered, transparent background. No text, no letters, no characters, no existing-game elements."
+  },
+  {
+    "name": "hero-fortress",
+    "file": "public/assets/generated/hero-fortress.webp",
+    "transparent": true,
+    "usage": "Report + guides hero illustration (grand fortress).",
+    "prompt": "A premium isometric fantasy stronghold, an ORIGINAL generic medieval-fantasy castle keep with stone towers, battlements, small violet (#a855f7) and gold (#e8b339) heraldic banners, lit braziers, a central gold-trimmed shield crest, standing on a floating dark rock platform with grass, soft volumetric violet glow and warm ember light, cinematic painted 3D game-quality render. ORIGINAL design — not from any existing game, not Clash of Clans, no recognizable game logos or trademarked buildings. Centered on a fully transparent background. No text, no characters."
+  },
+  {
+    "name": "hero-strategy-board",
+    "file": "public/assets/generated/hero-strategy-board.webp",
+    "transparent": true,
+    "usage": "Guides hub hero illustration (strategy planning).",
+    "prompt": "A premium isometric magical strategy board: a dark stone tabletop with a glowing violet (#a855f7) rune grid / battle-plan diagram etched in light, surrounded by an ornate gold (#e8b339) shield, a lit torch, rolled scrolls, an open spellbook, and a small glowing potion, warm and arcane, cinematic painted 3D game-quality render, ORIGINAL fantasy-strategy art (not from any existing game, no Clash of Clans, no trademarked elements). Centered on a fully transparent background. No text, no characters."
+  },
+  {
+    "name": "art-spellbook",
+    "file": "public/assets/generated/art-spellbook.webp",
+    "transparent": true,
+    "usage": "Guide-card + methodology illustration (knowledge / strategy).",
+    "prompt": "A premium ornate fantasy spellbook / tome, dark leather and gold (#e8b339) trim, standing open or angled with a glowing violet (#a855f7) gem on the cover and faint magical glow from the pages, painted game-quality 3D render, ORIGINAL design (not from any existing game). Centered on a fully transparent background. No text, no characters, no logos."
+  },
+  {
+    "name": "art-crystal-shield",
+    "file": "public/assets/generated/art-crystal-shield.webp",
+    "transparent": true,
+    "usage": "Achievement / rank / guide-card emblem.",
+    "prompt": "A premium floating crystalline heraldic shield trophy, translucent violet (#a855f7) crystal body with luminous gold (#e8b339) metal trim and a small crown or star motif, radiant inner glow and soft sparkles, painted game-quality 3D render, ORIGINAL fantasy design (not from any existing game). Centered on a fully transparent background. No text, no characters, no logos."
+  },
+  {
+    "name": "art-village",
+    "file": "public/assets/generated/art-village.webp",
+    "transparent": true,
+    "usage": "Guides \"before\"/recovery storytelling (pairs with hero-fortress).",
+    "prompt": "A small humble ORIGINAL medieval-fantasy hamlet: a few modest stone-and-timber cottages with a tiny watchtower on a floating dark rock platform with grass, faint violet (#a855f7) dusk glow, painted game-quality 3D isometric render, ORIGINAL design (not from any existing game, no Clash of Clans, no trademarked buildings). Centered on a fully transparent background. No text, no characters, no logos."
+  },
+  {
+    "name": "art-scroll-map",
+    "file": "public/assets/generated/art-scroll-map.webp",
+    "transparent": true,
+    "usage": "Roadmap / methodology \"the plan\" illustration.",
+    "prompt": "A premium unfurled fantasy map on aged parchment, subtle drawn paths, a small compass rose, wax seal and gold (#e8b339) trim, faint violet (#a855f7) magical glow at the edges, painted game-quality 3D render, ORIGINAL design (not from any existing game). Centered on a fully transparent background. No readable text, no characters, no logos."
   }
 ]
