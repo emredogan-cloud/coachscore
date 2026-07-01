@@ -1,4 +1,5 @@
 export { GlassPanel } from './glass-panel';
+export { Spinner } from './spinner';
 export { PremiumCard } from './premium-card';
 export { MagicButton } from './magic-button';
 export { HeroBanner } from './hero-banner';

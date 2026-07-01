@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { requestCheckout } from '@/app/report/actions';
 import { track } from '@/components/analytics/track';
 import type { SkuId } from '@/lib/pricing';
-import { MagicButton } from '@/components/ui';
+import { MagicButton, Spinner } from '@/components/ui';
 
 type Status = 'idle' | 'loading' | 'not_activated' | 'error';
 
@@ -37,7 +37,13 @@ export function BuyButton({ sku, label }: { sku: SkuId; label: string }) {
         onClick={() => void buy()}
         disabled={status === 'loading'}
       >
-        {status === 'loading' ? 'Starting…' : label}
+        {status === 'loading' ? (
+          <>
+            <Spinner size={18} /> Starting…
+          </>
+        ) : (
+          label
+        )}
       </MagicButton>
       {status === 'not_activated' ? (
         <p className="mt-2 text-xs text-amber-300/90">
