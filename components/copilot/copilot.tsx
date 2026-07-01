@@ -25,6 +25,15 @@ const GREETING: Msg = {
 };
 
 const MASCOT = '/assets/generated/mascot-tactician.webp';
+const EMPTY_ART = '/assets/generated/art-altar-shield.webp';
+
+// Conversation starters shown at the greeting — grounded in what the Copilot
+// actually answers (scoring, upgrades, rush), so first-time users get a nudge.
+const SUGGESTIONS: readonly string[] = [
+  'How does CoachScore scoring work?',
+  'What should I upgrade first?',
+  'Is my base rushed?',
+];
 
 // Feature 4 · P2: short conversation memory persisted across reloads. Bounded so
 // it never grows without limit; "Clear" is the explicit forget control.
@@ -104,7 +113,11 @@ export function Copilot() {
   }, [messages, open]);
 
   async function send() {
-    const text = input.trim();
+    await sendText(input);
+  }
+
+  async function sendText(raw: string) {
+    const text = raw.trim();
     if (text === '' || busy) return;
     const userMsg: Msg = { role: 'user', content: text, ts: Date.now() };
     // Anthropic requires the first turn to be a user turn — drop any leading
@@ -312,6 +325,32 @@ export function Copilot() {
                 </div>
               ),
             )}
+            {messages.length === 1 && !busy ? (
+              <div className="pt-1">
+                <div className="relative mb-3 flex justify-center" aria-hidden>
+                  <div className="absolute inset-0 bg-[radial-gradient(50%_50%_at_50%_50%,rgba(168,85,247,0.16),transparent_70%)]" />
+                  <Image
+                    src={EMPTY_ART}
+                    alt=""
+                    width={120}
+                    height={120}
+                    className="h-auto w-24 opacity-40"
+                  />
+                </div>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {SUGGESTIONS.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => void sendText(s)}
+                      className="rounded-full border border-brand-violet/30 bg-brand-violet/10 px-3 py-1.5 text-xs font-medium text-brand-violet-light transition hover:border-brand-violet/60 hover:text-white"
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             {note ? <p className="text-xs text-amber-300/90">{note}</p> : null}
             <div ref={endRef} />
           </div>
@@ -349,6 +388,21 @@ export function Copilot() {
               </svg>
             </button>
           </div>
+          <p className="flex items-center justify-center gap-1.5 px-3 pb-2.5 text-[10px] text-[var(--muted)]">
+            <svg
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden
+            >
+              <rect x="4" y="11" width="16" height="9" rx="2" />
+              <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+            </svg>
+            Private &amp; secure · we never store your login or personal data.
+          </p>
         </div>
       ) : null}
     </>
