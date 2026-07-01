@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import {
@@ -85,18 +86,31 @@ function guideTags(guide: SeoGuide): string[] {
 }
 
 /**
- * Abstract, IP-safe card emblem — a pure-CSS gradient glyph (NO Clash building
- * or troop art). The glyph differs by guide kind so cards read distinctly.
+ * Card emblem — an original, IP-safe fantasy illustration per guide kind (from
+ * the W1 art library; NO Clash building/troop art). Gives each card real
+ * artwork density instead of a flat glyph: crystal shield for rush checks,
+ * spellbook for equipment, fortress for upgrade orders.
  */
+const EMBLEM_ART: Record<SeoGuide['kind'], string> = {
+  rush_check: '/assets/generated/art-crystal-shield.webp',
+  equipment_priority: '/assets/generated/art-spellbook.webp',
+  upgrade_order: '/assets/generated/hero-fortress.webp',
+};
+
 function CardEmblem({ kind }: { kind: SeoGuide['kind'] }) {
-  const glyph =
-    kind === 'rush_check' ? '◆' : kind === 'equipment_priority' ? '✦' : '▲';
   return (
     <span
       aria-hidden
-      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/8 bg-violet-gradient text-lg text-white shadow-glow-violet-sm"
+      className="relative flex h-14 w-14 shrink-0 items-center justify-center"
     >
-      {glyph}
+      <span className="absolute inset-0 rounded-xl bg-[radial-gradient(60%_60%_at_50%_45%,rgba(168,85,247,0.3),transparent_70%)]" />
+      <Image
+        src={EMBLEM_ART[kind]}
+        alt=""
+        width={56}
+        height={56}
+        className="h-12 w-12 object-contain drop-shadow-[0_4px_14px_rgba(168,85,247,0.4)]"
+      />
     </span>
   );
 }
@@ -224,16 +238,29 @@ export default async function GuidesPage({
         ]}
       />
 
-      <header className="mt-4">
-        <EyebrowPill>TH11 · TH18 · Rush checker</EyebrowPill>
-        <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
-          Upgrade Smarter,{' '}
-          <span className="text-violet-gradient">Dominate Faster</span>
-        </h1>
-        <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--muted)]">
-          Goal-aware upgrade orders, hero-equipment priorities, and a free rush
-          checker — then get your account scored in under a minute.
-        </p>
+      <header className="mt-4 flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+        <div className="sm:order-1">
+          <EyebrowPill>TH11 · TH18 · Rush checker</EyebrowPill>
+          <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
+            Upgrade Smarter,{' '}
+            <span className="text-violet-gradient">Dominate Faster</span>
+          </h1>
+          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--muted)]">
+            Goal-aware upgrade orders, hero-equipment priorities, and a free
+            rush checker — then get your account scored in under a minute.
+          </p>
+        </div>
+        <div className="relative order-first shrink-0 sm:order-2" aria-hidden>
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(55%_55%_at_50%_50%,rgba(168,85,247,0.28),transparent_70%)]" />
+          <Image
+            src="/assets/generated/hero-strategy-board.webp"
+            alt=""
+            width={224}
+            height={224}
+            priority
+            className="h-auto w-40 drop-shadow-[0_12px_40px_rgba(168,85,247,0.35)] sm:w-52"
+          />
+        </div>
       </header>
 
       {/* Native GET search — works without JS and is the SearchAction target. */}
@@ -362,6 +389,16 @@ export default async function GuidesPage({
 
       {/* CTA banner */}
       <PremiumCard tone="gold" glowed className="mt-12 p-6 text-center">
+        <div className="relative mx-auto mb-3 flex justify-center" aria-hidden>
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(55%_55%_at_50%_50%,rgba(232,179,57,0.26),transparent_70%)]" />
+          <Image
+            src="/assets/generated/art-treasure.webp"
+            alt=""
+            width={112}
+            height={112}
+            className="h-auto w-24 drop-shadow-[0_8px_26px_rgba(232,179,57,0.4)]"
+          />
+        </div>
         <p className="text-lg font-semibold text-white">
           Ready to see where you stand?
         </p>
