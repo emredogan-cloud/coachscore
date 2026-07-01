@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
+import Image from 'next/image';
 import type { SubScores } from '@/lib/core';
 import type { RenderableReport } from '@/lib/report';
 import { benchmarkVsMaxed } from '@/lib/benchmark';
+import { dimensionIcon } from './dimension-icons';
 import {
   DimensionBar,
   GradeBadge,
@@ -39,19 +40,6 @@ function humanize(id: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-// Abstract, IP-safe glyph (no game art) for the dimension rows.
-const shieldGlyph: ReactNode = (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    aria-hidden
-  >
-    <path d="M12 2l8 3v6c0 5-3.5 8-8 11-4.5-3-8-6-8-11V5l8-3z" />
-  </svg>
-);
-
 export function ReportView({ report }: { report: RenderableReport }) {
   // HR-4 — objective "you vs a maxed base" benchmark (reuses the tested lib).
   const subScoreMap = Object.fromEntries(
@@ -64,6 +52,19 @@ export function ReportView({ report }: { report: RenderableReport }) {
       <h2 id="report-heading" className="sr-only">
         CoachScore Report
       </h2>
+
+      {/* Fortress hero — premium "reward" crest above the score. */}
+      <div className="relative -mb-1 flex justify-center" aria-hidden>
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(50%_50%_at_50%_45%,rgba(168,85,247,0.25),transparent_70%)]" />
+        <Image
+          src="/assets/generated/hero-fortress.webp"
+          alt=""
+          width={188}
+          height={188}
+          priority
+          className="h-auto w-40 drop-shadow-[0_10px_36px_rgba(168,85,247,0.35)] sm:w-44"
+        />
+      </div>
 
       {/* Score header */}
       <PremiumCard tone="gold" glowed className="animate-score-reveal p-6">
@@ -125,7 +126,7 @@ export function ReportView({ report }: { report: RenderableReport }) {
                 <DimensionBar
                   label={s.label}
                   percent={pct}
-                  icon={shieldGlyph}
+                  icon={dimensionIcon(s.label)}
                 />
               </li>
             );
