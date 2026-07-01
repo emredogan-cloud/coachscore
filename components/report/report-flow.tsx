@@ -9,7 +9,7 @@ import { track } from '@/components/analytics/track';
 import { ManualEntryForm } from '@/components/intake/manual-entry-form';
 import { ScoreHistory } from '@/components/report/score-history';
 import { ShareButtons } from '@/components/share/share-buttons';
-import { MagicButton, SectionDivider } from '@/components/ui';
+import { MagicButton, SectionDivider, Spinner } from '@/components/ui';
 import { ReportView } from './report-view';
 import { TeaserView } from './teaser-view';
 
@@ -339,7 +339,13 @@ export function ReportFlow() {
         disabled={submitting}
         className={primaryBtn}
       >
-        {submitting ? 'Analyzing…' : 'Analyze My Account'}
+        {submitting ? (
+          <>
+            <Spinner size={18} /> Analyzing…
+          </>
+        ) : (
+          'Analyze My Account'
+        )}
       </button>
 
       <p className="text-center text-xs text-[var(--muted)]">
