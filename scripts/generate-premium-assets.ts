@@ -197,6 +197,70 @@ const ASSETS: readonly AssetSpec[] = [
     usage:
       'Account Rescue pricing tier emblem (pairs with star/crown shields).',
   },
+
+  // ── Visual Immersion sprint · original fantasy hero/scene art (IP-safe) ──
+  // Generic medieval-fantasy — original designs, NOT Clash of Clans. No real
+  // game buildings/characters/logos/trade dress. Painted game-quality renders.
+  {
+    name: 'hero-fortress',
+    prompt:
+      'A premium isometric fantasy stronghold, an ORIGINAL generic medieval-fantasy castle keep with stone towers, battlements, small violet (#a855f7) and gold (#e8b339) heraldic banners, lit braziers, a central gold-trimmed shield crest, standing on a floating dark rock platform with grass, soft volumetric violet glow and warm ember light, cinematic painted 3D game-quality render. ORIGINAL design — not from any existing game, not Clash of Clans, no recognizable game logos or trademarked buildings. Centered on a fully transparent background. No text, no characters.',
+    size: '1024x1024',
+    transparent: true,
+    quality: 'high',
+    maxEdge: 900,
+    usage: 'Report + guides hero illustration (grand fortress).',
+  },
+  {
+    name: 'hero-strategy-board',
+    prompt:
+      'A premium isometric magical strategy board: a dark stone tabletop with a glowing violet (#a855f7) rune grid / battle-plan diagram etched in light, surrounded by an ornate gold (#e8b339) shield, a lit torch, rolled scrolls, an open spellbook, and a small glowing potion, warm and arcane, cinematic painted 3D game-quality render, ORIGINAL fantasy-strategy art (not from any existing game, no Clash of Clans, no trademarked elements). Centered on a fully transparent background. No text, no characters.',
+    size: '1024x1024',
+    transparent: true,
+    quality: 'high',
+    maxEdge: 860,
+    usage: 'Guides hub hero illustration (strategy planning).',
+  },
+  {
+    name: 'art-spellbook',
+    prompt:
+      'A premium ornate fantasy spellbook / tome, dark leather and gold (#e8b339) trim, standing open or angled with a glowing violet (#a855f7) gem on the cover and faint magical glow from the pages, painted game-quality 3D render, ORIGINAL design (not from any existing game). Centered on a fully transparent background. No text, no characters, no logos.',
+    size: '1024x1024',
+    transparent: true,
+    quality: 'high',
+    maxEdge: 520,
+    usage: 'Guide-card + methodology illustration (knowledge / strategy).',
+  },
+  {
+    name: 'art-crystal-shield',
+    prompt:
+      'A premium floating crystalline heraldic shield trophy, translucent violet (#a855f7) crystal body with luminous gold (#e8b339) metal trim and a small crown or star motif, radiant inner glow and soft sparkles, painted game-quality 3D render, ORIGINAL fantasy design (not from any existing game). Centered on a fully transparent background. No text, no characters, no logos.',
+    size: '1024x1024',
+    transparent: true,
+    quality: 'high',
+    maxEdge: 480,
+    usage: 'Achievement / rank / guide-card emblem.',
+  },
+  {
+    name: 'art-village',
+    prompt:
+      'A small humble ORIGINAL medieval-fantasy hamlet: a few modest stone-and-timber cottages with a tiny watchtower on a floating dark rock platform with grass, faint violet (#a855f7) dusk glow, painted game-quality 3D isometric render, ORIGINAL design (not from any existing game, no Clash of Clans, no trademarked buildings). Centered on a fully transparent background. No text, no characters, no logos.',
+    size: '1024x1024',
+    transparent: true,
+    quality: 'medium',
+    maxEdge: 520,
+    usage: 'Guides "before"/recovery storytelling (pairs with hero-fortress).',
+  },
+  {
+    name: 'art-scroll-map',
+    prompt:
+      'A premium unfurled fantasy map on aged parchment, subtle drawn paths, a small compass rose, wax seal and gold (#e8b339) trim, faint violet (#a855f7) magical glow at the edges, painted game-quality 3D render, ORIGINAL design (not from any existing game). Centered on a fully transparent background. No readable text, no characters, no logos.',
+    size: '1536x1024',
+    transparent: true,
+    quality: 'medium',
+    maxEdge: 640,
+    usage: 'Roadmap / methodology "the plan" illustration.',
+  },
 ];
 
 function readKey(): string {
