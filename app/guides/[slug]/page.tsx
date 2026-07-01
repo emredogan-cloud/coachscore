@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ScoreBreakdown } from '@/components/score-breakdown';
@@ -170,23 +171,45 @@ export default async function GuidePage({
         ]}
       />
 
-      <header className="mt-4">
-        <div className="flex flex-wrap gap-2">
-          {guideEyebrows(guide).map((e) => (
-            <EyebrowPill key={e.label} tone={e.tone}>
-              {e.label}
-            </EyebrowPill>
-          ))}
+      <header className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+        <div className="min-w-0 sm:order-1">
+          <div className="flex flex-wrap gap-2">
+            {guideEyebrows(guide).map((e) => (
+              <EyebrowPill key={e.label} tone={e.tone}>
+                {e.label}
+              </EyebrowPill>
+            ))}
+          </div>
+          <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
+            {guide.h1}
+          </h1>
+          <p className="mt-2 text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
+            Updated {freshnessLabel(updated)} · data {gameDataVersion()}
+          </p>
+          <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">
+            {guide.intro}
+          </p>
         </div>
-        <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
-          {guide.h1}
-        </h1>
-        <p className="mt-2 text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
-          Updated {freshnessLabel(updated)} · data {gameDataVersion()}
-        </p>
-        <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">
-          {guide.intro}
-        </p>
+        <div
+          className="relative order-first shrink-0 self-center sm:order-2 sm:self-start"
+          aria-hidden
+        >
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(55%_55%_at_50%_45%,rgba(168,85,247,0.26),transparent_70%)]" />
+          <Image
+            src={
+              guide.kind === 'rush_check'
+                ? '/assets/generated/art-crystal-shield.webp'
+                : guide.kind === 'equipment_priority'
+                  ? '/assets/generated/art-spellbook.webp'
+                  : '/assets/generated/hero-fortress.webp'
+            }
+            alt=""
+            width={168}
+            height={168}
+            priority
+            className="h-auto w-32 drop-shadow-[0_10px_34px_rgba(168,85,247,0.32)] sm:w-40"
+          />
+        </div>
       </header>
 
       {guide.dataPoints.length > 0 ? (
