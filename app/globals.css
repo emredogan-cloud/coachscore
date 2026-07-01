@@ -85,7 +85,12 @@ body::after {
       transparent 60%
     ),
     radial-gradient(100% 100% at 50% 48%, transparent 58%, rgba(0, 0, 0, 0.5)),
-    url('/castle-horizon.svg') 50% 100% / 100% auto no-repeat;
+    url('/castle-horizon.svg') 50% 100% / 100% auto no-repeat,
+    radial-gradient(
+      130% 24% at 50% 100%,
+      rgba(168, 85, 247, 0.17),
+      transparent 62%
+    );
 }
 
 @keyframes atmosphere-breathe {
