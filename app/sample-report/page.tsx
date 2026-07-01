@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { dimensionIcon } from '@/components/report/dimension-icons';
 import { Disclaimer } from '@/components/disclaimer';
 import { JsonLdScript } from '@/components/seo/json-ld';
 import { ShareButtons } from '@/components/share/share-buttons';
@@ -95,16 +97,29 @@ export default function SampleReportPage() {
         items={[{ label: 'Home', href: '/' }, { label: 'Sample report' }]}
       />
 
-      <div className="mt-4">
+      {/* Fortress hero crest */}
+      <div className="relative mt-4 flex justify-center" aria-hidden>
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(50%_50%_at_50%_45%,rgba(168,85,247,0.22),transparent_70%)]" />
+        <Image
+          src="/assets/generated/hero-fortress.webp"
+          alt=""
+          width={168}
+          height={168}
+          priority
+          className="h-auto w-36 drop-shadow-[0_10px_34px_rgba(168,85,247,0.32)]"
+        />
+      </div>
+
+      <div className="mt-4 flex justify-center">
         <EyebrowPill tone="violet">
           Illustrative example — not a real account
         </EyebrowPill>
       </div>
 
-      <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white">
+      <h1 className="mt-3 text-center text-3xl font-extrabold tracking-tight text-white">
         A sample <span className="text-violet-gradient">CoachScore</span> report
       </h1>
-      <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">
+      <p className="mt-3 text-center text-[15px] leading-relaxed text-[var(--muted)]">
         This is what a finished report looks like: a single grade, the dimension
         breakdown behind it, and a prioritized roadmap. The numbers below are
         made up to show the format.
@@ -166,7 +181,7 @@ export default function SampleReportPage() {
                 key={d.label}
                 label={d.label}
                 percent={d.pct}
-                icon={shieldGlyph}
+                icon={dimensionIcon(d.label)}
               />
             ))}
           </div>
@@ -197,6 +212,16 @@ export default function SampleReportPage() {
 
       {/* CTA banner */}
       <PremiumCard tone="gold" glowed className="mt-9 p-6 text-center">
+        <div className="relative mx-auto mb-3 flex justify-center" aria-hidden>
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(55%_55%_at_50%_50%,rgba(232,179,57,0.28),transparent_70%)]" />
+          <Image
+            src="/assets/generated/art-treasure.webp"
+            alt=""
+            width={116}
+            height={116}
+            className="h-auto w-24 drop-shadow-[0_8px_26px_rgba(232,179,57,0.4)]"
+          />
+        </div>
         <p className="text-lg font-bold text-white">
           Get your real grade — free
         </p>
